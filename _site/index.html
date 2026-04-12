@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>股权报告提取结果</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    .header { background: #2c3e50; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .header h1 { font-size: 18px; font-weight: 600; }
+    .header .actions { display: flex; gap: 8px; align-items: center; font-size: 12px; opacity: 0.7; }
+    .toolbar { background: #fff; padding: 12px 24px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-bottom: 1px solid #e1e4e8; }
+    .toolbar input[type="text"] { padding: 6px 10px; border: 1px solid #d1d5da; border-radius: 4px; font-size: 14px; width: 200px; }
+    .toolbar select { padding: 6px 10px; border: 1px solid #d1d5da; border-radius: 4px; font-size: 14px; }
+    .toolbar button { padding: 6px 14px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; background: #3498db; color: #fff; }
+    .toolbar button:hover { background: #2980b9; }
+    .stats { background: #ecf0f1; padding: 8px 24px; font-size: 13px; color: #555; border-bottom: 1px solid #e1e4e8; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px; min-width: 900px; }
+    th { background: #f8f9fa; padding: 10px 10px; text-align: left; font-weight: 600; border-bottom: 2px solid #dee2e6; position: sticky; top: 0; z-index: 10; white-space: nowrap; }
+    td { padding: 8px 10px; border-bottom: 1px solid #f1f1f1; vertical-align: middle; max-width: 200px; }
+    tr:hover td { background: #f8f9ff; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+    .tag-stage-预告期 { background: #e8f5e9; color: #2e7d32; }
+    .tag-stage-定价期 { background: #fff8e1; color: #f57f17; }
+    .tag-stage-成交期 { background: #e3f2fd; color: #1565c0; }
+    .tag-stage-定增 { background: #fce4ec; color: #c62828; }
+    .tag-stage-未知阶段 { background: #f5f5f5; color: #999; }
+    .tag-doc-询价转让 { background: #e8eaf6; color: #3949ab; }
+    .tag-doc-定增 { background: #fbe9e7; color: #d84315; }
+    .tag-doc-公告 { background: #f5f5f5; color: #666; }
+    .cell-stock { font-weight: 500; color: #2c3e50; white-space: nowrap; }
+    .cell-code { color: #888; font-size: 12px; white-space: nowrap; }
+    .cell-date { white-space: nowrap; font-size: 12px; color: #555; }
+    .cell-price { white-space: nowrap; font-weight: 500; color: #e74c3c; }
+    .tooltip-wrap { position: relative; display: inline-block; max-width: 100%; }
+    .tooltip-wrap .text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tip { display: none; position: fixed; background: #2c3e50; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 12px; line-height: 1.5; max-width: 500px; white-space: pre-wrap; word-break: break-all; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+    .cell-content { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: #666; cursor: pointer; }
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; padding: 40px; overflow-y: auto; }
+    .modal.show { display: flex; }
+    .modal-content { background: #fff; border-radius: 8px; width: 100%; max-width: 800px; margin: auto; padding: 24px; position: relative; }
+    .modal-close { position: absolute; top: 12px; right: 16px; font-size: 24px; cursor: pointer; color: #999; border: none; background: none; }
+    .modal-close:hover { color: #333; }
+    .modal pre { white-space: pre-wrap; word-break: break-all; font-size: 13px; line-height: 1.6; background: #f8f9fa; padding: 16px; border-radius: 4px; max-height: 70vh; overflow-y: auto; }
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; background: #fff; border-top: 1px solid #e1e4e8; }
+    .pagination button { padding: 6px 12px; border: 1px solid #d1d5da; border-radius: 4px; background: #fff; cursor: pointer; font-size: 14px; }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .pagination span { font-size: 14px; color: #555; }
+    .loading { text-align: center; padding: 40px; color: #888; font-size: 14px; }
+    .error-row td { color: #c0392b; background: #fdf2f2; }
+    .skipped-row td { color: #999; background: #fafafa; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>股权报告提取结果</h1>
+  <div class="actions">
+    <span id="update-time"></span>
+  </div>
+</div>
+
+<div class="toolbar">
+  <input type="text" id="search-input" placeholder="搜索股票名/代码/内容..." oninput="doFilter()">
+  <input type="text" id="recipient-filter" placeholder="受让方筛选..." oninput="doFilter()" style="padding:6px 10px;border:1px solid #d1d5da;border-radius:4px;font-size:14px;width:150px;">
+  <select id="stage-filter" onchange="doFilter()">
+    <option value="">全部阶段</option>
+    <option value="定价期">定价期</option>
+    <option value="成交期">成交期</option>
+    <option value="定增">定增</option>
+    <option value="未知阶段">未知阶段</option>
+  </select>
+  <select id="doctype-filter" onchange="doFilter()">
+    <option value="">全部类型</option>
+    <option value="询价转让">询价转让</option>
+    <option value="定增">定增</option>
+    <option value="公告">公告</option>
+  </select>
+  <input type="date" id="date-from" onchange="doFilter()">
+  <span style="font-size:12px;color:#999;">至</span>
+  <input type="date" id="date-to" onchange="doFilter()">
+  <button onclick="clearFilters()">清除筛选</button>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="table-wrap">
+  <div id="table-container">
+    <div class="loading">加载数据中...</div>
+  </div>
+</div>
+
+<div class="pagination" id="pagination"></div>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <h2 id="modal-title" style="margin-bottom:12px;font-size:16px;"></h2>
+    <pre id="modal-body"></pre>
+  </div>
+</div>
+
+<script>
+let allRecords = [];
+let filteredRecords = [];
+let currentPage = 1;
+const pageSize = 50;
+
+async function init() {
+  try {
+    const res = await fetch("data.json");
+    if (!res.ok) throw new Error("data.json not found");
+    allRecords = await res.json();
+    document.getElementById("update-time").textContent = "数据更新: " + new Date().toLocaleString();
+  } catch (e) {
+    document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + "<br>请确保 data.json 已生成并推送到仓库</div>";
+    return;
+  }
+  doFilter();
+}
+
+function doFilter() {
+  const q = document.getElementById("search-input").value.trim().toLowerCase();
+  const recipient = document.getElementById("recipient-filter").value.trim();
+  const stage = document.getElementById("stage-filter").value;
+  const docType = document.getElementById("doctype-filter").value;
+  const dateFrom = document.getElementById("date-from").value;
+  const dateTo = document.getElementById("date-to").value;
+
+  filteredRecords = allRecords.filter(r => {
+    if (stage && r.stage !== stage) return false;
+    if (docType && r.doc_type !== docType) return false;
+    if (dateFrom && (r._date || "") < dateFrom) return false;
+    if (dateTo && (r._date || "") > dateTo) return false;
+    if (recipient && !(r._recipients_full || "").includes(recipient)) return false;
+    if (q) {
+      const fields = [
+        r.stock_name || "", r.stock_code || "", r.stage || "", r.doc_type || "",
+        r._date || "", r.content || "", r._price || "", r._recipients_full || "",
+      ];
+      const parsed = r._parsed || {};
+      for (const v of Object.values(parsed)) {
+        if (typeof v === "string") fields.push(v);
+        else if (typeof v === "object") {
+          for (const sv of Object.values(v)) {
+            if (typeof sv === "string") fields.push(sv);
+          }
+        }
+      }
+      if (!fields.some(f => f.toLowerCase().includes(q))) return false;
+    }
+    return true;
+  });
+
+  currentPage = 1;
+  renderPage();
+}
+
+function renderPage() {
+  const container = document.getElementById("table-container");
+  const total = filteredRecords.length;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const start = (currentPage - 1) * pageSize;
+  const pageRecords = filteredRecords.slice(start, start + pageSize);
+
+  document.getElementById("stats").textContent =
+    `共 ${total} 条记录（已过滤预告期、同股票同价格保留最新阶段），当前第 ${currentPage} / ${totalPages} 页`;
+
+  if (!pageRecords.length) {
+    container.innerHTML = '<div class="loading">无数据</div>';
+    document.getElementById("pagination").innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = `<table>
+    <thead><tr><th>日期</th><th>股票(代码)</th><th>阶段</th><th>类型</th><th>每股价格</th><th>预计完成</th><th>解禁日期</th><th>受让方</th><th>LLM输出</th></tr></thead>
+    <tbody>
+      ${pageRecords.map((r, i) => {
+        const idx = start + i;
+        const isError = !!r.error;
+        const isSkipped = !!r.skipped;
+        const rowClass = isError ? "error-row" : isSkipped ? "skipped-row" : "";
+        const stockLabel = r.stock_name && r.stock_name !== "未知" ? r.stock_name : (r._parsed && (r._parsed.股票名称 || r._parsed.股票简称) ? (r._parsed.股票名称 || r._parsed.股票简称) : "");
+        const codeLabel = r.stock_code || (r._parsed && r._parsed.股票代码 ? r._parsed.股票代码 : "");
+        const stockCell = stockLabel && codeLabel
+          ? `<span class="cell-stock">${esc(stockLabel)}</span> <span class="cell-code">(${esc(codeLabel)})</span>`
+          : `<span class="cell-stock">${esc(stockLabel || codeLabel || "未知")}</span>`;
+        const price = r._price || (r._parsed && r._parsed.每股价格 ? r._parsed.每股价格 : "");
+        const estFinish = r._est_finish_date || (r._parsed && r._parsed.预计完成日期 ? r._parsed.预计完成日期 : "");
+        const unlock = r._unlock_date || (r._parsed && r._parsed.解禁日期 ? r._parsed.解禁日期 : "");
+        const shortRecip = r._recipients_short || "";
+        const fullRecip = r._recipients_full || "";
+        const showRecip = shortRecip || (r._parsed && r._parsed.受让方信息 ? r._parsed.受让方信息 : "");
+        const content = r.content || r.error || "";
+        const shortContent = content.length > 5 ? content.slice(0, 5) + "..." : content;
+
+        return `<tr class="${rowClass}">
+          <td class="cell-date">${esc(r._date || "")}</td>
+          <td>${stockCell}</td>
+          <td><span class="tag tag-stage-${esc(r.stage || "未知阶段")}">${esc(r.stage || "未知")}</span></td>
+          <td><span class="tag tag-doc-${esc(r.doc_type || "公告")}">${esc(r.doc_type || "公告")}</span></td>
+          <td class="cell-price">${esc(price)}</td>
+          <td class="cell-date">${esc(estFinish)}</td>
+          <td class="cell-date">${esc(unlock)}</td>
+          <td>${showRecip ? `<div class="tooltip-wrap" onmouseover="showTip(this)" onmouseout="hideTip(this)"><span class="text">${esc(showRecip.length > 15 ? showRecip.slice(0, 15) + "..." : showRecip)}</span><div class="tip">${esc(fullRecip || showRecip)}</div></div>` : `<span style="color:#ccc;">-</span>`}</td>
+          <td><div class="cell-content tooltip-wrap" onclick="openModal(${idx})" onmouseover="showTip(this)" onmouseout="hideTip(this)"><span class="text">${esc(shortContent)}</span><div class="tip">${esc(content)}</div></div></td>
+        </tr>`;
+      }).join("")}
+    </tbody>
+  </table>`;
+
+  document.getElementById("pagination").innerHTML = `
+    <button ${currentPage <= 1 ? "disabled" : ""} onclick="goPage(1)">首页</button>
+    <button ${currentPage <= 1 ? "disabled" : ""} onclick="goPage(${currentPage - 1})">上一页</button>
+    <span>第 ${currentPage} / ${totalPages} 页</span>
+    <button ${currentPage >= totalPages ? "disabled" : ""} onclick="goPage(${currentPage + 1})">下一页</button>
+    <button ${currentPage >= totalPages ? "disabled" : ""} onclick="goPage(${totalPages})">末页</button>
+  `;
+}
+
+function goPage(n) {
+  currentPage = n;
+  renderPage();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function openModal(idx) {
+  const r = filteredRecords[idx];
+  if (!r) return;
+  document.getElementById("modal-title").textContent = `${r.stock_name || "未知"} ${r.stage || ""} ${r.doc_type || ""}`;
+  document.getElementById("modal-body").textContent = r.content || r.error || "";
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeModal() { document.getElementById("modal").classList.remove("show"); }
+document.getElementById("modal").addEventListener("click", e => { if (e.target === document.getElementById("modal")) closeModal(); });
+
+function clearFilters() {
+  document.getElementById("search-input").value = "";
+  document.getElementById("recipient-filter").value = "";
+  document.getElementById("stage-filter").value = "";
+  document.getElementById("doctype-filter").value = "";
+  document.getElementById("date-from").value = "";
+  document.getElementById("date-to").value = "";
+  doFilter();
+}
+
+function esc(s) {
+  return String(s || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function showTip(el) {
+  const tip = el.querySelector(".tip");
+  if (!tip) return;
+  const rect = el.getBoundingClientRect();
+  let top = rect.bottom + 6;
+  let left = rect.left;
+  if (top + tip.offsetHeight > window.innerHeight - 8) top = rect.top - tip.offsetHeight - 6;
+  if (left + tip.offsetWidth > window.innerWidth - 8) left = window.innerWidth - tip.offsetWidth - 8;
+  tip.style.top = top + "px";
+  tip.style.left = left + "px";
+  tip.style.display = "block";
+}
+
+function hideTip(el) {
+  const tip = el.querySelector(".tip");
+  if (tip) tip.style.display = "none";
+}
+
+init();
+</script>
+</body>
+</html>

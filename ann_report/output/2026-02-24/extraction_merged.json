@@ -1,0 +1,31 @@
+{
+  "total_stocks": 1,
+  "total_events": 1,
+  "stocks": [
+    {
+      "stock_code": "300900",
+      "stock_name": "广联航空",
+      "event_count": 1,
+      "events": [
+        {
+          "stage": "",
+          "doc_type": "",
+          "has_skipped": false,
+          "parsed_info": {},
+          "merged_content": "",
+          "files": [
+            {
+              "file": "1224983509.PDF",
+              "stage": "",
+              "doc_type": "",
+              "content": null,
+              "skipped": false,
+              "skip_reason": "",
+              "error": "Server disconnected without sending a response."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
