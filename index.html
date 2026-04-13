@@ -128,7 +128,7 @@ let dateRange = { from: "", to: "" };
 
 function esc(s) {
   if (s == null) return "";
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, '&quot;');
 }
 
 async function init() {
@@ -140,23 +140,13 @@ async function init() {
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
   } catch (e) {
-    document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + "<br>请确保 data.json 已生成并推送到仓库</div>';
+    document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
     return;
   }
   doFilter();
 }
 
-function getCheckedValues(name) {
-  return Array.from(document.querySelectorAll(`input[type="checkbox"][onchange="doFilter()"][value="${''}"`)).filter(() => true).map;
-}
 
-function getSelectedStages() {
-  return Array.from(document.querySelectorAll('.toolbar input[type="checkbox"]:checked')).map(cb => cb.value);
-}
-
-function getSelectedDocTypes() {
-  return Array.from(document.querySelectorAll('.toolbar input[type="checkbox"]')).filter(cb => cb.value);
-}
 
 function doFilter() {
   const q = document.getElementById("search-input").value.trim().toLowerCase();
@@ -217,7 +207,7 @@ function sortBy(col) {
     sortAsc = true;
   }
   document.querySelectorAll("th").forEach(th => th.classList.remove("sorted"));
-  document.querySelector(`th[onclick="sortBy('${col}')"]`).classList.add("sorted");
+  document.querySelector('th[onclick="sortBy(\'' + col + '\')"]').classList.add("sorted");
   applySort();
   renderPage();
 }
