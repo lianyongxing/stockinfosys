@@ -439,7 +439,7 @@ function doBasicsFilter() {
   renderBasics();
 }
 
-function init() {
+async function init() {
   try {
     const res = await fetch('data.json');
     if (!res.ok) throw new Error('data.json not found');
