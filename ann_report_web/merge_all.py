@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 
@@ -154,8 +155,11 @@ def merge_all(output_dir: Path, merged_path: Path) -> list[dict]:
         for r in records:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
+    tz = timezone(timedelta(hours=8))
+    update_time = datetime.now(tz).strftime("%Y-%m-%d %H:%M:%S")
     print(f"汇总完成: 共 {len(records)} 条记录 -> {merged_path}")
-    return records
+    print(f"更新时间: {update_time}")
+    return records, update_time
 
 
 def main() -> None:
@@ -163,7 +167,7 @@ def main() -> None:
     output_dir = script_dir.parent / "ann_report" / "output"
     merged_path = script_dir / "data" / "all_records.jsonl"
 
-    records = merge_all(output_dir, merged_path)
+    records, update_time = merge_all(output_dir, merged_path)
     print(f"统计: {len(records)} 条记录")
 
 

@@ -112,8 +112,10 @@ async function init() {
   try {
     const res = await fetch("data.json");
     if (!res.ok) throw new Error("data.json not found");
-    allRecords = await res.json();
-    document.getElementById("update-time").textContent = "数据更新: " + new Date().toLocaleString();
+    const data = await res.json();
+    allRecords = data.records || [];
+    const updateTime = data.update_time || new Date().toLocaleString();
+    document.getElementById("update-time").textContent = "数据更新: " + updateTime;
   } catch (e) {
     document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + "<br>请确保 data.json 已生成并推送到仓库</div>";
     return;
