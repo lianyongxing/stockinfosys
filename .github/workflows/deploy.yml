@@ -2,7 +2,7 @@ name: Deploy static content to Pages
 
 on:
   push:
-    branches: ["main"] # 如果你的主分支叫 master，请改为 master
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -19,14 +19,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r ann_report_web/requirements.txt
+
+      - name: Generate data.json
+        run: |
+          python -c "
+          import json
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, '.')
+          from ann_report_web.merge_all import merge_all
+
+          output_dir = Path('ann_report/output')
+          merged_path = Path('ann_report_web/data/all_records.jsonl')
+          merged_path.parent.mkdir(parents=True, exist_ok=True)
+          records = merge_all(output_dir, merged_path)
+
+          data = list(records)
+          data.sort(key=lambda r: (r.get('_date', ''), r.get('stock_name', '')), reverse=True)
+          with open('_site/data.json', 'w', encoding='utf-8') as f:
+              json.dump(data, f, ensure_ascii=False)
+          print(f'data.json: {len(data)} records')
+          "
+
+      - name: Copy index.html to _site
+        run: cp index.html _site/
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # 【关键点】这里填入包含 index.html 的文件夹名
-          path: './_site'
+          path: "./_site"
 
       - name: Deploy to GitHub Pages
         id: deployment
