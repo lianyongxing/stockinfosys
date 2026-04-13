@@ -50,6 +50,9 @@ jobs:
           print(f'data.json: {len(data)} records')
           "
 
+      - name: Copy static files
+        run: cp ann_report_web/data/stock_basics.json .
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
