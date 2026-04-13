@@ -58,7 +58,8 @@ def _has_valid_price(price: str) -> bool:
     if not price:
         return False
     noise = {"未披露", "未提及", "未确定", "待定", "未确定价格", "未确定每股价格",
-             "待定价格", "尚未确定", "未注明", "未知", "价格待定", "定价待定"}
+             "待定价格", "尚未确定", "未注明", "未知", "价格待定", "定价待定", "待确定",
+             "不低于", "不高于", "最终价格", "尚未披露", "待披露", "具体价格"}
     if price in noise:
         return False
     if any(n in price for n in noise):
