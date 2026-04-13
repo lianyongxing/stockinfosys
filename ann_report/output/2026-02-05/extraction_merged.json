@@ -1,0 +1,46 @@
+[
+  {
+    "file": "1224969281.PDF",
+    "stock_code": "300789",
+    "stock_name": "唐源电气",
+    "stage": "定增",
+    "doc_type": "定增",
+    "content": "{\n  \"股票名称\": \"\",\n  \"股票代码\": \"\",\n  \"公告日期\": \"\",\n  \"预计完成日期\": \"\",\n  \"解禁日期\": \"\",\n  \"股份详情\": \"\",\n  \"每股价格\": \"\",\n  \"总金额\": \"\",\n  \"总占比数\": \"\",\n  \"转让方信息\": \"\",\n  \"受让方信息\": \"\"\n}",
+    "_parsed": {
+      "股票名称": "",
+      "股票代码": "",
+      "公告日期": "",
+      "预计完成日期": "",
+      "解禁日期": "",
+      "股份详情": "",
+      "每股价格": "",
+      "总金额": "",
+      "总占比数": "",
+      "转让方信息": "",
+      "受让方信息": ""
+    },
+    "_price": "",
+    "_announce_date": "",
+    "_est_finish_date": "",
+    "_unlock_date": "",
+    "_transferor": "",
+    "_recipients_short": "",
+    "_recipients_full": ""
+  },
+  {
+    "file": "1224967351.PDF",
+    "stock_code": "600863",
+    "stock_name": "内蒙华电",
+    "stage": "定增",
+    "doc_type": "定增",
+    "error": "无文本内容",
+    "_parsed": null,
+    "_price": "",
+    "_announce_date": "",
+    "_est_finish_date": "",
+    "_unlock_date": "",
+    "_transferor": "",
+    "_recipients_short": "",
+    "_recipients_full": ""
+  }
+]
