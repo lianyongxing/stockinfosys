@@ -7,11 +7,11 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; display: flex; }
-    .sidebar { width: 140px; background: #2c3e50; min-height: 100vh; padding-top: 20px; }
-    .sidebar .nav-item { padding: 12px 20px; color: #fff; cursor: pointer; font-size: 14px; }
-    .sidebar .nav-item:hover { background: #34495e; }
-    .sidebar .nav-item.active { background: #3498db; }
-    .main { flex: 1; }
+    .sidebar { width: 120px; background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%); min-height: 100vh; padding-top: 60px; box-shadow: 2px 0 8px rgba(0,0,0,0.1); position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar .nav-item { padding: 14px 16px; color: #fff; cursor: pointer; font-size: 14px; border-radius: 8px; margin: 4px 8px; transition: all 0.2s; opacity: 0.7; }
+    .sidebar .nav-item:hover { background: rgba(255,255,255,0.1); opacity: 1; }
+    .sidebar .nav-item.active { background: #3498db; opacity: 1; box-shadow: 0 2px 8px rgba(52,152,219,0.3); }
+    .main { flex: 1; margin-left: 120px; }
     .header { background: #2c3e50; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 18px; font-weight: 600; }
     .header .actions { display: flex; gap: 8px; align-items: center; font-size: 12px; opacity: 0.7; }
@@ -61,8 +61,8 @@
 </head>
 <body>
   <div class="sidebar">
-    <div class="nav-item active" onclick="switchTab('trade', this)">股权转让</div>
     <div class="nav-item" onclick="switchTab('basics', this)">基本面</div>
+    <div class="nav-item active" onclick="switchTab('trade', this)">股权转让</div>
   </div>
   <div class="main">
     <div class="header">
@@ -141,7 +141,7 @@
     </div>
     <table style="margin-top:16px;">
       <thead>
-        <tr><th>代码</th><th>名称</th><th>主营业务</th><th>核心竞争力</th><th>主要竞争对手</th></tr>
+        <tr><th>代码</th><th>名称</th><th>主营业务</th><th>核心竞争力</th><th>对手</th><th>市值</th><th>净利润</th><th>毛利率</th><th>净利率</th><th>扣非净利</th><th>PE</th></tr>
       </thead>
       <tbody id="basics-table"></tbody>
     </table>
@@ -163,10 +163,13 @@ function esc(s) {
 }
 
 async function init() {
+  console.log("init starting...");
   try {
     const res = await fetch("data.json");
+    console.log("fetched:", res.ok);
     if (!res.ok) throw new Error("data.json not found");
     const data = await res.json();
+    console.log("data loaded:", data.records.length);
     allRecords = data.records || [];
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
@@ -431,7 +434,7 @@ function renderBasics() {
     return s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q);
   });
   document.getElementById('basics-table').innerHTML = filtered.map(s =>
-    '<tr><td>' + s.code + '</td><td>' + s.name + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td></tr>'
+    '<tr><td>' + s.code + '</td><td>' + s.name + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td></tr>'
   ).join('');
 }
 
@@ -452,6 +455,12 @@ async function init() {
     return;
   }
   doFilter();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
 }
   </script>
 </body>
