@@ -1,0 +1,12 @@
+_site/
+*.PDF
+*.pdf
+*.pyc
+__pycache__/
+.DS_Store
+.idea/
+.ipynb_checkpoints/
+.env
+.env.*
+ann_report_web/__pycache__/
+ann_report_web/.ipynb_checkpoints/

@@ -27,7 +27,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r ann_report_web/requirements.txt
 
-      - name: Generate data.json
+      - name: Generate data files
         run: |
           python -c "
           import json
@@ -43,16 +43,10 @@ jobs:
 
           data = list(records)
           data.sort(key=lambda r: (r.get('_date', ''), r.get('stock_name', '')), reverse=True)
-          with open('_site/data.json', 'w', encoding='utf-8') as f:
+          with open('data.json', 'w', encoding='utf-8') as f:
               json.dump(data, f, ensure_ascii=False)
           print(f'data.json: {len(data)} records')
           "
-
-      - name: Setup site directory
-        run: mkdir -p _site
-
-      - name: Copy index.html to _site
-        run: cp index.html _site/
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -60,7 +54,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "./_site"
+          path: "."
 
       - name: Deploy to GitHub Pages
         id: deployment
