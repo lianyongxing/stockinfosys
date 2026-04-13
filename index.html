@@ -60,18 +60,21 @@
   </div>
 
   <div class="toolbar">
-    <input type="text" id="search-input" placeholder="搜索股票名/代码/内容..." oninput="doFilter()">
-    <input type="text" id="recipient-filter" placeholder="受让方筛选..." oninput="doFilter()" style="padding:6px 10px;border:1px solid #d1d5da;border-radius:4px;font-size:14px;width:150px;">
+    <input type="text" id="search-input" placeholder="搜索..." oninput="doFilter()" style="width:120px;">
     <span style="font-size:13px;margin-right:4px;">阶段:</span>
-    <label><input type="checkbox" class="stage-cb" value="定价期" onchange="doFilter()"> 定价期</label>
-    <label><input type="checkbox" class="stage-cb" value="成交期" onchange="doFilter()"> 成交期</label>
-    <label><input type="checkbox" class="stage-cb" value="定增" onchange="doFilter()"> 定增</label>
-    <label><input type="checkbox" class="stage-cb" value="未知阶段" onchange="doFilter()"> 未知</label>
-    <span style="font-size:13px;margin-left:12px;margin-right:4px;">类型:</span>
-    <label><input type="checkbox" class="doctype-cb" value="询价转让" onchange="doFilter()"> 询价转让</label>
-    <label><input type="checkbox" class="doctype-cb" value="定增" onchange="doFilter()"> 定增</label>
-    <label><input type="checkbox" class="doctype-cb" value="公告" onchange="doFilter()"> 公告</label>
-    <span style="font-size:13px;margin-left:12px;margin-right:4px;">日期:</span>
+    <select id="stage-filter" onchange="doFilter()" style="width:100px;">
+      <option value="">全部</option>
+      <option value="定价期">定价期</option>
+      <option value="成交期">成交期</option>
+      <option value="定增">定增</option>
+    </select>
+    <span style="font-size:13px;margin-left:8px;margin-right:4px;">类型:</span>
+    <select id="doctype-filter" onchange="doFilter()" style="width:100px;">
+      <option value="">全部</option>
+      <option value="询价转让">询价转让</option>
+      <option value="定增">定增</option>
+    </select>
+    <span style="font-size:13px;margin-left:8px;margin-right:4px;">日期:</span>
     <select id="date-range" onchange="applyDateRange()">
       <option value="">全部</option>
       <option value="7">近7天</option>
@@ -82,6 +85,8 @@
       <option value="2026-01">2026年1月</option>
       <option value="2025">2025年</option>
     </select>
+    <input type="text" id="recipient-filter" placeholder="受让方..." oninput="doFilter()" style="width:120px;margin-left:auto;">
+    <button onclick="clearFilters()">清除</button>
     <button onclick="clearFilters()">清除筛选</button>
   </div>
 
@@ -96,7 +101,7 @@
           <th onclick="sortBy('stage')">阶段<span class="sort-indicator">▴▾</span></th>
           <th onclick="sortBy('doc_type')">类型<span class="sort-indicator">▴▾</span></th>
           <th onclick="sortBy('price')">每股价格<span class="sort-indicator">▴▾</span></th>
-          <th>预计完成</th>
+          <th>总金额</th>
           <th>解禁日期</th>
           <th>受让方</th>
           <th>LLM输出</th>
@@ -151,14 +156,14 @@ async function init() {
 function doFilter() {
   const q = document.getElementById("search-input").value.trim().toLowerCase();
   const recipient = document.getElementById("recipient-filter").value.trim();
-  const stages = Array.from(document.querySelectorAll('.stage-cb:checked')).map(cb => cb.value);
-  const docTypes = Array.from(document.querySelectorAll('.doctype-cb:checked')).map(cb => cb.value);
+  const stage = document.getElementById("stage-filter").value;
+  const docType = document.getElementById("doctype-filter").value;
   const dateFrom = dateRange.from;
   const dateTo = dateRange.to;
 
   filteredRecords = allRecords.filter(r => {
-    if (stages.length && !stages.includes(r.stage)) return false;
-    if (docTypes.length && !docTypes.includes(r.doc_type)) return false;
+    if (stage && r.stage !== stage) return false;
+    if (docType && r.doc_type !== docType) return false;
     if (dateFrom && (r._date || "") < dateFrom) return false;
     if (dateTo && (r._date || "") > dateTo) return false;
     if (recipient && !(r._recipients_full || "").includes(recipient)) return false;
@@ -243,8 +248,9 @@ function applyDateRange() {
 function clearFilters() {
   document.getElementById("search-input").value = "";
   document.getElementById("recipient-filter").value = "";
+  document.getElementById("stage-filter").value = "";
+  document.getElementById("doctype-filter").value = "";
   document.getElementById("date-range").value = "";
-  document.querySelectorAll('.stage-cb, .doctype-cb').forEach(cb => cb.checked = false);
   dateRange = { from: "", to: "" };
   doFilter();
 }
@@ -273,7 +279,7 @@ function renderPage() {
     const codeLabel = r.stock_code || (r._parsed && r._parsed.股票代码 ? r._parsed.股票代码 : "");
     const stockCell = stockLabel && codeLabel ? '<span class="cell-stock">' + esc(stockLabel) + '</span> <span class="cell-code">(' + esc(codeLabel) + ')</span>' : '<span class="cell-stock">' + esc(stockLabel || codeLabel || "未知") + '</span>';
     const price = r._price || (r._parsed && r._parsed.每股价格 ? r._parsed.每股价格 : "");
-    const estFinish = r._est_finish_date || (r._parsed && r._parsed.预计完成日期 ? r._parsed.预计完成日期 : "");
+    const totalAmount = r._parsed && r._parsed.总金额 ? r._parsed.总金额 : "";
     const unlock = r._unlock_date || (r._parsed && r._parsed.解禁日期 ? r._parsed.解禁日期 : "");
     const shortRecip = r._recipients_short || "";
     const fullRecip = r._recipients_full || "";
@@ -287,7 +293,7 @@ function renderPage() {
       '<td><span class="tag tag-stage-' + esc(r.stage || "未知阶段") + '">' + esc(r.stage || "未知") + '</span></td>' +
       '<td><span class="tag tag-doc-' + esc(r.doc_type || "公告") + '">' + esc(r.doc_type || "公告") + '</span></td>' +
       '<td class="cell-price">' + esc(price) + '</td>' +
-      '<td>' + esc(estFinish) + '</td>' +
+      '<td>' + esc(totalAmount) + '</td>' +
       '<td>' + esc(unlock) + '</td>' +
       '<td title="' + esc(fullRecip) + '">' + esc(shortRecip || showRecip) + '</td>' +
       '<td title="' + esc(content) + '">' + esc(shortContent) + '</td>' +
