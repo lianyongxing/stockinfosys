@@ -129,6 +129,7 @@ let currentPage = 1;
 let pageSize = 50;
 let sortColumn = "_date";
 let sortAsc = false;
+let sortClickCount = {};
 let dateRange = { from: "", to: "" };
 
 function esc(s) {
@@ -205,11 +206,22 @@ function applySort() {
 }
 
 function sortBy(col) {
+  if (!sortClickCount[col]) sortClickCount[col] = 0;
+  sortClickCount[col]++;
   if (sortColumn === col) {
-    sortAsc = !sortAsc;
+    if (sortClickCount[col] >= 3) {
+      sortColumn = "_date";
+      sortAsc = false;
+      sortClickCount = {};
+      document.querySelectorAll("th").forEach(th => th.classList.remove("sorted"));
+    } else {
+      sortAsc = sortClickCount[col] === 1;
+    }
   } else {
     sortColumn = col;
     sortAsc = true;
+    sortClickCount = {};
+    sortClickCount[col] = 1;
   }
   document.querySelectorAll("th").forEach(th => th.classList.remove("sorted"));
   document.querySelector('th[onclick="sortBy(\'' + col + '\')"]').classList.add("sorted");
