@@ -9,8 +9,10 @@ DATE_STR=$(date +%Y-%m-%d)
 echo "$(date '+%Y-%m-%d %H:%M:%S') 开始执行..." >> "$LOG_DIR/daily.log"
 
 cd "$REPO_DIR"
+export PATH="/Users/yxlian/miniconda3/envs/lyx_py311/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 
-PYTHONPATH="$REPO_DIR" python -m ann_report.main -s "$DATE_STR" >> "$LOG_DIR/daily.log" 2>&1
+env -i PATH="$PATH" HOME="$HOME" USER="$USER" LANG="$LANG" \
+    python -m ann_report.main -s "$DATE_STR" >> "$LOG_DIR/daily.log" 2>&1
 
 PYTHONPATH="$REPO_DIR" python -c "
 import json

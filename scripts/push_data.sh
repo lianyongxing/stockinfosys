@@ -4,6 +4,8 @@ set -e
 REPO_DIR="/Users/yxlian/Desktop/quant2"
 cd "$REPO_DIR"
 
+unset http_proxy https_proxy HTTP_PROXY HTTPS_PROXY all_proxy ALL_PROXY
+
 echo "开始合并数据..."
 PYTHONPATH="$REPO_DIR" python -c "
 import json
