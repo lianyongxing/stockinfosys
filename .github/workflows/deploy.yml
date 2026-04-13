@@ -48,6 +48,9 @@ jobs:
           print(f'data.json: {len(data)} records')
           "
 
+      - name: Setup site directory
+        run: mkdir -p _site
+
       - name: Copy index.html to _site
         run: cp index.html _site/
 
