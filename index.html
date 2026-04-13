@@ -189,18 +189,39 @@ function doFilter() {
   renderPage();
 }
 
+function extractPriceNum(price) {
+  if (!price) return 0;
+  const m = String(price).match(/[\d.]+/);
+  return m ? parseFloat(m[0]) : 0;
+}
+
 function applySort() {
   filteredRecords.sort((a, b) => {
     let va, vb;
+    let cmp = 0;
     switch (sortColumn) {
-      case "date": va = a._date || ""; vb = b._date || ""; break;
-      case "stock": va = a.stock_name || ""; vb = b.stock_name || ""; break;
-      case "stage": va = a.stage || ""; vb = b.stage || ""; break;
-      case "doc_type": va = a.doc_type || ""; vb = b.doc_type || ""; break;
-      case "price": va = a._price || ""; vb = b._price || ""; break;
-      default: va = a._date || ""; vb = b._date || "";
+      case "date":
+      case "stock":
+      case "stage":
+      case "doc_type":
+        va = a[sortColumn] || a["_" + sortColumn] || "";
+        vb = b[sortColumn] || b["_" + sortColumn] || "";
+        if (sortColumn === "date") {
+          cmp = (va || "").localeCompare(vb || "");
+        } else {
+          cmp = (va || "").localeCompare(vb || "");
+        }
+        break;
+      case "price":
+        va = extractPriceNum(a._price);
+        vb = extractPriceNum(b._price);
+        cmp = va - vb;
+        break;
+      default:
+        va = a._date || "";
+        vb = b._date || "";
+        cmp = (va || "").localeCompare(vb || "");
     }
-    const cmp = va.localeCompare(vb);
     return sortAsc ? cmp : -cmp;
   });
 }
