@@ -6,7 +6,12 @@
   <title>股权报告提取结果</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; display: flex; }
+    .sidebar { width: 140px; background: #2c3e50; min-height: 100vh; padding-top: 20px; }
+    .sidebar .nav-item { padding: 12px 20px; color: #fff; cursor: pointer; font-size: 14px; }
+    .sidebar .nav-item:hover { background: #34495e; }
+    .sidebar .nav-item.active { background: #3498db; }
+    .main { flex: 1; }
     .header { background: #2c3e50; color: #fff; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
     .header h1 { font-size: 18px; font-weight: 600; }
     .header .actions { display: flex; gap: 8px; align-items: center; font-size: 12px; opacity: 0.7; }
@@ -49,15 +54,23 @@
     .pagination button:disabled { opacity: 0.5; cursor: not-allowed; }
     .pagination .info { color: #666; font-size: 13px; }
     .page-size-select { padding: 4px 8px; border: 1px solid #d1d5da; border-radius: 4px; font-size: 13px; }
+    .basics-header { margin-bottom: 12px; }
+    #basics-table th, #basics-table td { padding: 10px 12px; border: 1px solid #e1e4e8; }
+    #basics-table th { background: #f8f9fa; font-weight: 600; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1>股权报告提取结果</h1>
-    <div class="actions">
-      <span id="update-time"></span>
-    </div>
+  <div class="sidebar">
+    <div class="nav-item active" onclick="switchTab('trade', this)">股权转让</div>
+    <div class="nav-item" onclick="switchTab('basics', this)">基本面</div>
   </div>
+  <div class="main">
+    <div class="header">
+      <h1 id="page-title">股权报告提取结果</h1>
+      <div class="actions">
+        <span id="update-time"></span>
+      </div>
+    </div>
 
   <div class="toolbar">
     <input type="text" id="search-input" placeholder="搜索..." oninput="doFilter()" style="width:120px;">
@@ -120,6 +133,18 @@
       <option value="100">100条/页</option>
       <option value="200">200条/页</option>
     </select>
+  </div>
+
+  <div id="basics-view" style="display:none;padding:20px;">
+    <div class="basics-header">
+      <input type="text" id="basics-search" placeholder="搜索股票代码/名称..." oninput="doBasicsFilter()" style="padding:8px 12px;border:1px solid #ddd;border-radius:4px;width:200px;font-size:14px;">
+    </div>
+    <table style="margin-top:16px;">
+      <thead>
+        <tr><th>代码</th><th>名称</th><th>主营业务</th><th>核心竞争力</th><th>主要竞争对手</th></tr>
+      </thead>
+      <tbody id="basics-table"></tbody>
+    </table>
   </div>
 
   <script>
@@ -364,7 +389,70 @@ function changePageSize() {
   renderPage();
 }
 
-init();
+let currentTab = 'trade';
+let basicsData = [];
+
+function switchTab(tab, el) {
+  currentTab = tab;
+  document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  if (tab === 'trade') {
+    document.getElementById('basics-view').style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'flex';
+    document.querySelector('.stats').style.display = 'block';
+    document.querySelector('.table-wrap').style.display = 'block';
+    document.querySelector('.pagination').style.display = 'flex';
+    document.getElementById('page-title').textContent = '股权报告提取结果';
+  } else {
+    document.getElementById('basics-view').style.display = 'block';
+    document.querySelector('.toolbar').style.display = 'none';
+    document.querySelector('.stats').style.display = 'none';
+    document.querySelector('.table-wrap').style.display = 'none';
+    document.querySelector('.pagination').style.display = 'none';
+    document.getElementById('page-title').textContent = '股票基本面';
+    if (!basicsData.length) loadBasics();
+  }
+}
+
+async function loadBasics() {
+  try {
+    const res = await fetch('stock_basics.json');
+    basicsData = await res.json();
+    renderBasics();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderBasics() {
+  const q = document.getElementById('basics-search').value.trim().toLowerCase();
+  const filtered = basicsData.filter(s => {
+    if (!q) return true;
+    return s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q);
+  });
+  document.getElementById('basics-table').innerHTML = filtered.map(s =>
+    '<tr><td>' + s.code + '</td><td>' + s.name + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td></tr>'
+  ).join('');
+}
+
+function doBasicsFilter() {
+  renderBasics();
+}
+
+function init() {
+  try {
+    const res = await fetch('data.json');
+    if (!res.ok) throw new Error('data.json not found');
+    const data = await res.json();
+    allRecords = data.records || [];
+    const updateTime = data.update_time || new Date().toLocaleString();
+    document.getElementById('update-time').textContent = '数据更新: ' + updateTime;
+  } catch (e) {
+    document.getElementById('table-container').innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
+    return;
+  }
+  doFilter();
+}
   </script>
 </body>
 </html>

@@ -1,0 +1,10 @@
+[
+  {"code": "300789", "name": "唐源电气", "business": "轨道交通智能运维设备研发、制造与销售", "advantage": "自主研发智能运维机器人，轨道交通细分领域龙头", "competitor": "神州高铁、康尼机电"},
+  {"code": "301188", "name": "力诺药包", "business": "药用包装材料研发、生产", "advantage": "一致性评价通过率高，药包品种全", "competitor": "山东药玻、正川股份"},
+  {"code": "300724", "name": "捷佳伟创", "business": "光伏设备研发制造", "advantage": "PERC电池设备市占率高", "competitor": "迈为股份、隆基绿能"},
+  {"code": "688147", "name": "微导纳米", "business": "ALD薄膜沉积设备", "advantage": "32nm以下先进制程设备", "competitor": "北方华创、中微公司"},
+  {"code": "688520", "name": "神州细胞", "business": "生物创新药研发", "advantage": "多款生物类似药在研", "competitor": "复宏汉霖、海正药业"},
+  {"code": "300869", "name": "康泰医学", "business": "医疗设备研发生产", "advantage": "血氧仪、监护仪品类全", "competitor": "鱼跃医疗、宝莱特"},
+  {"code": "603259", "name": "药明康德", "business": "医药研发外包服务", "advantage": "CRO/CDMO全产业链", "competitor": "康龙化成、泰格医药"},
+  {"code": "688328", "name": "络捷星空", "business": "芯片设计服务", "advantage": "Arm架构授权", "competitor": "芯原股份、寒武纪"}
+]
