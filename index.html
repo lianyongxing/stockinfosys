@@ -102,7 +102,7 @@
           <th onclick="sortBy('doc_type')">类型<span class="sort-indicator">▴▾</span></th>
           <th onclick="sortBy('price')">每股价格<span class="sort-indicator">▴▾</span></th>
           <th>总金额</th>
-          <th>解禁日期</th>
+          <th onclick="sortBy('unlock')">解禁日期<span class="sort-indicator">▴▾</span></th>
           <th>受让方</th>
           <th>LLM输出</th>
         </tr>
@@ -191,8 +191,14 @@ function doFilter() {
 
 function extractPriceNum(price) {
   if (!price) return 0;
-  const m = String(price).match(/[\d.]+/);
+  const s = String(price).replace(/,/g, "").replace("元", "").replace("万", "0000").replace("亿", "00000000");
+  const m = s.match(/[\d.]+/);
   return m ? parseFloat(m[0]) : 0;
+}
+
+function extractDateNum(date) {
+  if (!date) return 0;
+  return date.replace(/-/g, "");
 }
 
 function applySort() {
@@ -215,6 +221,11 @@ function applySort() {
       case "price":
         va = extractPriceNum(a._price);
         vb = extractPriceNum(b._price);
+        cmp = va - vb;
+        break;
+      case "unlock":
+        va = extractDateNum(a._unlock_date);
+        vb = extractDateNum(b._unlock_date);
         cmp = va - vb;
         break;
       default:
