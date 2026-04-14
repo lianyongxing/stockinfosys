@@ -99,7 +99,6 @@
       <option value="2025">2025年</option>
     </select>
     <input type="text" id="recipient-filter" placeholder="受让方..." oninput="doFilter()" style="width:120px;margin-left:auto;">
-    <button onclick="clearFilters()">清除</button>
     <button onclick="clearFilters()">清除筛选</button>
   </div>
 
@@ -135,16 +134,45 @@
     </select>
   </div>
 
-  <div id="basics-view" style="display:none;padding:20px;">
-    <div class="basics-header">
-      <input type="text" id="basics-search" placeholder="搜索股票代码/名称..." oninput="doBasicsFilter()" style="padding:8px 12px;border:1px solid #ddd;border-radius:4px;width:200px;font-size:14px;">
+  <div id="basics-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
+    <button onclick="backToList()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;display:none;" id="back-btn">< 返回列表</button>
+    <div id="detail-view" style="display:none;"></div>
+    <div id="list-view">
+      <div id="basics-header" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+        <input type="text" id="basics-search" placeholder="搜索..." oninput="doBasicsFilter()" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;width:120px;font-size:13px;">
+        <select id="industry-filter" onchange="doBasicsFilter()" style="padding:6px 10px;border:1px solid #ddd;border-radius:4px;font-size:13px;">
+          <option value="">全行业</option>
+          <option value="机械设备">机械设备</option>
+          <option value="医药包装">医药包装</option>
+          <option value="光伏设备">光伏设备</option>
+          <option value="半导体设备">半导体设备</option>
+          <option value="生物医药">生物医药</option>
+          <option value="医疗器械">医疗器械</option>
+          <option value="医疗服务">医疗服务</option>
+          <option value="半导体">半导体</option>
+        </select>
+        <button onclick="showAddForm()" style="padding:6px 12px;background:#3498db;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">+新增</button>
+        <button onclick="reloadBasics()" style="padding:6px 12px;background:#e67e22;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">刷新</button>
+      </div>
+      <div id="add-form" style="display:none;background:#f8f9fa;padding:12px;margin-bottom:12px;border-radius:8px;">
+        <div style="margin-bottom:8px;">
+          <textarea id="add-json" placeholder='{"code":"300789","name":"唐源电气",...}' style="width:100%;height:60px;padding:6px;font-size:12px;font-family:monospace;"></textarea>
+          <button onclick="parseJson()" style="padding:4px 10px;background:#3498db;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;margin-top:4px;">解析</button>
+        </div>
+        <div id="parsed-fields" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <div style="margin-top:8px;">
+          <button onclick="addStock()" style="padding:4px 10px;background:#2ecc71;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">保存</button>
+          <button onclick="hideAddForm()" style="padding:4px 10px;background:#999;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">取消</button>
+        </div>
+      </div>
+      <table style="margin-top:16px;">
+        <thead>
+          <tr><th>代码</th><th>名称</th><th>行业</th><th>主营业务</th><th>核心竞争力</th><th>对手</th><th>市值</th><th>净利润</th><th>毛利率</th><th>净利率</th><th>扣非净利</th><th>PE</th><th>操作</th></tr>
+        </thead>
+        <tbody id="basics-table"></tbody>
+      </table>
     </div>
-    <table style="margin-top:16px;">
-      <thead>
-        <tr><th>代码</th><th>名称</th><th>主营业务</th><th>核心竞争力</th><th>对手</th><th>市值</th><th>净利润</th><th>毛利率</th><th>净利率</th><th>扣非净利</th><th>PE</th></tr>
-      </thead>
-      <tbody id="basics-table"></tbody>
-    </table>
+  </div>
   </div>
 
   <script>
@@ -327,6 +355,12 @@ function clearFilters() {
   doFilter();
 }
 
+function clearBasicsFilter() {
+  document.getElementById("basics-search").value = "";
+  document.getElementById("industry-filter").value = "";
+  renderBasics();
+}
+
 function renderPage() {
   const container = document.getElementById("table-container");
   const total = filteredRecords.length;
@@ -413,29 +447,183 @@ function switchTab(tab, el) {
     document.querySelector('.table-wrap').style.display = 'none';
     document.querySelector('.pagination').style.display = 'none';
     document.getElementById('page-title').textContent = '股票基本面';
-    if (!basicsData.length) loadBasics();
+    document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('list-view').style.display = 'block';
+    document.getElementById('basics-header').style.display = 'flex';
+    document.getElementById('back-btn').style.display = 'none';
+    if (!basicsData || !basicsData.length) loadBasics();
   }
 }
 
 async function loadBasics() {
   try {
-    const res = await fetch('stock_basics.json');
-    basicsData = await res.json();
+    const stored = localStorage.getItem('stock_basics');
+    console.log('localStorage stock_basics:', stored ? 'exists' : 'null');
+    if (stored && stored !== '[]' && stored.length > 10) {
+      try {
+        basicsData = JSON.parse(stored);
+        console.log('parsed from localStorage:', basicsData.length);
+      } catch (parseErr) {
+        console.error('parse error:', parseErr);
+        basicsData = [];
+      }
+    } else {
+      localStorage.removeItem('stock_basics');
+      basicsData = [];
+    } 
+    if (!basicsData || !basicsData.length) {
+      console.log('fetching from JSON file...');
+      const res = await fetch('stock_basics.json');
+      if (!res.ok) {
+        console.error('fetch failed:', res.status);
+        return;
+      }
+      basicsData = await res.json();
+      console.log('fetched from JSON:', basicsData.length);
+      if (basicsData.length) {
+        localStorage.setItem('stock_basics', JSON.stringify(basicsData));
+      }
+    }
+    console.log('final basicsData:', basicsData.length);
     renderBasics();
   } catch (e) {
-    console.error(e);
+    console.error('loadBasics error:', e);
   }
+}
+
+function reloadBasics() {
+  localStorage.removeItem('stock_basics');
+  basicsData = [];
+  loadBasics();
 }
 
 function renderBasics() {
   const q = document.getElementById('basics-search').value.trim().toLowerCase();
+  const industry = document.getElementById('industry-filter').value;
   const filtered = basicsData.filter(s => {
-    if (!q) return true;
-    return s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q);
+    if (!q && !industry) return true;
+    if (industry && s.industry !== industry) return false;
+    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
+    return true;
   });
-  document.getElementById('basics-table').innerHTML = filtered.map(s =>
-    '<tr><td>' + s.code + '</td><td>' + s.name + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td></tr>'
+  document.getElementById('basics-table').innerHTML = filtered.map((s, idx) =>
+    '<tr onclick="showDetail(' + idx + ')" style="cursor:pointer;"><td>' + s.code + '</td><td>' + s.name + '</td><td>' + (s.industry || '-') + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td><td><button onclick="event.stopPropagation();deleteStock(' + idx + ')" style="padding:4px 8px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button></td></tr>'
   ).join('');
+}
+
+function showDetail(idx) {
+  console.log('showDetail called, idx:', idx, 'basicsData length:', basicsData ? basicsData.length : 'undefined');
+  const q = document.getElementById('basics-search').value.trim().toLowerCase();
+  const industry = document.getElementById('industry-filter').value;
+  const filtered = basicsData.filter(s => {
+    if (!q && !industry) return true;
+    if (industry && s.industry !== industry) return false;
+    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
+    return true;
+  });
+  const s = filtered[idx];
+  if (!s) return;
+  document.getElementById('list-view').style.display = 'none';
+  document.getElementById('basics-header').style.display = 'none';
+  document.getElementById('back-btn').style.display = 'inline-block';
+  document.getElementById('detail-view').style.display = 'block';
+  document.getElementById('detail-view').innerHTML = '<div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + s.business + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div><div><span style="color:#666;">成立时间：</span>' + (s.founded || '-') + '</div><div><span style="color:#666;">员工人数：</span>' + (s.employees || '-') + '</div><div><span style="color:#666;">营收：</span>' + (s.revenue || '-') + '</div><div><span style="color:#666;">总资产：</span>' + (s.assets || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + s.advantage + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + s.competitor + '</div><div style="margin-top:16px;"><span style="color:#666;">公司简介：</span>' + (s.description || '-') + '</div></div>';
+}
+
+function backToList() {
+  document.getElementById('detail-view').style.display = 'none';
+  document.getElementById('list-view').style.display = 'block';
+  document.getElementById('basics-header').style.display = 'flex';
+  document.getElementById('back-btn').style.display = 'none';
+}
+
+let parsedData = {};
+
+function showAddForm() {
+  document.getElementById('add-form').style.display = 'block';
+  document.getElementById('add-json').value = '';
+  document.getElementById('parsed-fields').innerHTML = '';
+  parsedData = {};
+}
+
+function parseJson() {
+  try {
+    const jsonStr = document.getElementById('add-json').value.trim();
+    parsedData = JSON.parse(jsonStr);
+    const fields = document.getElementById('parsed-fields');
+    const keys = ['code','name','industry','business','advantage','competitor','market_cap','profit','gross_margin','net_margin','deduct_net_margin','pe','founded','employees','revenue','assets','description'];
+    fields.innerHTML = keys.map(k => '<input data-key="' + k + '" placeholder="' + k + '" value="' + (parsedData[k] || '') + '" style="width:80px;padding:6px;">').join('');
+  } catch (e) {
+    alert('JSON解析失败: ' + e.message);
+  }
+}
+
+function addStock() {
+  const inputs = document.querySelectorAll('#parsed-fields input');
+  const newStock = {};
+  inputs.forEach(inp => {
+    newStock[inp.getAttribute('data-key')] = inp.value.trim();
+  });
+  if (!newStock.code || !newStock.name) {
+    alert('代码和名称不能为空');
+    return;
+  }
+  basicsData.push(newStock);
+  renderBasics();
+  hideAddForm();
+  saveBasics();
+}
+
+function hideAddForm() {
+  document.getElementById('add-form').style.display = 'none';
+}
+
+function addStock() {
+  const newStock = {
+    code: document.getElementById('add-code').value.trim(),
+    name: document.getElementById('add-name').value.trim(),
+    industry: document.getElementById('add-industry').value,
+    business: document.getElementById('add-business').value.trim(),
+    advantage: document.getElementById('add-advantage').value.trim(),
+    competitor: document.getElementById('add-competitor').value.trim(),
+    market_cap: document.getElementById('add-market').value.trim(),
+    profit: document.getElementById('add-profit').value.trim(),
+    gross_margin: document.getElementById('add-gross').value.trim(),
+    net_margin: document.getElementById('add-net').value.trim(),
+    deduct_net_margin: document.getElementById('add-deduct').value.trim(),
+    pe: document.getElementById('add-pe').value.trim()
+  };
+  if (!newStock.code || !newStock.name) {
+    alert('代码和名称不能为空');
+    return;
+  }
+  basicsData.push(newStock);
+  renderBasics();
+  hideAddForm();
+  saveBasics();
+}
+
+function deleteStock(idx) {
+  if (!confirm('确定删除？')) return;
+  const q = document.getElementById('basics-search').value.trim().toLowerCase();
+  const industry = document.getElementById('industry-filter').value;
+  const filtered = basicsData.filter(s => {
+    if (!q && !industry) return true;
+    if (industry && s.industry !== industry) return false;
+    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
+    return true;
+  });
+  const stockToDelete = filtered[idx];
+  if (stockToDelete) {
+    const actualIdx = basicsData.findIndex(s => s.code === stockToDelete.code);
+    basicsData.splice(actualIdx, 1);
+  }
+  renderBasics();
+  saveBasics();
+}
+
+function saveBasics() {
+  localStorage.setItem('stock_basics', JSON.stringify(basicsData));
 }
 
 function doBasicsFilter() {
