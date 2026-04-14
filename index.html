@@ -505,15 +505,39 @@ async function fetchQuotes() {
     return;
   }
   const codes = basicsData.map(s => s.code);
+  const sinaCodes = codes.map(c => {
+    if (c.startsWith('sh') || c.startsWith('sz')) return c;
+    return c[0] === '6' || c.startsWith('68') ? 'sh' + c : 'sz' + c;
+  });
   try {
-    const url = '/api/quote?' + codes.map(c => 'codes=' + c).join('&');
-    const res = await fetch(url);
-    if (!res.ok) {
-      const err = await res.json();
-      alert('获取失败: ' + (err.error || '未知错误'));
+    const url = 'https://hq.sinajs.cn/list=' + sinaCodes.join(',');
+    const res = await fetch(url, {
+      headers: {
+        "Referer": "http://finance.sina.com.cn",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+    const text = await res.text();
+    console.log('quote response:', text);
+    if (!res.ok || text.includes('error') || text.length < 10) {
+      alert('获取失败，请重试');
       return;
     }
-    const quotes = await res.json();
+    const quotes = {};
+    for (const line of text.trim().split('\n')) {
+      if (!line || line.indexOf('hq_str_') < 0) continue;
+      const match = line.match(/var hq_str_(sh|sz)(\d+)="(.*)"/);
+      if (!match) continue;
+      const code = match.group(2);
+      const data = match.group(3);
+      if (!data) continue;
+      const fields = data.split(',');
+      if (fields.length < 6) continue;
+      const currentPrice = parseFloat(fields[3]) || 0;
+      const preClose = parseFloat(fields[2]) || 0;
+      const changePercent = preClose ? ((currentPrice - preClose) / preClose * 100).toFixed(2) : 0;
+      quotes[code] = { price: currentPrice, change_percent: parseFloat(changePercent) };
+    }
     quotesCache = quotes;
     renderBasics();
     alert('价格已更新');
