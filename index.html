@@ -429,7 +429,7 @@ function changePageSize() {
 
 let currentTab = 'trade';
 let basicsData = [];
-let quotesCache = {};
+let quotesCache = JSON.parse(localStorage.getItem('quotes_cache') || '{}');
 
 function switchTab(tab, el) {
   currentTab = tab;
@@ -539,6 +539,7 @@ async function fetchQuotes() {
       quotes[code] = { price: currentPrice, change_percent: parseFloat(changePercent) };
     }
     quotesCache = quotes;
+    localStorage.setItem('quotes_cache', JSON.stringify(quotes));
     renderBasics();
     alert('价格已更新');
   } catch (e) {
