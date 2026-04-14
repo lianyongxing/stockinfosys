@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import requests
 from flask import Flask, jsonify, render_template, request, send_file
 
 app = Flask(__name__)
@@ -77,6 +78,75 @@ def api_records():
 def data_json():
     records, update_time = load_records()
     return jsonify({"records": records, "update_time": update_time})
+
+@app.route("/stock_basics.json")
+def stock_basics():
+    return send_file(SCRIPT_DIR / "static" / "stock_basics.json")
+
+
+@app.route("/api/quote")
+def api_quote():
+    codes = request.args.getlist("codes")
+    if not codes:
+        return jsonify({"error": "缺少股票代码"}), 400
+
+    sina_codes = []
+    for code in codes:
+        code = code.strip()
+        if not code:
+            continue
+        if code.startswith("sh") or code.startswith("sz"):
+            sina_codes.append(code)
+        else:
+            if len(code) == 6 and code.isdigit():
+                if code[0] in "69":  # 沪市或科创板
+                    sina_codes.append(f"sh{code}")
+                else:
+                    sina_codes.append(f"sz{code}")
+
+    if not sina_codes:
+        return jsonify({"error": "无效的股票代码"}), 400
+
+    try:
+        url = "https://hq.sinajs.cn/list=" + ",".join(sina_codes)
+        response = requests.get(url, timeout=10, headers={
+            "Referer": "http://finance.sina.com.cn",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        })
+        response.raise_for_status()
+
+        import re
+        quotes = {}
+        for line in response.text.strip().split("\n"):
+            if not line or "hq_str_" not in line:
+                continue
+            match = re.match(r'var hq_str_(sh|sz)(\d+)="(.*)"', line)
+            if not match:
+                continue
+            market = match.group(1)
+            code = match.group(2)
+            data = match.group(3)
+            if not data:
+                continue
+            fields = data.split(",")
+            if len(fields) < 6:
+                continue
+            name = fields[0]
+            current_price = float(fields[3]) if fields[3] else 0
+            pre_close = float(fields[2]) if fields[2] else 0
+            change_percent = round(((current_price - pre_close) / pre_close * 100), 2) if pre_close else 0
+            quotes[code] = {
+                "name": name,
+                "price": current_price,
+                "change_percent": change_percent
+            }
+
+        return jsonify(quotes)
+    except requests.Timeout:
+        return jsonify({"error": "请求超时"}), 504
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 def api_refresh():
     records, update_time = load_records()
