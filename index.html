@@ -542,7 +542,11 @@ async function fetchQuotes() {
     renderBasics();
     alert('价格已更新');
   } catch (e) {
-    alert('获取失败: ' + e.message);
+    if (e.message.includes('CORS') || e.message.includes('NetworkError')) {
+      alert('获取失败：浏览器安全限制。请在本地面向localhost运行，或使用代理服务器。');
+    } else {
+      alert('获取失败: ' + e.message);
+    }
   }
 }
 
