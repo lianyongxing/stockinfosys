@@ -61,6 +61,7 @@
 </head>
 <body>
   <div class="sidebar">
+    <div class="nav-item" onclick="switchTab('detail', this)">信息查询</div>
     <div class="nav-item" onclick="switchTab('basics', this)">基本面</div>
     <div class="nav-item active" onclick="switchTab('trade', this)">股权转让</div>
   </div>
@@ -174,6 +175,17 @@
       </table>
     </div>
   </div>
+
+  <div id="detail-search-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
+    <div style="max-width:600px;margin:0 auto;">
+      <button onclick="goToDetailSearch()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;display:none;" id="detail-back-btn">< 返回搜索</button>
+      <div id="detail-search-list">
+        <h2 style="margin-bottom:16px;color:#2c3e50;">信息查询</h2>
+        <input type="text" id="detail-search-input" placeholder="搜索股票代码或名称..." oninput="searchDetailStocks()" style="width:100%;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:16px;box-sizing:border-box;">
+        <div id="detail-search-results" style="margin-top:16px;"></div>
+      </div>
+      <div id="detail-content" style="display:none;"></div>
+    </div>
   </div>
 
   <script>
@@ -437,13 +449,29 @@ function switchTab(tab, el) {
   el.classList.add('active');
   if (tab === 'trade') {
     document.getElementById('basics-view').style.display = 'none';
+    document.getElementById('detail-search-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'flex';
     document.querySelector('.stats').style.display = 'block';
     document.querySelector('.table-wrap').style.display = 'block';
     document.querySelector('.pagination').style.display = 'flex';
     document.getElementById('page-title').textContent = '股权报告提取结果';
+  } else if (tab === 'detail') {
+    document.getElementById('basics-view').style.display = 'none';
+    document.getElementById('detail-search-view').style.display = 'block';
+    document.getElementById('detail-search-list').style.display = 'block';
+    document.getElementById('detail-view').style.display = 'none';
+    document.querySelector('.toolbar').style.display = 'none';
+    document.querySelector('.stats').style.display = 'none';
+    document.querySelector('.table-wrap').style.display = 'none';
+    document.querySelector('.pagination').style.display = 'none';
+    document.getElementById('page-title').textContent = '信息查询';
+    document.getElementById('detail-search-input').value = '';
+    document.getElementById('detail-search-results').innerHTML = '';
+    if (!basicsData || !basicsData.length) loadBasics();
+    else searchDetailStocks();
   } else {
     document.getElementById('basics-view').style.display = 'block';
+    document.getElementById('detail-search-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'none';
     document.querySelector('.stats').style.display = 'none';
     document.querySelector('.table-wrap').style.display = 'none';
@@ -455,6 +483,60 @@ function switchTab(tab, el) {
     document.getElementById('back-btn').style.display = 'none';
     if (!basicsData || !basicsData.length) loadBasics();
   }
+}
+
+function searchDetailStocks() {
+  const q = document.getElementById('detail-search-input').value.trim().toLowerCase();
+  const container = document.getElementById('detail-search-results');
+  if (!basicsData || !basicsData.length) {
+    container.innerHTML = '';
+    return;
+  }
+  let results;
+  if (!q) {
+    results = basicsData.slice(0, 10);
+  } else {
+    results = basicsData.filter(s => 
+      s.code.includes(q) || s.name.includes(q) || s.business.includes(q)
+    ).slice(0, 10);
+  }
+  if (!results.length) {
+    container.innerHTML = '<div style="color:#999;">未找到匹配股票</div>';
+    return;
+  }
+  container.innerHTML = results.map(s => 
+    '<div onclick="showDetailByCode(\'' + s.code + '\')" style="padding:12px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;"><span><b>' + s.code + '</b> ' + s.name + '</span><span style="color:#999;">' + (s.industry || '-') + '</span></div>'
+  ).join('');
+}
+
+function showDetailByCode(code) {
+  const s = basicsData.find(stock => stock.code === code);
+  if (!s) return;
+  document.getElementById('detail-search-list').style.display = 'none';
+  document.getElementById('detail-back-btn').style.display = 'inline-block';
+  document.getElementById('detail-content').style.display = 'block';
+  const q = quotesCache[s.code] || {};
+  const curPrice = q.price ? q.price.toFixed(2) : '-';
+  let priceChange = '-';
+  let priceChangeColor = '#666';
+  if (q.price) {
+    const oldPrice = parseFloat(s.profit?.replace(/[^\d.]/g, '')) || 0;
+    if (oldPrice) {
+      const change = ((q.price - oldPrice) / oldPrice * 100);
+      priceChange = (change > 0 ? '+' : '') + change.toFixed(2) + '%';
+      priceChangeColor = change > 0 ? '#e74c3c' : change < 0 ? '#27ae60' : '#666';
+    }
+  }
+  document.getElementById('detail-content').innerHTML = '<div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + s.business + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">现价：</span><b>' + curPrice + '</b></div><div><span style="color:#666;">涨跌：</span><span style="color:' + priceChangeColor + ';">' + priceChange + '</span></div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div><div><span style="color:#666;">成立时间：</span>' + (s.founded || '-') + '</div><div><span style="color:#666;">员工人数：</span>' + (s.employees || '-') + '</div><div><span style="color:#666;">营收：</span>' + (s.revenue || '-') + '</div><div><span style="color:#666;">总资产：</span>' + (s.assets || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + s.advantage + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + s.competitor + '</div><div style="margin-top:16px;"><span style="color:#666;">公司简介：</span>' + (s.description || '-') + '</div></div>';
+}
+
+function goToDetailSearch() {
+  document.getElementById('detail-content').style.display = 'none';
+  document.getElementById('detail-back-btn').style.display = 'none';
+  document.getElementById('detail-search-list').style.display = 'block';
+  document.getElementById('detail-search-input').value = '';
+  document.getElementById('detail-search-results').innerHTML = '';
+  searchDetailStocks();
 }
 
 async function loadBasics() {
