@@ -79,9 +79,65 @@ def data_json():
     records, update_time = load_records()
     return jsonify({"records": records, "update_time": update_time})
 
+@app.route("/stockinfos.json")
+def stockinfos_json():
+    return send_file(SCRIPT_DIR / "static" / "stockinfos.json", mimetype="application/json")
+
 @app.route("/stock_basics.json")
 def stock_basics():
     return send_file(SCRIPT_DIR / "static" / "stock_basics.json")
+
+@app.route("/stockinfos.html")
+def stockinfos():
+    return send_file(SCRIPT_DIR / "static" / "stockinfos.html")
+
+
+@app.route("/api/stockinfos", methods=["GET", "POST"])
+def api_stockinfos():
+    json_path = SCRIPT_DIR / "static" / "stockinfos.json"
+    from datetime import datetime, timezone, timedelta
+    
+    if request.method == "GET":
+        if not json_path.exists():
+            return jsonify([])
+        with open(json_path, encoding="utf-8") as f:
+            return jsonify(json.load(f))
+    
+    data = request.get_json()
+    if not data or not data.get("name") or not data.get("content"):
+        return jsonify({"error": "缺少名称或内容"}), 400
+    
+    if json_path.exists():
+        with open(json_path, encoding="utf-8") as f:
+            items = json.load(f)
+    else:
+        items = []
+    
+    name = data["name"].strip()
+    content = data["content"].strip()
+    tz = timezone(timedelta(hours=8))
+    add_date = datetime.now(tz).strftime("%Y-%m-%d")
+    
+    file_name = f"{name}.md"
+    existing = next((i for i, x in enumerate(items) if x["name"] == name), None)
+    
+    md_header = f"---\n添加日期: {add_date}\n---\n\n"
+    full_content = md_header + content
+    
+    if existing is not None:
+        items[existing] = {"name": name, "file": file_name, "content": content, "add_date": add_date}
+    else:
+        items.append({"name": name, "file": file_name, "content": content, "add_date": add_date})
+    
+    md_path = SCRIPT_DIR.parent / "stockinfos" / file_name
+    md_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write(full_content)
+    
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False)
+    
+    return jsonify({"success": True, "items": items})
 
 
 @app.route("/api/quote")
