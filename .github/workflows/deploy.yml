@@ -19,16 +19,17 @@ jobs:
         run: pip install -r ann_report_web/requirements.txt
 
       - name: Generate data.json
-        run: python -c "
-import json
-from pathlib import Path
-import sys
-sys.path.insert(0, '.')
-from ann_report_web.merge_all import merge_all
-records, update_time = merge_all(Path('ann_report/output'), Path('ann_report_web/data/all_records.jsonl'))
-with open('data.json', 'w', encoding='utf-8') as f:
-    json.dump({'records': records, 'update_time': update_time}, f, ensure_ascii=False)
-"
+        run: |
+          python3 -c "
+          import json
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, '.')
+          from ann_report_web.merge_all import merge_all
+          records, update_time = merge_all(Path('ann_report/output'), Path('ann_report_web/data/all_records.jsonl'))
+          with open('data.json', 'w', encoding='utf-8') as f:
+              json.dump({'records': records, 'update_time': update_time}, f, ensure_ascii=False)
+          "
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
