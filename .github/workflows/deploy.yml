@@ -66,9 +66,9 @@ jobs:
           cp ann_report_web/data/stock_basics.json .
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
         with:
-          enablement: true
+          default_branch: main
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
