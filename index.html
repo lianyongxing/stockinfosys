@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>股权报告提取结果</title>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f7fa; color: #333; display: flex; }
@@ -57,19 +58,32 @@
     .basics-header { margin-bottom: 12px; }
     #basics-table th, #basics-table td { padding: 10px 12px; border: 1px solid #e1e4e8; }
     #basics-table th { background: #f8f9fa; font-weight: 600; }
+    .markdown-body { line-height: 1.8; }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 { margin: 20px 0 10px; color: #2c3e50; }
+    .markdown-body p { margin: 10px 0; }
+    .markdown-body ul, .markdown-body ol { margin: 10px 0; padding-left: 20px; }
+    .markdown-body code { background: #f5f5f5; padding: 2px 6px; border-radius: 3px; font-family: monospace; }
+    .markdown-body pre { background: #f8f9fa; padding: 15px; border-radius: 6px; overflow-x: auto; }
+    .markdown-body blockquote { border-left: 4px solid #3498db; margin: 10px 0; padding-left: 15px; color: #666; }
+    .markdown-body table { border-collapse: collapse; width: 100%; margin: 10px 0; }
+    .markdown-body th, .markdown-body td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .markdown-body th { background: #f5f5f5; }
   </style>
 </head>
 <body>
   <div class="sidebar">
     <div class="nav-item" onclick="switchTab('detail', this)">信息查询</div>
     <div class="nav-item" onclick="switchTab('basics', this)">基本面</div>
-    <div class="nav-item active" onclick="switchTab('trade', this)">股权转让</div>
+    <div class="nav-item" onclick="switchTab('trade', this)">股权转让</div>
+    <div class="nav-item" onclick="switchTab('reports', this)">研究报告</div>
   </div>
   <div class="main">
     <div class="header">
       <h1 id="page-title">股权报告提取结果</h1>
       <div class="actions">
         <span id="update-time"></span>
+        <br>
+        <span id="quote-time" style="font-size:11px;color:#ddd;"></span>
       </div>
     </div>
 
@@ -89,17 +103,31 @@
       <option value="定增">定增</option>
     </select>
     <span style="font-size:13px;margin-left:8px;margin-right:4px;">日期:</span>
-    <select id="date-range" onchange="applyDateRange()">
-      <option value="">全部</option>
-      <option value="7">近7天</option>
-      <option value="30">近30天</option>
-      <option value="90">近90天</option>
-      <option value="2026-03">2026年3月</option>
-      <option value="2026-02">2026年2月</option>
-      <option value="2026-01">2026年1月</option>
-      <option value="2025">2025年</option>
-    </select>
+      <select id="date-range" onchange="applyDateRange()"></select>
+      <script>
+        (function initDateOptions() {
+          const sel = document.getElementById('date-range');
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = now.getMonth() + 1;
+          const opts = [
+            {value: '', text: '全部'},
+            {value: '7', text: '近7天'},
+            {value: '30', text: '近30天'},
+            {value: '90', text: '近90天'}
+          ];
+          for (let m = month; m >= 1; m--) {
+            const v = year + '-' + String(m).padStart(2, '0');
+            opts.push({value: v, text: year + '年' + m + '月'});
+          }
+          for (let y = year - 1; y >= year - 2; y--) {
+            opts.push({value: String(y), text: y + '年'});
+          }
+          sel.innerHTML = opts.map(o => '<option value="' + o.value + '">' + o.text + '</option>').join('');
+        })();
+      </script>
     <input type="text" id="recipient-filter" placeholder="受让方..." oninput="doFilter()" style="width:120px;margin-left:auto;">
+    <button onclick="fetchTradeQuotes()" style="padding:6px 14px;background:#9b59b6;color:#fff;border:none;border-radius:4px;font-size:14px;cursor:pointer;">获取最新价</button>
     <button onclick="clearFilters()">清除筛选</button>
   </div>
 
@@ -188,6 +216,27 @@
     </div>
   </div>
 
+  <div id="reports-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
+    <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;">
+      <h2 style="color:#2c3e50;margin:0;">股票研究报告</h2>
+      <button onclick="showAddReport()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">+ 新增报告</button>
+    </div>
+    <div id="reports-add-form" style="display:none;background:#fff;padding:20px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px8px rgba(0,0,0,0.1);">
+      <div style="margin-bottom:12px;">
+        <input type="text" id="report-name" placeholder="股票名称" style="width:200px;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <textarea id="report-content" placeholder="粘贴markdown内容..." style="width:100%;height:300px;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;font-family:monospace;box-sizing:border-box;"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="saveReport()" style="padding:8px 20px;background:#2ecc71;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">保存</button>
+        <button onclick="hideAddReport()" style="padding:8px 20px;background:#999;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">取消</button>
+      </div>
+    </div>
+    <div id="reports-list"></div>
+    <div id="reports-detail" style="display:none;"></div>
+  </div>
+
   <script>
 let allRecords = [];
 let filteredRecords = [];
@@ -214,11 +263,87 @@ async function init() {
     allRecords = data.records || [];
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
+    const savedQuoteTime = localStorage.getItem('trade_quote_time');
+    if (savedQuoteTime) {
+      document.getElementById('quote-time').textContent = '价格更新: ' + savedQuoteTime;
+    }
+    doFilter();
   } catch (e) {
     document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
     return;
   }
-  doFilter();
+}
+
+let reportsData = [];
+
+async function loadReports() {
+  try {
+    const res = await fetch('stockinfos.json');
+    reportsData = await res.json();
+    renderReportsList();
+  } catch (e) {
+    console.error('loadReports error:', e);
+  }
+}
+
+function renderReportsList() {
+  document.getElementById('reports-list').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:20px;">' + 
+    reportsData.map(r => '<div class="card" onclick="showReport(\'' + r.file + '\')" style="padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);cursor:pointer;"><h3 style="margin:0 0 10px;color:#2c3e50;">' + r.name + '</h3><p style="color:#999;font-size:12px;margin:0 0 8px;">添加日期: ' + (r.add_date || '-') + '</p><p style="color:#666;font-size:14px;margin:0;">' + r.content.substring(0, 100) + '...</p></div>').join('') + 
+    '</div>';
+}
+
+function showReport(file) {
+  const item = reportsData.find(r => r.file === file);
+  if (!item) return;
+  document.getElementById('reports-list').style.display = 'none';
+  const d = document.getElementById('reports-detail');
+  d.style.display = 'block';
+  const htmlContent = marked.parse(item.content);
+  d.innerHTML = '<button onclick="backToReports()" style="padding:10px 20px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:20px;">← 返回</button><div class="markdown-body" style="background:#fff;padding:20px;border-radius:8px;font-size:14px;line-height:1.6;">' + htmlContent + '</div>';
+}
+
+function backToReports() {
+  document.getElementById('reports-list').style.display = 'block';
+  document.getElementById('reports-detail').style.display = 'none';
+}
+
+function showAddReport() {
+  document.getElementById('reports-add-form').style.display = 'block';
+  document.getElementById('report-name').value = '';
+  document.getElementById('report-content').value = '';
+  document.getElementById('reports-list').style.display = 'none';
+}
+
+function hideAddReport() {
+  document.getElementById('reports-add-form').style.display = 'none';
+  document.getElementById('reports-list').style.display = 'block';
+}
+
+async function saveReport() {
+  const name = document.getElementById('report-name').value.trim();
+  const content = document.getElementById('report-content').value.trim();
+  if (!name || !content) {
+    alert('请填写股票名称和内容');
+    return;
+  }
+  try {
+    const res = await fetch('/api/stockinfos', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({name, content})
+    });
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    reportsData = data.items;
+    renderReportsList();
+    hideAddReport();
+    alert('保存成功');
+  } catch (e) {
+    alert('保存失败: ' + e.message);
+  }
 }
 
 
@@ -398,6 +523,16 @@ function renderPage() {
     const codeLabel = r.stock_code || (r._parsed && r._parsed.股票代码 ? r._parsed.股票代码 : "");
     const stockCell = stockLabel && codeLabel ? '<span class="cell-stock">' + esc(stockLabel) + '</span> <span class="cell-code">(' + esc(codeLabel) + ')</span>' : '<span class="cell-stock">' + esc(stockLabel || codeLabel || "未知") + '</span>';
     const price = r._price || (r._parsed && r._parsed.每股价格 ? r._parsed.每股价格 : "");
+    const curPrice = tradeQuotesCache[codeLabel];
+    let priceHtml = esc(price);
+    if (curPrice) {
+      const priceNum = parseFloat(String(price).replace(/[^\d.]/g, '')) || 0;
+      const change = priceNum > 0 ? ((curPrice.price - priceNum) / priceNum * 100) : 0;
+      const changeColor = change >= 0 ? '#e74c3c' : '#27ae60';
+      const changeSign = change >= 0 ? '+' : '';
+      priceHtml += '<br><span style="color:#666;font-size:11px;">现价:' + curPrice.price.toFixed(2) + '</span>' +
+        '<br><span style="font-size:11px;color:' + changeColor + ';">' + changeSign + change.toFixed(2) + '%</span>';
+    }
     const totalAmount = r._parsed && r._parsed.总金额 ? r._parsed.总金额 : "";
     const unlock = r._unlock_date || (r._parsed && r._parsed.解禁日期 ? r._parsed.解禁日期 : "");
     const shortRecip = r._recipients_short || "";
@@ -411,7 +546,7 @@ function renderPage() {
       '<td>' + stockCell + '</td>' +
       '<td><span class="tag tag-stage-' + esc(r.stage || "未知阶段") + '">' + esc(r.stage || "未知") + '</span></td>' +
       '<td><span class="tag tag-doc-' + esc(r.doc_type || "公告") + '">' + esc(r.doc_type || "公告") + '</span></td>' +
-      '<td class="cell-price">' + esc(price) + '</td>' +
+      '<td class="cell-price">' + priceHtml + '</td>' +
       '<td>' + esc(totalAmount) + '</td>' +
       '<td>' + esc(unlock) + '</td>' +
       '<td title="' + esc(fullRecip) + '">' + esc(shortRecip || showRecip) + '</td>' +
@@ -440,6 +575,7 @@ function changePageSize() {
 }
 
 let currentTab = 'trade';
+let tradeQuotesCache = JSON.parse(localStorage.getItem('trade_quotes_cache') || '{}');
 let basicsData = [];
 let quotesCache = JSON.parse(localStorage.getItem('quotes_cache') || '{}');
 
@@ -450,6 +586,7 @@ function switchTab(tab, el) {
   if (tab === 'trade') {
     document.getElementById('basics-view').style.display = 'none';
     document.getElementById('detail-search-view').style.display = 'none';
+    document.getElementById('reports-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'flex';
     document.querySelector('.stats').style.display = 'block';
     document.querySelector('.table-wrap').style.display = 'block';
@@ -460,6 +597,7 @@ function switchTab(tab, el) {
     document.getElementById('detail-search-view').style.display = 'block';
     document.getElementById('detail-search-list').style.display = 'block';
     document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('reports-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'none';
     document.querySelector('.stats').style.display = 'none';
     document.querySelector('.table-wrap').style.display = 'none';
@@ -469,6 +607,16 @@ function switchTab(tab, el) {
     document.getElementById('detail-search-results').innerHTML = '';
     if (!basicsData || !basicsData.length) loadBasics();
     else searchDetailStocks();
+  } else if (tab === 'reports') {
+    document.getElementById('basics-view').style.display = 'none';
+    document.getElementById('detail-search-view').style.display = 'none';
+    document.getElementById('reports-view').style.display = 'block';
+    document.querySelector('.toolbar').style.display = 'none';
+    document.querySelector('.stats').style.display = 'none';
+    document.querySelector('.table-wrap').style.display = 'none';
+    document.querySelector('.pagination').style.display = 'none';
+    document.getElementById('page-title').textContent = '股票研究报告';
+    if (!reportsData || !reportsData.length) loadReports();
   } else {
     document.getElementById('basics-view').style.display = 'block';
     document.getElementById('detail-search-view').style.display = 'none';
@@ -587,49 +735,53 @@ async function fetchQuotes() {
     return;
   }
   const codes = basicsData.map(s => s.code);
-  const sinaCodes = codes.map(c => {
-    if (c.startsWith('sh') || c.startsWith('sz')) return c;
-    return c[0] === '6' || c.startsWith('68') ? 'sh' + c : 'sz' + c;
-  });
   try {
-    const url = 'https://hq.sinajs.cn/list=' + sinaCodes.join(',');
-    const res = await fetch(url, {
-      headers: {
-        "Referer": "http://finance.sina.com.cn",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-      }
-    });
-    const text = await res.text();
-    console.log('quote response:', text);
-    if (!res.ok || text.includes('error') || text.length < 10) {
-      alert('获取失败，请重试');
+    const res = await fetch('/api/quote?codes=' + codes.join('&codes='));
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
       return;
     }
     const quotes = {};
-    for (const line of text.trim().split('\n')) {
-      if (!line || line.indexOf('hq_str_') < 0) continue;
-      const match = line.match(/var hq_str_(sh|sz)(\d+)="(.*)"/);
-      if (!match) continue;
-      const code = match.group(2);
-      const data = match.group(3);
-      if (!data) continue;
-      const fields = data.split(',');
-      if (fields.length < 6) continue;
-      const currentPrice = parseFloat(fields[3]) || 0;
-      const preClose = parseFloat(fields[2]) || 0;
-      const changePercent = preClose ? ((currentPrice - preClose) / preClose * 100).toFixed(2) : 0;
-      quotes[code] = { price: currentPrice, change_percent: parseFloat(changePercent) };
+    for (const [code, q] of Object.entries(data)) {
+      quotes[code] = { price: q.price, change_percent: q.change_percent };
     }
     quotesCache = quotes;
     localStorage.setItem('quotes_cache', JSON.stringify(quotes));
     renderBasics();
     alert('价格已更新');
   } catch (e) {
-    if (e.message.includes('CORS') || e.message.includes('NetworkError')) {
-      alert('获取失败：浏览器安全限制。请在本地面向localhost运行，或使用代理服务器。');
-    } else {
-      alert('获取失败: ' + e.message);
+    alert('获取失败: ' + e.message);
+  }
+}
+
+async function fetchTradeQuotes() {
+  if (!allRecords || !allRecords.length) {
+    alert('暂无交易数据');
+    return;
+  }
+  const codes = [...new Set(allRecords.map(r => r.stock_code).filter(c => c && c.length === 6))];
+  if (!codes.length) {
+    alert('无有效股票代码');
+    return;
+  }
+  try {
+    const res = await fetch('/api/quote?codes=' + codes.join('&codes='));
+    const data = await res.json();
+    if (data.error) {
+      alert(data.error);
+      return;
     }
+    tradeQuotesCache = data;
+    localStorage.setItem('trade_quotes_cache', JSON.stringify(data));
+    const now = new Date();
+    const timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+    localStorage.setItem('trade_quote_time', timeStr);
+    document.getElementById('quote-time').textContent = '价格更新: ' + timeStr;
+    renderPage();
+    alert('交易价格已更新');
+  } catch (e) {
+    alert('获取失败: ' + e.message);
   }
 }
 
@@ -710,36 +862,7 @@ function addStock() {
   }
   basicsData.push(newStock);
   renderBasics();
-  hideAddForm();
-  saveBasics();
-}
-
-function hideAddForm() {
   document.getElementById('add-form').style.display = 'none';
-}
-
-function addStock() {
-  const newStock = {
-    code: document.getElementById('add-code').value.trim(),
-    name: document.getElementById('add-name').value.trim(),
-    industry: document.getElementById('add-industry').value,
-    business: document.getElementById('add-business').value.trim(),
-    advantage: document.getElementById('add-advantage').value.trim(),
-    competitor: document.getElementById('add-competitor').value.trim(),
-    market_cap: document.getElementById('add-market').value.trim(),
-    profit: document.getElementById('add-profit').value.trim(),
-    gross_margin: document.getElementById('add-gross').value.trim(),
-    net_margin: document.getElementById('add-net').value.trim(),
-    deduct_net_margin: document.getElementById('add-deduct').value.trim(),
-    pe: document.getElementById('add-pe').value.trim()
-  };
-  if (!newStock.code || !newStock.name) {
-    alert('代码和名称不能为空');
-    return;
-  }
-  basicsData.push(newStock);
-  renderBasics();
-  hideAddForm();
   saveBasics();
 }
 
@@ -768,21 +891,6 @@ function saveBasics() {
 
 function doBasicsFilter() {
   renderBasics();
-}
-
-async function init() {
-  try {
-    const res = await fetch('data.json');
-    if (!res.ok) throw new Error('data.json not found');
-    const data = await res.json();
-    allRecords = data.records || [];
-    const updateTime = data.update_time || new Date().toLocaleString();
-    document.getElementById('update-time').textContent = '数据更新: ' + updateTime;
-  } catch (e) {
-    document.getElementById('table-container').innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
-    return;
-  }
-  doFilter();
 }
 
 if (document.readyState === 'loading') {
