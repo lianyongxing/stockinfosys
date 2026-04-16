@@ -1,34 +1,14 @@
-name: Deploy static content to Pages
+name: Deploy to Pages
 
 on:
   push:
     branches: ["main"]
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
   deploy:
-    permissions:
-      pages: write
-      id-token: write
-      contents: read
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -38,43 +18,22 @@ jobs:
       - name: Install dependencies
         run: pip install -r ann_report_web/requirements.txt
 
-      - name: Generate data files
-        run: |
-          python -c "
-          import json
-          from pathlib import Path
-          from datetime import datetime, timezone, timedelta
-          import sys
-          sys.path.insert(0, '.')
-          from ann_report_web.merge_all import merge_all
-
-          output_dir = Path('ann_report/output')
-          merged_path = Path('ann_report_web/data/all_records.jsonl')
-          merged_path.parent.mkdir(parents=True, exist_ok=True)
-          records, update_time = merge_all(output_dir, merged_path)
-
-          data = list(records)
-          data.sort(key=lambda r: (r.get('_date', ''), r.get('stock_name', '')), reverse=True)
-          output = {'records': data, 'update_time': update_time}
-          with open('data.json', 'w', encoding='utf-8') as f:
-              json.dump(output, f, ensure_ascii=False)
-          print(f'data.json: {len(data)} records')
-          "
-
-      - name: Copy static files
-        run: |
-          cp ann_report_web/data/stock_basics.json .
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-        with:
-          default_branch: main
+      - name: Generate data.json
+        run: python -c "
+import json
+from pathlib import Path
+import sys
+sys.path.insert(0, '.')
+from ann_report_web.merge_all import merge_all
+records, update_time = merge_all(Path('ann_report/output'), Path('ann_report_web/data/all_records.jsonl'))
+with open('data.json', 'w', encoding='utf-8') as f:
+    json.dump({'records': records, 'update_time': update_time}, f, ensure_ascii=False)
+"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "."
+          path: .
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
