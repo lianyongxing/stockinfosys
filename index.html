@@ -267,6 +267,15 @@ async function init() {
     if (savedQuoteTime) {
       document.getElementById('quote-time').textContent = '价格更新: ' + savedQuoteTime;
     }
+    try {
+      const quotesRes = await fetch('trade_quotes.json');
+      if (quotesRes.ok) {
+        const fileQuotes = await quotesRes.json();
+        tradeQuotesCache = fileQuotes;
+        const today = new Date().toISOString().slice(0, 10);
+        document.getElementById('quote-time').textContent = '价格更新: ' + today;
+      }
+    } catch(e) {}
     doFilter();
   } catch (e) {
     document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
