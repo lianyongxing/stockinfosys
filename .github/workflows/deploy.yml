@@ -53,8 +53,8 @@ jobs:
       - name: Copy static files
         run: |
           cp ann_report_web/data/stock_basics.json .
-          cp ann_report_web/static/stockinfos.json .
-          cp ann_report_web/static/stockinfos.html .
+          cp stockinfos.json .
+          cp stockinfos.html .
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
