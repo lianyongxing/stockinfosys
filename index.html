@@ -307,9 +307,28 @@ async function loadReports() {
 }
 
 function renderReportsList() {
+  const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
   document.getElementById('reports-list').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:20px;">' + 
-    reportsData.map(r => '<div class="card" onclick="showReport(\'' + r.file + '\')" style="padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);cursor:pointer;"><h3 style="margin:0 0 10px;color:#2c3e50;">' + r.name + '</h3><p style="color:#999;font-size:12px;margin:0 0 8px;">添加日期: ' + (r.add_date || '-') + '</p><p style="color:#666;font-size:14px;margin:0;">' + r.content.substring(0, 100) + '...</p></div>').join('') + 
+    reportsData.map(r => {
+      const rating = r.rating || savedRatings[r.name] || 0;
+      const stars = Array(5).fill(0).map((_, i) => {
+        const starNum = i + 1;
+        return '<span onclick="event.stopPropagation();setRating(\'' + r.name + '\',' + starNum + ')" onmouseover="event.target.style.transform=\'scale(1.3)\'" onmouseout="event.target.style.transform=\'scale(1)\'" style="cursor:pointer;color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:18px;margin:0 2px;transition:transform 0.2s;display:inline-block;">★</span>';
+      }).join('');
+      return '<div class="card" onclick="showReport(\'' + r.file + '\')" style="padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);cursor:pointer;position:relative;"><div style="position:absolute;top:10px;right:10px;">' + stars + '</div><h3 style="margin:0 0 10px;color:#2c3e50;">' + r.name + '</h3><p style="color:#999;font-size:12px;margin:0 0 8px;">添加日期: ' + (r.add_date || '-') + '</p><p style="color:#666;font-size:14px;margin:0;">' + r.content.substring(0, 100) + '...</p></div>';
+    }).join('') + 
     '</div>';
+}
+
+function setRating(name, rating) {
+  const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
+  const current = savedRatings[name] || 0;
+  const newRating = current === rating ? 0 : rating;
+  savedRatings[name] = newRating;
+  localStorage.setItem('report_ratings', JSON.stringify(savedRatings));
+  const item = reportsData.find(r => r.name === name);
+  if (item) item.rating = newRating;
+  renderReportsList();
 }
 
 function showReport(file) {

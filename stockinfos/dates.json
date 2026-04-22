@@ -2,61 +2,73 @@
   {
     "name": "乐鑫科技",
     "add_date": "2026-04-16",
-    "order": 1
+    "order": 1,
+    "rating": 3
   },
   {
     "name": "华恒生物",
     "add_date": "2026-04-16",
-    "order": 2
+    "order": 2,
+    "rating": 0
   },
   {
     "name": "安凯微",
     "add_date": "2026-04-16",
-    "order": 3
+    "order": 3,
+    "rating": 0
   },
   {
     "name": "孩子王",
     "add_date": "2026-04-16",
-    "order": 4
+    "order": 4,
+    "rating": 0
   },
   {
     "name": "乖宝宠物",
     "add_date": "2026-04-16",
-    "order": 5
+    "order": 5,
+    "rating": 0
   },
   {
     "name": "科兴制药",
     "add_date": "2026-04-16",
-    "order": 6
+    "order": 6,
+    "rating": 0
   },
   {
     "name": "爱博医疗",
     "add_date": "2026-04-16",
-    "order": 7
+    "order": 7,
+    "rating": 0
   },
   {
     "name": "中微半导",
     "add_date": "2026-04-16",
-    "order": 8
+    "order": 8,
+    "rating": 0
   },
   {
     "name": "瑞芯微",
     "add_date": "2026-04-18",
-    "order": 9
+    "order": 9,
+    "rating": 0
   },
   {
     "name": "晶晨股份",
     "add_date": "2026-04-18",
-    "order": 10
+    "order": 10,
+    "rating": 0
   },
   {
     "name": "全志科技",
     "add_date": "2026-04-18",
-    "order": 11
+    "order": 11,
+    "rating": 0
   },
   {
     "name": "思特威",
     "add_date": "2026-04-18",
-    "order": 12
+    "order": 12,
+    "rating": 0
   }
 ]
