@@ -70,5 +70,29 @@
     "add_date": "2026-04-18",
     "order": 12,
     "rating": 0
+  },
+  {
+    "name": "恒瑞医药",
+    "add_date": "2026-04-24",
+    "order": 13,
+    "rating": 0
+  },
+  {
+    "name": "拼多多",
+    "add_date": "2026-04-24",
+    "order": 14,
+    "rating": 0
+  },
+  {
+    "name": "小商品城",
+    "add_date": "2026-04-24",
+    "order": 15,
+    "rating": 0
+  },
+  {
+    "name": "人福医药",
+    "add_date": "2026-04-24",
+    "order": 16,
+    "rating": 0
   }
 ]
