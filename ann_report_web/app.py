@@ -14,6 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 OUTPUT_DIR = SCRIPT_DIR.parent / "ann_report" / "output"
 DATA_DIR = SCRIPT_DIR / "data"
 MERGED_PATH = DATA_DIR / "all_records.jsonl"
+USER_DATA_DIR = SCRIPT_DIR / "static" / "user_data"
 
 
 def load_records() -> tuple[list[dict], str]:
@@ -87,9 +88,82 @@ def stockinfos_json():
 def stock_basics():
     return send_file(SCRIPT_DIR / "static" / "stock_basics.json")
 
+@app.route("/trade_quotes.json")
+def trade_quotes():
+    return send_file(SCRIPT_DIR / "static" / "trade_quotes.json")
+
+@app.route("/user_data/<path:filepath>", methods=["GET", "POST"])
+def user_data(filepath):
+    file_path = USER_DATA_DIR / filepath
+    if request.method == "GET":
+        if not file_path.exists():
+            return jsonify({}), 200
+        try:
+            with open(file_path, encoding="utf-8") as f:
+                return jsonify(json.load(f))
+        except:
+            return jsonify({}), 200
+    else:
+        data = request.get_json()
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return jsonify({"success": True})
+
 @app.route("/stockinfos.html")
 def stockinfos():
     return send_file(SCRIPT_DIR / "static" / "stockinfos.html")
+
+
+@app.route("/api/sync-reports", methods=["POST"])
+def sync_reports():
+    from datetime import datetime, timezone, timedelta
+    tz = timezone(timedelta(hours=8))
+    today = datetime.now(tz).strftime("%Y-%m-%d")
+    
+    md_dir = SCRIPT_DIR.parent / "stockinfos"
+    dates_path = md_dir / "dates.json"
+    json_path = SCRIPT_DIR / "static" / "stockinfos.json"
+    
+    dates = []
+    if dates_path.exists():
+        with open(dates_path, encoding="utf-8") as f:
+            dates = json.load(f)
+    
+    existing_names = {d["name"] for d in dates}
+    
+    new_count = 0
+    for md_file in sorted(md_dir.glob("*.md")):
+        name = md_file.stem
+        if name not in existing_names:
+            dates.append({
+                "name": name,
+                "add_date": today,
+                "order": len(dates) + 1,
+                "rating": 0
+            })
+            new_count += 1
+    
+    with open(dates_path, "w", encoding="utf-8") as f:
+        json.dump(dates, f, ensure_ascii=False, indent=2)
+    
+    items = []
+    for d in dates:
+        md_file = md_dir / (d["name"] + ".md")
+        if md_file.exists():
+            content = md_file.read_text(encoding="utf-8")
+            items.append({
+                "name": d["name"],
+                "file": d["name"] + ".md",
+                "add_date": d["add_date"],
+                "rating": d.get("rating", 0),
+                "content": content
+            })
+    
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(items, f, ensure_ascii=False, indent=2)
+    
+    return jsonify({"success": True, "new_count": new_count, "total": len(items)})
 
 
 @app.route("/api/stockinfos", methods=["GET", "POST"])
