@@ -168,6 +168,8 @@
     <span class="info" id="page-info"></span>
     <button id="next-btn" onclick="nextPage()">下一页</button>
     <select class="page-size-select" id="page-size" onchange="changePageSize()">
+      <option value="10" selected>10条/页</option>
+      <option value="20">20条/页</option>
       <option value="50">50条/页</option>
       <option value="100">100条/页</option>
       <option value="200">200条/页</option>
@@ -228,9 +230,18 @@
   </div>
 
   <div id="reports-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
-    <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;">
+    <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
       <h2 style="color:#2c3e50;margin:0;">股票研究报告</h2>
       <button onclick="showAddReport()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">+ 新增报告</button>
+      <button onclick="syncReports()" style="padding:8px 16px;background:#e67e22;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">🔄 同步报告</button>
+      <button onclick="showTagManager()" style="padding:8px 16px;background:#9b59b6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">管理标签</button>
+    </div>
+    <div id="tag-manager" style="display:none;background:#fff;padding:20px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px8px rgba(0,0,0,0.1);">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+        <input type="text" id="new-tag-input" placeholder="输入新标签名称" style="padding:8px;border:1px solid #ddd;border-radius:4px;font-size:14px;width:150px;">
+        <button onclick="addNewTag()" style="padding:8px 16px;background:#2ecc71;color:#fff;border:none;border-radius:4px;cursor:pointer;">添加标签</button>
+      </div>
+      <div id="tag-list-manager" style="display:flex;gap:8px;flex-wrap:wrap;"></div>
     </div>
     <div id="reports-add-form" style="display:none;background:#fff;padding:20px;border-radius:8px;margin-bottom:20px;box-shadow:0 2px8px rgba(0,0,0,0.1);">
       <div style="margin-bottom:12px;">
@@ -244,15 +255,41 @@
         <button onclick="hideAddReport()" style="padding:8px 20px;background:#999;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;">取消</button>
       </div>
     </div>
-    <div id="reports-list"></div>
-    <div id="reports-detail" style="display:none;"></div>
+    <div style="display:flex;gap:20px;">
+      <div style="width:200px;flex-shrink:0;">
+        <div style="background:#fff;border-radius:8px;padding:12px;margin-bottom:12px;box-shadow:0 2px4px rgba(0,0,0,0.1);">
+          <input type="text" id="report-search" placeholder="搜索股票..." oninput="filterReports()" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;font-size:13px;box-sizing:border-box;margin-bottom:8px;">
+          <div style="font-size:12px;color:#666;margin-bottom:6px;">星级:</div>
+          <select id="report-rating-filter" onchange="filterReports()" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;margin-bottom:8px;">
+            <option value="">全部</option>
+            <option value="0">未评分</option>
+            <option value="1">1星</option>
+            <option value="2">2星</option>
+            <option value="3">3星</option>
+            <option value="4">4星</option>
+            <option value="5">5星</option>
+          </select>
+          <div style="font-size:12px;color:#666;margin-bottom:6px;">标签:</div>
+          <select id="report-tag-filter" onchange="filterReports()" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;margin-bottom:8px;">
+            <option value="">全部</option>
+          </select>
+          <div style="font-size:12px;color:#666;margin-bottom:6px;">添加日期:</div>
+          <select id="report-date-filter" onchange="filterReports()" style="width:100%;padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;"></select>
+        </div>
+        <div id="reports-toc" style="background:#fff;border-radius:8px;padding:8px;box-shadow:0 2px4px rgba(0,0,0,0.1);max-height:calc(100vh - 400px);overflow-y:auto;"></div>
+      </div>
+      <div style="flex:1;">
+        <div id="reports-list"></div>
+        <div id="reports-detail" style="display:none;"></div>
+      </div>
+    </div>
   </div>
 
   <script>
 let allRecords = [];
 let filteredRecords = [];
 let currentPage = 1;
-let pageSize = 50;
+let pageSize = 10;
 let sortColumn = "_date";
 let sortAsc = false;
 let sortClickCount = {};
@@ -260,7 +297,34 @@ let dateRange = { from: "", to: "" };
 
 function esc(s) {
   if (s == null) return "";
-  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, '&quot;');
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, '&quot;');
+}
+
+async function syncToFile(path, data) {
+  try {
+    await fetch('/user_data/' + path, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+  } catch(e) { console.error('sync error:', e); }
+}
+
+async function loadFromFile(path) {
+  try {
+    const res = await fetch('/user_data/' + path);
+    if (res.ok) return await res.json();
+  } catch(e) {}
+  return {};
+}
+
+function getLocalData(key, defaultVal) {
+  const local = localStorage.getItem(key);
+  return local ? JSON.parse(local) : defaultVal;
+}
+
+function setLocalData(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
 }
 
 async function init() {
@@ -274,19 +338,33 @@ async function init() {
     allRecords = data.records || [];
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
-    const savedQuoteTime = localStorage.getItem('trade_quote_time');
-    if (savedQuoteTime) {
-      document.getElementById('quote-time').textContent = '价格更新: ' + savedQuoteTime;
+    
+    const tradeData = await loadFromFile('trade/quotes.json');
+    const fileQuoteTime = tradeData.update_time;
+    const localQuoteTime = localStorage.getItem('trade_quote_time');
+    const savedQuotes = localStorage.getItem('trade_quotes_cache');
+    
+    if (savedQuotes) {
+      tradeQuotesCache = JSON.parse(savedQuotes);
+      document.getElementById('quote-time').textContent = '价格更新: ' + (localQuoteTime || '');
+    } else if (tradeData.quotes && Object.keys(tradeData.quotes).length) {
+      tradeQuotesCache = tradeData.quotes;
+      localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData.quotes));
+      localStorage.setItem('trade_quote_time', tradeData.update_time || '');
+      document.getElementById('quote-time').textContent = '价格更新: ' + (tradeData.update_time || '');
+    } else {
+      try {
+        const quotesRes = await fetch('trade_quotes.json');
+        if (quotesRes.ok) {
+          const fileQuotes = await quotesRes.json();
+          tradeQuotesCache = fileQuotes;
+          localStorage.setItem('trade_quotes_cache', JSON.stringify(fileQuotes));
+          const today = new Date().toISOString().slice(0, 10);
+          localStorage.setItem('trade_quote_time', today);
+          document.getElementById('quote-time').textContent = '价格更新: ' + today;
+        }
+      } catch(e) {}
     }
-    try {
-      const quotesRes = await fetch('trade_quotes.json');
-      if (quotesRes.ok) {
-        const fileQuotes = await quotesRes.json();
-        tradeQuotesCache = fileQuotes;
-        const today = new Date().toISOString().slice(0, 10);
-        document.getElementById('quote-time').textContent = '价格更新: ' + today;
-      }
-    } catch(e) {}
     doFilter();
   } catch (e) {
     document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
@@ -296,10 +374,33 @@ async function init() {
 
 let reportsData = [];
 
+async function syncReports() {
+  try {
+    const res = await fetch('/api/sync-reports', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      alert('同步成功！发现 ' + data.new_count + ' 个新报告，当前共 ' + data.total + ' 个报告');
+      await loadReports();
+    } else {
+      alert('同步失败');
+    }
+  } catch (e) {
+    alert('同步失败: ' + e.message);
+  }
+}
+
 async function loadReports() {
   try {
     const res = await fetch('stockinfos.json');
     reportsData = await res.json();
+    const reportsFileData = await loadFromFile('reports/data.json');
+    if (reportsFileData.ratings) {
+      localStorage.setItem('report_ratings', JSON.stringify(reportsFileData.ratings));
+    }
+    if (reportsFileData.tags) {
+      localStorage.setItem('report_tags', JSON.stringify(reportsFileData.tags));
+    }
+    initReportFilters();
     renderReportsList();
   } catch (e) {
     console.error('loadReports error:', e);
@@ -308,16 +409,176 @@ async function loadReports() {
 
 function renderReportsList() {
   const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  const allTags = getAllTags();
+  const q = document.getElementById('report-search').value.trim().toLowerCase();
+  const ratingFilter = document.getElementById('report-rating-filter').value;
+  const tagFilter = document.getElementById('report-tag-filter').value;
+  const dateFilter = document.getElementById('report-date-filter').value;
+  
+  const filtered = reportsData.filter(r => {
+    const rating = savedRatings[r.name] ?? r.rating ?? 0;
+    const tags = savedTags[r.name] || [];
+    if (q && !r.name.toLowerCase().includes(q)) return false;
+    if (ratingFilter && String(rating) !== ratingFilter) return false;
+    if (tagFilter && !tags.includes(tagFilter)) return false;
+    if (dateFilter && r.add_date !== dateFilter) return false;
+    return true;
+  });
+  
+  renderReportsTOC(filtered, savedRatings, savedTags);
+  if (filtered.length === 0) {
+    document.getElementById('reports-list').innerHTML = '<div style="padding:20px;color:#999;">暂无报告</div>';
+    return;
+  }
   document.getElementById('reports-list').innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:20px;">' + 
-    reportsData.map(r => {
-      const rating = r.rating || savedRatings[r.name] || 0;
+    filtered.map(r => {
+      const rating = savedRatings[r.name] ?? r.rating ?? 0;
+      const tags = savedTags[r.name] || [];
       const stars = Array(5).fill(0).map((_, i) => {
         const starNum = i + 1;
         return '<span onclick="event.stopPropagation();setRating(\'' + r.name + '\',' + starNum + ')" onmouseover="event.target.style.transform=\'scale(1.3)\'" onmouseout="event.target.style.transform=\'scale(1)\'" style="cursor:pointer;color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:18px;margin:0 2px;transition:transform 0.2s;display:inline-block;">★</span>';
       }).join('');
-      return '<div class="card" onclick="showReport(\'' + r.file + '\')" style="padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);cursor:pointer;position:relative;"><div style="position:absolute;top:10px;right:10px;">' + stars + '</div><h3 style="margin:0 0 10px;color:#2c3e50;">' + r.name + '</h3><p style="color:#999;font-size:12px;margin:0 0 8px;">添加日期: ' + (r.add_date || '-') + '</p><p style="color:#666;font-size:14px;margin:0;">' + r.content.substring(0, 100) + '...</p></div>';
+      const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;margin-right:4px;">' + t + '</span>').join('');
+      return '<div class="card" onclick="showReport(\'' + r.file + '\')" style="padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);cursor:pointer;position:relative;"><div style="position:absolute;top:10px;right:10px;">' + stars + '</div><h3 style="margin:0 0 6px;color:#2c3e50;">' + r.name + '</h3><div style="margin-bottom:8px;">' + tagHtml + '</div><p style="color:#999;font-size:12px;margin:0 0 8px;">添加日期: ' + (r.add_date || '-') + '</p><p style="color:#666;font-size:14px;margin:0;">' + r.content.substring(0, 100) + '...</p></div>';
     }).join('') + 
     '</div>';
+}
+
+function renderReportsTOC(filtered, savedRatings, savedTags) {
+  const toc = document.getElementById('reports-toc');
+  if (!filtered.length) {
+    toc.innerHTML = '<div style="padding:10px;color:#999;font-size:12px;">无结果</div>';
+    return;
+  }
+  toc.innerHTML = filtered.map(r => {
+    const rating = r.rating || savedRatings[r.name] || 0;
+    const tags = savedTags[r.name] || [];
+    const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:12px;">★</span>').join('');
+    const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:1px 4px;border-radius:8px;font-size:10px;margin-right:2px;">' + t + '</span>').join('');
+    return '<div onclick="showReport(\'' + r.file + '\')" style="padding:8px;cursor:pointer;border-bottom:1px solid #f0f0f0;font-size:12px;color:#333;" onmouseover="this.style.background=\'#f5f5f5\'" onmouseout="this.style.background=\'#fff\'"><div style="font-weight:500;">' + r.name + '</div><div style="margin:4px 0;">' + tagHtml + '</div><div style="color:#999;font-size:11px;">' + stars + ' | ' + (r.add_date || '') + '</div></div>';
+  }).join('');
+}
+
+function filterReports() {
+  renderReportsList();
+}
+
+function getTagColor(tag) {
+  const colors = ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6', '#f39c12', '#1abc9c', '#e67e22', '#34495e', '#16a085', '#c0392b'];
+  let hash = 0;
+  for (let i = 0; i < tag.length; i++) {
+    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+function getAllTags() {
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  const tagSet = new Set();
+  Object.values(savedTags).forEach(tags => {
+    tags.forEach(t => tagSet.add(t));
+  });
+  return Array.from(tagSet).sort();
+}
+
+function showTagManager() {
+  const div = document.getElementById('tag-manager');
+  div.style.display = div.style.display === 'none' ? 'block' : 'none';
+  renderTagManager();
+}
+
+function renderTagManager() {
+  const allTags = getAllTags();
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  document.getElementById('tag-list-manager').innerHTML = allTags.map(t => {
+    const usedCount = Object.values(savedTags).filter(tags => tags.includes(t)).length;
+    return '<div style="display:flex;align-items:center;gap:8px;background:' + getTagColor(t) + ';color:#fff;padding:6px 10px;border-radius:20px;"><span>' + t + '</span><span style="font-size:11px;opacity:0.8;">(' + usedCount + ')</span><span onclick="deleteTag(\'' + t + '\')" style="cursor:pointer;margin-left:4px;">×</span></div>';
+  }).join('') + (allTags.length ? '' : '<span style="color:#999;">暂无标签</span>');
+}
+
+function addNewTag() {
+  const input = document.getElementById('new-tag-input');
+  const tag = input.value.trim();
+  if (!tag) return;
+  const allTags = getAllTags();
+  if (!allTags.includes(tag)) {
+    const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+    localStorage.setItem('report_tags', JSON.stringify(savedTags));
+  }
+  input.value = '';
+  renderTagManager();
+  updateTagFilter();
+  renderReportsList();
+}
+
+function deleteTag(tag) {
+  if (!confirm('删除标签 "' + tag + '"？')) return;
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  Object.keys(savedTags).forEach(name => {
+    savedTags[name] = savedTags[name].filter(t => t !== tag);
+    if (savedTags[name].length === 0) delete savedTags[name];
+  });
+  localStorage.setItem('report_tags', JSON.stringify(savedTags));
+  renderTagManager();
+  updateTagFilter();
+  renderReportsList();
+}
+
+function updateTagFilter() {
+  const allTags = getAllTags();
+  const select = document.getElementById('report-tag-filter');
+  select.innerHTML = '<option value="">全部</option>' + allTags.map(t => '<option value="' + t + '">' + t + '</option>').join('');
+}
+
+function showTagEditor(name) {
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  const currentTags = savedTags[name] || [];
+  const allTags = getAllTags();
+  const usedTags = new Set(currentTags);
+  
+  let html = '<div style="padding:20px;background:#fff;border-radius:8px;margin-top:20px;">';
+  html += '<div style="margin-bottom:12px;font-weight:500;">为 "' + name + '" 添加标签:</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">';
+  allTags.forEach(t => {
+    const checked = usedTags.has(t) ? 'checked' : '';
+    html += '<label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" ' + checked + ' onchange="toggleTag(\'' + name + '\', \'' + t + '\', this.checked)"><span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;">' + t + '</span></label>';
+  });
+  html += '</div>';
+  html += '<div style="display:flex;gap:8px;"><input type="text" id="quick-tag-input" placeholder="快速添加新标签" style="padding:6px;border:1px solid #ddd;border-radius:4px;font-size:12px;width:120px;"><button onclick="quickAddTag(\'' + name + '\')" style="padding:6px 12px;background:#2ecc71;color:#fff;border:none;border-radius:4px;cursor:pointer;">添加</button></div>';
+  html += '</div>';
+  return html;
+}
+
+function toggleTag(name, tag, checked) {
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  if (!savedTags[name]) savedTags[name] = [];
+  if (checked) {
+    if (!savedTags[name].includes(tag)) savedTags[name].push(tag);
+  } else {
+    savedTags[name] = savedTags[name].filter(t => t !== tag);
+  }
+  localStorage.setItem('report_tags', JSON.stringify(savedTags));
+  syncToFile('reports/data.json', { ratings: getLocalData('report_ratings', {}), tags: savedTags });
+  updateTagFilter();
+  renderReportsList();
+}
+
+function quickAddTag(name) {
+  const input = document.getElementById('quick-tag-input');
+  const tag = input.value.trim();
+  if (!tag) return;
+  toggleTag(name, tag, true);
+  input.value = '';
+  const modal = document.querySelector('#tag-editor-modal');
+  if (modal) modal.innerHTML = showTagEditor(name);
+}
+
+function initReportFilters() {
+  const dates = [...new Set(reportsData.map(r => r.add_date).filter(Boolean))].sort().reverse();
+  const dateSel = document.getElementById('report-date-filter');
+  dateSel.innerHTML = '<option value="">全部</option>' + dates.map(d => '<option value="' + d + '">' + d + '</option>').join('');
+  updateTagFilter();
 }
 
 function setRating(name, rating) {
@@ -326,6 +587,7 @@ function setRating(name, rating) {
   const newRating = current === rating ? 0 : rating;
   savedRatings[name] = newRating;
   localStorage.setItem('report_ratings', JSON.stringify(savedRatings));
+  syncToFile('reports/data.json', { ratings: savedRatings, tags: getLocalData('report_tags', {}) });
   const item = reportsData.find(r => r.name === name);
   if (item) item.rating = newRating;
   renderReportsList();
@@ -338,7 +600,11 @@ function showReport(file) {
   const d = document.getElementById('reports-detail');
   d.style.display = 'block';
   const htmlContent = marked.parse(item.content);
-  d.innerHTML = '<button onclick="backToReports()" style="padding:10px 20px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:20px;">← 返回</button><div class="markdown-body" style="background:#fff;padding:20px;border-radius:8px;font-size:14px;line-height:1.6;">' + htmlContent + '</div>';
+  const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  const tags = savedTags[item.name] || [];
+  const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;margin-right:4px;">' + t + '</span>').join('');
+  d.innerHTML = '<button onclick="backToReports()" style="padding:10px 20px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:20px;">← 返回</button><div style="margin-bottom:16px;padding:12px;background:#f8f9fa;border-radius:8px;"><div style="font-weight:500;margin-bottom:8px;">标签: ' + (tagHtml || '<span style="color:#999;">暂无</span>') + '</div><button onclick="document.getElementById(\'tag-editor-content\').style.display=document.getElementById(\'tag-editor-content\').style.display===\'none\'?\'block\':\'none\'" style="padding:6px 12px;background:#9b59b6;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">编辑标签</button><div id="tag-editor-content" style="display:none;margin-top:12px;"></div></div><div id="tag-editor-content"></div><div class="markdown-body" style="background:#fff;padding:20px;border-radius:8px;font-size:14px;line-height:1.6;">' + htmlContent + '</div>';
+  document.getElementById('tag-editor-content').innerHTML = showTagEditor(item.name);
 }
 
 function backToReports() {
@@ -636,6 +902,7 @@ function switchTab(tab, el) {
     document.getElementById('detail-search-view').style.display = 'block';
     document.getElementById('detail-search-list').style.display = 'block';
     document.getElementById('detail-view').style.display = 'none';
+    document.getElementById('detail-content').style.display = 'none';
     document.getElementById('reports-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'none';
     document.querySelector('.stats').style.display = 'none';
@@ -673,90 +940,51 @@ function switchTab(tab, el) {
 }
 
 function searchDetailStocks() {
-  const q = document.getElementById('detail-search-input').value.trim().toLowerCase();
-  const container = document.getElementById('detail-search-results');
+  var q = document.getElementById('detail-search-input').value.trim().toLowerCase();
+  var container = document.getElementById('detail-search-results');
   if (!basicsData || !basicsData.length) {
     container.innerHTML = '';
     return;
   }
-  let results;
-  if (!q) {
-    results = basicsData.slice(0, 10);
-  } else {
-    results = basicsData.filter(s => 
-      s.code.includes(q) || s.name.includes(q) || s.business.includes(q)
-    ).slice(0, 10);
-  }
-  if (!results.length) {
-    container.innerHTML = '<div style="color:#999;">未找到匹配股票</div>';
-    return;
-  }
-  container.innerHTML = results.map(s => 
-    '<div onclick="showDetailByCode(\'' + s.code + '\')" style="padding:12px;border-bottom:1px solid #eee;cursor:pointer;display:flex;justify-content:space-between;"><span><b>' + s.code + '</b> ' + s.name + '</span><span style="color:#999;">' + (s.industry || '-') + '</span></div>'
-  ).join('');
-}
-
-function showDetailByCode(code) {
-  const s = basicsData.find(stock => stock.code === code);
-  if (!s) return;
-  document.getElementById('detail-search-list').style.display = 'none';
-  document.getElementById('detail-back-btn').style.display = 'inline-block';
-  document.getElementById('detail-content').style.display = 'block';
-  const q = quotesCache[s.code] || {};
-  const curPrice = q.price ? q.price.toFixed(2) : '-';
-  let priceChange = '-';
-  let priceChangeColor = '#666';
-  if (q.price) {
-    const oldPrice = parseFloat(s.profit?.replace(/[^\d.]/g, '')) || 0;
-    if (oldPrice) {
-      const change = ((q.price - oldPrice) / oldPrice * 100);
-      priceChange = (change > 0 ? '+' : '') + change.toFixed(2) + '%';
-      priceChangeColor = change > 0 ? '#e74c3c' : change < 0 ? '#27ae60' : '#666';
-    }
-  }
-  document.getElementById('detail-content').innerHTML = '<div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + s.business + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">现价：</span><b>' + curPrice + '</b></div><div><span style="color:#666;">涨跌：</span><span style="color:' + priceChangeColor + ';">' + priceChange + '</span></div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div><div><span style="color:#666;">成立时间：</span>' + (s.founded || '-') + '</div><div><span style="color:#666;">员工人数：</span>' + (s.employees || '-') + '</div><div><span style="color:#666;">营收：</span>' + (s.revenue || '-') + '</div><div><span style="color:#666;">总资产：</span>' + (s.assets || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + s.advantage + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + s.competitor + '</div><div style="margin-top:16px;"><span style="color:#666;">公司简介：</span>' + (s.description || '-') + '</div></div>';
-}
-
-function goToDetailSearch() {
-  document.getElementById('detail-content').style.display = 'none';
-  document.getElementById('detail-back-btn').style.display = 'none';
-  document.getElementById('detail-search-list').style.display = 'block';
-  document.getElementById('detail-search-input').value = '';
-  document.getElementById('detail-search-results').innerHTML = '';
-  searchDetailStocks();
+  var filtered = basicsData.filter(function(s) {
+    if (!q) return true;
+    return s.name.toLowerCase().includes(q) || s.code.includes(q);
+  });
+  container.innerHTML = '<div style="display:grid;gap:12px;">' + filtered.map(function(s) {
+    return '<div style="padding:12px;background:#fff;border-radius:8px;box-shadow:0 2px4px rgba(0,0,0,0.1);cursor:pointer;" onclick="showDetailByCode2(\'' + s.code + '\')"><strong>' + s.name + '</strong> (' + s.code + ')</div>';
+  }).join('') + '</div>';
 }
 
 async function loadBasics() {
   try {
     const stored = localStorage.getItem('stock_basics');
-    console.log('localStorage stock_basics:', stored ? 'exists' : 'null');
     if (stored && stored !== '[]' && stored.length > 10) {
       try {
         basicsData = JSON.parse(stored);
-        console.log('parsed from localStorage:', basicsData.length);
       } catch (parseErr) {
-        console.error('parse error:', parseErr);
         basicsData = [];
       }
     } else {
       localStorage.removeItem('stock_basics');
       basicsData = [];
-    } 
+    }
     if (!basicsData || !basicsData.length) {
-      console.log('fetching from JSON file...');
       const res = await fetch('stock_basics.json');
-      if (!res.ok) {
-        console.error('fetch failed:', res.status);
-        return;
-      }
+      if (!res.ok) return;
       basicsData = await res.json();
-      console.log('fetched from JSON:', basicsData.length);
       if (basicsData.length) {
         localStorage.setItem('stock_basics', JSON.stringify(basicsData));
       }
     }
-    console.log('final basicsData:', basicsData.length);
+    const basicsFileData = await loadFromFile('basics/quotes.json');
+    if (basicsFileData.quotes && Object.keys(basicsFileData.quotes).length) {
+      quotesCache = basicsFileData.quotes;
+    } else {
+      const localQuotes = localStorage.getItem('quotes_cache');
+      if (localQuotes) quotesCache = JSON.parse(localQuotes);
+    }
     renderBasics();
+    if (currentTab === 'detail') searchDetailStocks();
   } catch (e) {
     console.error('loadBasics error:', e);
   }
@@ -787,6 +1015,9 @@ async function fetchQuotes() {
     }
     quotesCache = quotes;
     localStorage.setItem('quotes_cache', JSON.stringify(quotes));
+    const now = new Date();
+    const timeStr = now.toISOString().slice(0, 16);
+    await syncToFile('basics/quotes.json', { quotes: quotes, update_time: timeStr });
     renderBasics();
     alert('价格已更新');
   } catch (e) {
@@ -817,6 +1048,7 @@ async function fetchTradeQuotes() {
     const timeStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
     localStorage.setItem('trade_quote_time', timeStr);
     document.getElementById('quote-time').textContent = '价格更新: ' + timeStr;
+    await syncToFile('trade/quotes.json', { quotes: data, update_time: timeStr });
     renderPage();
     alert('交易价格已更新');
   } catch (e) {
@@ -838,27 +1070,31 @@ function renderBasics() {
     const price = quote.price ? (quote.price >= 100 ? quote.price.toFixed(2) : quote.price.toFixed(2)) : '-';
     const change = quote.change_percent ? (quote.change_percent > 0 ? '+' + quote.change_percent.toFixed(2) + '%' : quote.change_percent.toFixed(2) + '%') : '-';
     const changeColor = quote.change_percent > 0 ? '#e74c3c' : quote.change_percent < 0 ? '#27ae60' : '#666';
-    return '<tr onclick="showDetail(' + idx + ')" style="cursor:pointer;"><td>' + s.code + '</td><td>' + s.name + '</td><td>' + (s.industry || '-') + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td style="font-weight:bold;">' + price + '</td><td style="color:' + changeColor + ';">' + change + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td><td><button onclick="event.stopPropagation();deleteStock(' + idx + ')" style="padding:4px 8px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button></td></tr>';
+    return '<tr onclick="showDetailByCode(\'' + s.code + '\')" style="cursor:pointer;"><td>' + s.code + '</td><td>' + s.name + '</td><td>' + (s.industry || '-') + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td style="font-weight:bold;">' + price + '</td><td style="color:' + changeColor + ';">' + change + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td><td><button onclick="event.stopPropagation();deleteStock(\'' + s.code + '\')" style="padding:4px 8px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button></td></tr>';
   }).join('');
 }
 
-function showDetail(idx) {
-  console.log('showDetail called, idx:', idx, 'basicsData length:', basicsData ? basicsData.length : 'undefined');
-  const q = document.getElementById('basics-search').value.trim().toLowerCase();
-  const industry = document.getElementById('industry-filter').value;
-  const filtered = basicsData.filter(s => {
-    if (!q && !industry) return true;
-    if (industry && s.industry !== industry) return false;
-    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
-    return true;
-  });
-  const s = filtered[idx];
+function showDetailByCode(code) {
+  var s = basicsData.find(function(x) { return x.code === code; });
   if (!s) return;
   document.getElementById('list-view').style.display = 'none';
   document.getElementById('basics-header').style.display = 'none';
-  document.getElementById('back-btn').style.display = 'inline-block';
   document.getElementById('detail-view').style.display = 'block';
-  document.getElementById('detail-view').innerHTML = '<div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + s.business + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div><div><span style="color:#666;">成立时间：</span>' + (s.founded || '-') + '</div><div><span style="color:#666;">员工人数：</span>' + (s.employees || '-') + '</div><div><span style="color:#666;">营收：</span>' + (s.revenue || '-') + '</div><div><span style="color:#666;">总资产：</span>' + (s.assets || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + s.advantage + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + s.competitor + '</div><div style="margin-top:16px;"><span style="color:#666;">公司简介：</span>' + (s.description || '-') + '</div></div>';
+  document.getElementById('detail-view').innerHTML = '<button onclick="backToList()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;">← 返回列表</button><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + (s.business || '-') + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + (s.advantage || '-') + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + (s.competitor || '-') + '</div></div>';
+}
+
+function showDetailByCode2(code) {
+  var s = basicsData.find(function(x) { return x.code === code; });
+  if (!s) return;
+  document.getElementById('detail-search-list').style.display = 'none';
+  document.getElementById('detail-content').style.display = 'block';
+  document.getElementById('detail-content').innerHTML = '<button onclick="goToDetailSearch()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;">← 返回搜索</button><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + (s.business || '-') + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + (s.advantage || '-') + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + (s.competitor || '-') + '</div></div>';
+}
+
+function goToDetailSearch() {
+  document.getElementById('detail-content').style.display = 'none';
+  document.getElementById('detail-search-list').style.display = 'block';
+  searchDetailStocks();
 }
 
 function backToList() {
@@ -905,23 +1141,14 @@ function addStock() {
   saveBasics();
 }
 
-function deleteStock(idx) {
+function deleteStock(code) {
   if (!confirm('确定删除？')) return;
-  const q = document.getElementById('basics-search').value.trim().toLowerCase();
-  const industry = document.getElementById('industry-filter').value;
-  const filtered = basicsData.filter(s => {
-    if (!q && !industry) return true;
-    if (industry && s.industry !== industry) return false;
-    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
-    return true;
-  });
-  const stockToDelete = filtered[idx];
-  if (stockToDelete) {
-    const actualIdx = basicsData.findIndex(s => s.code === stockToDelete.code);
-    basicsData.splice(actualIdx, 1);
+  var idx = basicsData.findIndex(function(s) { return s.code === code; });
+  if (idx >= 0) {
+    basicsData.splice(idx, 1);
   }
+  localStorage.setItem('stock_basics', JSON.stringify(basicsData));
   renderBasics();
-  saveBasics();
 }
 
 function saveBasics() {
