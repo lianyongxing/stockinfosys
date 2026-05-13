@@ -302,12 +302,20 @@ function esc(s) {
 
 async function syncToFile(path, data) {
   try {
-    await fetch('/user_data/' + path, {
+    const res = await fetch('/user_data/' + path, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify(data)
     });
-  } catch(e) { console.error('sync error:', e); }
+    if (!res.ok) throw new Error('API failed');
+  } catch(e) {
+    if (path === 'trade/quotes.json') {
+      const q = data.quotes || data;
+      const existing = JSON.parse(localStorage.getItem('trade_quotes_cache') || '{}');
+      Object.assign(existing, q);
+      localStorage.setItem('trade_quotes_cache', JSON.stringify(existing));
+    }
+  }
 }
 
 async function loadFromFile(path) {
@@ -339,36 +347,30 @@ async function init() {
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
     
-    const tradeData = await loadFromFile('trade/quotes.json');
-    const localQuoteTime = localStorage.getItem('trade_quote_time');
+    let fileQuotes = {};
+    try {
+      const quotesRes = await fetch('trade_quotes.json');
+      if (quotesRes.ok) fileQuotes = await quotesRes.json();
+    } catch(e) { console.log('trade_quotes.json fetch failed:', e); }
+    const fileCount = Object.keys(fileQuotes).length;
+    
     const savedQuotes = localStorage.getItem('trade_quotes_cache');
     const savedQuotesCount = savedQuotes ? Object.keys(JSON.parse(savedQuotes)).length : 0;
     
-    if (tradeData.quotes && Object.keys(tradeData.quotes).length > savedQuotesCount) {
-      tradeQuotesCache = tradeData.quotes;
-      localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData.quotes));
-      localStorage.setItem('trade_quote_time', tradeData.update_time || '');
-      document.getElementById('quote-time').textContent = '价格更新: ' + (tradeData.update_time || '');
+    if (fileCount > savedQuotesCount) {
+      tradeQuotesCache = fileQuotes;
+      localStorage.setItem('trade_quotes_cache', JSON.stringify(fileQuotes));
+      const today = new Date().toISOString().slice(0, 10);
+      localStorage.setItem('trade_quote_time', today);
+      document.getElementById('quote-time').textContent = '价格更新: ' + today;
+      console.log('Using file quotes:', fileCount);
     } else if (savedQuotes) {
       tradeQuotesCache = JSON.parse(savedQuotes);
-      document.getElementById('quote-time').textContent = '价格更新: ' + (localQuoteTime || '');
-    } else if (Object.keys(tradeData).length > 0 && tradeData.update_time === undefined) {
-      tradeQuotesCache = tradeData;
-      localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData));
-      localStorage.setItem('trade_quote_time', '');
-      document.getElementById('quote-time').textContent = '价格更新: 本地数据';
+      document.getElementById('quote-time').textContent = '价格更新: ' + (localStorage.getItem('trade_quote_time') || '');
+      console.log('Using cached quotes:', savedQuotesCount);
     } else {
-      try {
-        const quotesRes = await fetch('trade_quotes.json');
-        if (quotesRes.ok) {
-          const fileQuotes = await quotesRes.json();
-          tradeQuotesCache = fileQuotes;
-          localStorage.setItem('trade_quotes_cache', JSON.stringify(fileQuotes));
-          const today = new Date().toISOString().slice(0, 10);
-          localStorage.setItem('trade_quote_time', today);
-          document.getElementById('quote-time').textContent = '价格更新: ' + today;
-        }
-      } catch(e) {}
+      tradeQuotesCache = fileQuotes;
+      console.log('Using empty file quotes:', fileCount);
     }
     doFilter();
   } catch (e) {
@@ -1042,11 +1044,38 @@ async function fetchTradeQuotes() {
     return;
   }
   try {
-    const res = await fetch('/api/quote?codes=' + codes.join('&codes='));
-    const data = await res.json();
-    if (data.error) {
-      alert(data.error);
-      return;
+    let data = {};
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (isLocal) {
+      const res = await fetch('/api/quote?codes=' + codes.join('&codes='));
+      data = await res.json();
+      if (data.error) { alert(data.error); return; }
+    } else {
+      const chunkSize = 50;
+      for (let i = 0; i < codes.length; i += chunkSize) {
+        const chunk = codes.slice(i, i + chunkSize);
+        const param = chunk.map(c => 'code_' + c + '.SH,SZ').join(',');
+        try {
+          const res = await fetch('http://hq.sinajs.cn/list=' + param, { headers: { 'Referer': 'http://finance.sina.com.cn' } });
+          const text = await res.text();
+          const lines = text.split('\n');
+          for (const line of lines) {
+            const m = line.match(/="([^"]+)"/);
+            if (m) {
+              const parts = line.split('=')[0].split('_');
+              const code = parts[parts.length - 1];
+              const fields = m[1].split(',');
+              if (fields[1] && !isNaN(fields[1])) {
+                const price = parseFloat(fields[1]);
+                const prevClose = parseFloat(fields[2]) || price;
+                const change = price - prevClose;
+                const changePercent = prevClose ? (change / prevClose * 100) : 0;
+                data[code] = { price, change_percent: parseFloat(changePercent.toFixed(2)), name: fields[0].replace(/^[^"]*"/, '') };
+              }
+            }
+          }
+        } catch(e) { console.log('chunk failed:', e); }
+      }
     }
     tradeQuotesCache = data;
     localStorage.setItem('trade_quotes_cache', JSON.stringify(data));
@@ -1055,11 +1084,7 @@ async function fetchTradeQuotes() {
     localStorage.setItem('trade_quote_time', timeStr);
     document.getElementById('quote-time').textContent = '价格更新: ' + timeStr;
     await syncToFile('trade/quotes.json', { quotes: data, update_time: timeStr });
-    await fetch('/api/update-trade-quotes', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data)
-    }).catch(() => {});
+    await fetch('/api/update-trade-quotes', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) }).catch(() => {});
     renderPage();
     alert('交易价格已更新');
   } catch (e) {
