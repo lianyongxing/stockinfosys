@@ -340,18 +340,18 @@ async function init() {
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
     
     const tradeData = await loadFromFile('trade/quotes.json');
-    const fileQuoteTime = tradeData.update_time || (tradeData.quotes ? '' : '');
     const localQuoteTime = localStorage.getItem('trade_quote_time');
     const savedQuotes = localStorage.getItem('trade_quotes_cache');
+    const savedQuotesCount = savedQuotes ? Object.keys(JSON.parse(savedQuotes)).length : 0;
     
-    if (savedQuotes) {
-      tradeQuotesCache = JSON.parse(savedQuotes);
-      document.getElementById('quote-time').textContent = '价格更新: ' + (localQuoteTime || '');
-    } else if (tradeData.quotes && Object.keys(tradeData.quotes).length) {
+    if (tradeData.quotes && Object.keys(tradeData.quotes).length > savedQuotesCount) {
       tradeQuotesCache = tradeData.quotes;
       localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData.quotes));
       localStorage.setItem('trade_quote_time', tradeData.update_time || '');
       document.getElementById('quote-time').textContent = '价格更新: ' + (tradeData.update_time || '');
+    } else if (savedQuotes) {
+      tradeQuotesCache = JSON.parse(savedQuotes);
+      document.getElementById('quote-time').textContent = '价格更新: ' + (localQuoteTime || '');
     } else if (Object.keys(tradeData).length > 0 && tradeData.update_time === undefined) {
       tradeQuotesCache = tradeData;
       localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData));
