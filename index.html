@@ -696,8 +696,8 @@ function extractPriceNum(price) {
 }
 
 function extractDateNum(date) {
-  if (!date) return 0;
-  return date.replace(/-/g, "");
+  if (!date) return 99999999;
+  return parseInt(date.replace(/-/g, "")) || 99999999;
 }
 
 function applySort() {
