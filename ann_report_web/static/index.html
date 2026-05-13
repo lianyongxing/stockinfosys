@@ -1050,6 +1050,11 @@ async function fetchTradeQuotes() {
     localStorage.setItem('trade_quote_time', timeStr);
     document.getElementById('quote-time').textContent = '价格更新: ' + timeStr;
     await syncToFile('trade/quotes.json', { quotes: data, update_time: timeStr });
+    await fetch('/api/update-trade-quotes', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    }).catch(() => {});
     renderPage();
     alert('交易价格已更新');
   } catch (e) {

@@ -166,6 +166,16 @@ def sync_reports():
     return jsonify({"success": True, "new_count": new_count, "total": len(items)})
 
 
+@app.route("/api/update-trade-quotes", methods=["POST"])
+def api_update_trade_quotes():
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "无数据"}), 400
+    root_path = SCRIPT_DIR / "static" / "trade_quotes.json"
+    with open(root_path, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    return jsonify({"success": True})
+
 @app.route("/api/stockinfos", methods=["GET", "POST"])
 def api_stockinfos():
     json_path = SCRIPT_DIR / "static" / "stockinfos.json"
