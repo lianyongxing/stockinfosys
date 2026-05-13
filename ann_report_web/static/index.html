@@ -340,7 +340,7 @@ async function init() {
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
     
     const tradeData = await loadFromFile('trade/quotes.json');
-    const fileQuoteTime = tradeData.update_time;
+    const fileQuoteTime = tradeData.update_time || (tradeData.quotes ? '' : '');
     const localQuoteTime = localStorage.getItem('trade_quote_time');
     const savedQuotes = localStorage.getItem('trade_quotes_cache');
     
@@ -352,6 +352,11 @@ async function init() {
       localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData.quotes));
       localStorage.setItem('trade_quote_time', tradeData.update_time || '');
       document.getElementById('quote-time').textContent = '价格更新: ' + (tradeData.update_time || '');
+    } else if (Object.keys(tradeData).length > 0 && tradeData.update_time === undefined) {
+      tradeQuotesCache = tradeData;
+      localStorage.setItem('trade_quotes_cache', JSON.stringify(tradeData));
+      localStorage.setItem('trade_quote_time', '');
+      document.getElementById('quote-time').textContent = '价格更新: 本地数据';
     } else {
       try {
         const quotesRes = await fetch('trade_quotes.json');
