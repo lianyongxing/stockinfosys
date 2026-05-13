@@ -696,8 +696,8 @@ function extractPriceNum(price) {
 }
 
 function extractDateNum(date) {
-  if (!date) return 0;
-  return date.replace(/-/g, "");
+  if (!date) return 99999999;
+  return parseInt(date.replace(/-/g, "")) || 99999999;
 }
 
 function applySort() {
@@ -829,8 +829,9 @@ function renderPage() {
     const stockCell = stockLabel && codeLabel ? '<span class="cell-stock">' + esc(stockLabel) + '</span> <span class="cell-code">(' + esc(codeLabel) + ')</span>' : '<span class="cell-stock">' + esc(stockLabel || codeLabel || "未知") + '</span>';
     const price = r._price || (r._parsed && r._parsed.每股价格 ? r._parsed.每股价格 : "");
     const curPrice = tradeQuotesCache[codeLabel];
-    let priceHtml = esc(price);
-    if (curPrice) {
+    const hasPriceNum = price && /\d/.test(price);
+    let priceHtml = hasPriceNum ? esc(price) : '-';
+    if (hasPriceNum && curPrice) {
       const priceNum = parseFloat(String(price).replace(/[^\d.]/g, '')) || 0;
       const change = priceNum > 0 ? ((curPrice.price - priceNum) / priceNum * 100) : 0;
       const changeColor = change >= 0 ? '#e74c3c' : '#27ae60';
