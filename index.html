@@ -210,7 +210,7 @@
       </div>
       <table style="margin-top:16px;">
         <thead>
-          <tr><th>代码</th><th>名称</th><th>行业</th><th>主营业务</th><th>核心竞争力</th><th>对手</th><th>现价</th><th>涨跌幅</th><th>市值</th><th>净利润</th><th>毛利率</th><th>净利率</th><th>扣非净利</th><th>PE</th><th>操作</th></tr>
+          <tr><th>代码</th><th>名称</th><th>行业</th><th>行业定位</th><th>现价</th><th>涨跌幅</th><th>市值</th><th>净利润</th><th>毛利率</th><th>净利率</th><th>扣非净利</th><th>PE</th><th>评分</th></tr>
         </thead>
         <tbody id="basics-table"></tbody>
       </table>
@@ -378,6 +378,7 @@ async function init() {
       console.log('Using empty file quotes:', fileCount);
     }
     doFilter();
+    loadReports();
   } catch (e) {
     document.getElementById("table-container").innerHTML = '<div class="loading">数据加载失败: ' + e + '<br>请确保 data.json 已生成并推送到仓库</div>';
     return;
@@ -624,6 +625,16 @@ function backToReports() {
   document.getElementById('reports-detail').style.display = 'none';
 }
 
+function showReportByName(name) {
+  const item = reportsData.find(r => r.name === name);
+  if (item) {
+    switchTab('reports', document.querySelector('.nav-item:nth-child(4)'));
+    setTimeout(() => showReport(item.file), 50);
+  } else {
+    alert('暂无 ' + name + ' 的研究报告');
+  }
+}
+
 function showAddReport() {
   document.getElementById('reports-add-form').style.display = 'block';
   document.getElementById('report-name').value = '';
@@ -841,7 +852,7 @@ function renderPage() {
     const rowClass = isError ? "error-row" : isSkipped ? "skipped-row" : "";
     const stockLabel = r.stock_name && r.stock_name !== "未知" ? r.stock_name : (r._parsed && (r._parsed.股票名称 || r._parsed.股票简称) ? (r._parsed.股票名称 || r._parsed.股票简称) : "");
     const codeLabel = r.stock_code || (r._parsed && r._parsed.股票代码 ? r._parsed.股票代码 : "");
-    const stockCell = stockLabel && codeLabel ? '<span class="cell-stock">' + esc(stockLabel) + '</span> <span class="cell-code">(' + esc(codeLabel) + ')</span>' : '<span class="cell-stock">' + esc(stockLabel || codeLabel || "未知") + '</span>';
+    const stockCell = stockLabel && codeLabel ? '<span class="cell-stock" onclick="showReportByName(\'' + esc(stockLabel) + '\')" style="cursor:pointer;color:#3498db;">' + esc(stockLabel) + '</span> <span class="cell-code">(' + esc(codeLabel) + ')</span>' : '<span class="cell-stock" onclick="showReportByName(\'' + esc(stockLabel || codeLabel || "未知") + '\')" style="cursor:pointer;color:#3498db;">' + esc(stockLabel || codeLabel || "未知") + '</span>';
     const price = r._price || (r._parsed && r._parsed.每股价格 ? r._parsed.每股价格 : "");
     const curPrice = tradeQuotesCache[codeLabel];
     const hasPriceNum = price && /\d/.test(price);
@@ -951,7 +962,12 @@ function switchTab(tab, el) {
     document.getElementById('list-view').style.display = 'block';
     document.getElementById('basics-header').style.display = 'flex';
     document.getElementById('back-btn').style.display = 'none';
-    if (!basicsData || !basicsData.length) loadBasics();
+    if (!basicsData || !basicsData.length) {
+      loadBasics();
+    } else {
+      mergeReportsIntoBasics();
+      renderBasics();
+    }
   }
 }
 
@@ -973,37 +989,135 @@ function searchDetailStocks() {
 
 async function loadBasics() {
   try {
-    const stored = localStorage.getItem('stock_basics');
-    if (stored && stored !== '[]' && stored.length > 10) {
-      try {
-        basicsData = JSON.parse(stored);
-      } catch (parseErr) {
-        basicsData = [];
-      }
-    } else {
-      localStorage.removeItem('stock_basics');
-      basicsData = [];
-    }
-    if (!basicsData || !basicsData.length) {
-      const res = await fetch('stock_basics.json');
-      if (!res.ok) return;
-      basicsData = await res.json();
-      if (basicsData.length) {
-        localStorage.setItem('stock_basics', JSON.stringify(basicsData));
-      }
-    }
-    const basicsFileData = await loadFromFile('basics/quotes.json');
-    if (basicsFileData.quotes && Object.keys(basicsFileData.quotes).length) {
-      quotesCache = basicsFileData.quotes;
-    } else {
-      const localQuotes = localStorage.getItem('quotes_cache');
-      if (localQuotes) quotesCache = JSON.parse(localQuotes);
-    }
+    // 从统一数据库加载
+    const res = await fetch('stocks_db.json');
+    if (!res.ok) throw new Error('stocks_db.json not found');
+    const db = await res.json();
+    
+    // 转换为basicsData格式
+    basicsData = Object.values(db.stocks).map(s => ({
+      code: s.code || '',
+      name: s.name || '',
+      market: s.market || '',
+      full_code: s.full_code || '',
+      sw_industry: s.sw_industry || '-',
+      industry: s.industry || '-',
+      business: s.business || '-',
+      advantage: s.industry || '-',
+      competitor: '-',
+      price: s.price || '',
+      change_percent: s.change_percent || '',
+      market_cap: s.market_cap || '-',
+      profit: s.profit || '-',
+      gross_margin: s.gross_margin || '-',
+      net_margin: s.net_margin || '-',
+      deduct_net_margin: s.deduct_net_margin || '-',
+      pe: s.pe || '-',
+      rating: s.rating || 0,
+      tags: s.tags || [],
+      report_file: s.report_file || '',
+      add_date: s.add_date || '',
+      transfer_count: s.transfer_count || 0,
+      transfer_stages: s.transfer_stages || [],
+      last_transfer_date: s.last_transfer_date || '',
+      report_preview: s.report_preview || ''
+    }));
+    
+    // 保存到localStorage
+    localStorage.setItem('stock_basics', JSON.stringify(basicsData));
+    
     renderBasics();
     if (currentTab === 'detail') searchDetailStocks();
   } catch (e) {
     console.error('loadBasics error:', e);
   }
+}
+
+function mergeReportsIntoBasics() {
+  console.log('mergeReportsIntoBasics called, reportsData.length:', reportsData ? reportsData.length : 0, 'basicsData.length before:', basicsData.length);
+  if (!reportsData || !reportsData.length) {
+    console.log('No reports data available');
+    return;
+  }
+  const existingCodes = new Set(basicsData.map(s => s.code));
+  console.log('Existing codes:', existingCodes.size);
+  let changed = false;
+  for (const r of reportsData) {
+    const code = extractCodeFromReport(r.content);
+    console.log('Checking', r.name, 'code:', code, 'exists:', existingCodes.has(code));
+    if (code && !existingCodes.has(code)) {
+      basicsData.push({
+        code: code,
+        name: r.name,
+        industry: extractIndustry(r.content),
+        business: extractBusiness(r.content),
+        advantage: extractAdvantage(r.content),
+        competitor: extractCompetitor(r.content),
+        market_cap: extractMarketCap(r.content),
+        profit: extractProfit(r.content),
+        gross_margin: extractGrossMargin(r.content),
+        net_margin: extractNetMargin(r.content),
+        deduct_net_margin: '-',
+        pe: '-'
+      });
+      existingCodes.add(code);
+      changed = true;
+      console.log('Added', r.name, 'with code', code);
+    }
+  }
+  if (changed) {
+    localStorage.setItem('stock_basics', JSON.stringify(basicsData));
+    console.log('basicsData updated, now has', basicsData.length, 'items');
+  }
+}
+
+function extractCodeFromReport(content) {
+  const m = content.match(/(\d{6})\.[A-Z]{2}/);
+  return m ? m[1] : '';
+}
+
+function extractIndustry(content) {
+  const m = content.match(/一句话行业定位[：:]\s*[^：:【】\n]+/);
+  return m ? m[0].replace(/一句话行业定位[：:]\s*/, '').trim() : '-';
+}
+
+function extractBusiness(content) {
+  const m = content.match(/主营业务描述[：:][^\n]+[^\n]{10,100}/);
+  return m ? m[0].replace(/主营业务描述[：:]/, '').trim() : '-';
+}
+
+function extractAdvantage(content) {
+  const m = content.match(/市场地位[（(][^）)]+[）)][^\n]+/);
+  return m ? m[0].replace(/市场地位[（(][^）)]+[）)][：:]/, '').trim() : '-';
+}
+
+function extractCompetitor(content) {
+  const m = content.match(/核心竞对[^=\n]+/);
+  return m ? m[0].replace(/核心竞对/, '').replace(/[：:]/g, '').trim().substring(0, 50) : '-';
+}
+
+function extractMarketCap(content) {
+  const m = content.match(/当前市值[（(][^）)]+[）)][^|\n]+/);
+  if (m) {
+    const val = m[0].match(/[\d.]+/);
+    return val ? val[0] + '亿' : '-';
+  }
+  return '-';
+}
+
+function extractProfit(content) {
+  const m = content.match(/净利润[^亿元\n]+[\d.]+\s*亿/);
+  return m ? m[0].replace(/净利润/, '').trim() : '-';
+}
+
+function extractGrossMargin(content) {
+  const m = content.match(/毛利率[：:][^%\n]+(\d+\.?\d*%)/);
+  return m ? m[1] : '-';
+}
+
+function extractNetMargin(content) {
+  const m = content.match(/净利率[：:][^%\n]+(\d+\.?\d*%)/);
+  return m ? m[1] : '-';
 }
 
 function reloadBasics() {
@@ -1106,16 +1220,26 @@ function renderBasics() {
   const filtered = basicsData.filter(s => {
     if (!q && !industry) return true;
     if (industry && s.industry !== industry) return false;
-    if (q && !(s.code.includes(q) || s.name.includes(q) || s.business.includes(q) || s.competitor.includes(q))) return false;
+    if (q && !(s.full_code.includes(q) || s.code.includes(q) || s.name.includes(q) || (s.business && s.business.includes(q)) || (s.industry && s.industry.includes(q)))) return false;
     return true;
   });
   document.getElementById('basics-table').innerHTML = filtered.map((s, idx) => {
-    const quote = quotesCache[s.code] || {};
-    const price = quote.price ? (quote.price >= 100 ? quote.price.toFixed(2) : quote.price.toFixed(2)) : '-';
-    const change = quote.change_percent ? (quote.change_percent > 0 ? '+' + quote.change_percent.toFixed(2) + '%' : quote.change_percent.toFixed(2) + '%') : '-';
-    const changeColor = quote.change_percent > 0 ? '#e74c3c' : quote.change_percent < 0 ? '#27ae60' : '#666';
-    return '<tr onclick="showDetailByCode(\'' + s.code + '\')" style="cursor:pointer;"><td>' + s.code + '</td><td>' + s.name + '</td><td>' + (s.industry || '-') + '</td><td>' + s.business + '</td><td>' + s.advantage + '</td><td>' + s.competitor + '</td><td style="font-weight:bold;">' + price + '</td><td style="color:' + changeColor + ';">' + change + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td><td><button onclick="event.stopPropagation();deleteStock(\'' + s.code + '\')" style="padding:4px 8px;background:#e74c3c;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;">删除</button></td></tr>';
+    const price = s.price || '';
+    const change = s.change_percent || '';
+    const changeColor = change > 0 ? '#e74c3c' : change < 0 ? '#27ae60' : '#666';
+    const changeStr = change ? (change > 0 ? '+' + change.toFixed(2) + '%' : change.toFixed(2) + '%') : '-';
+    const priceStr = price ? (parseFloat(price) >= 100 ? parseFloat(price).toFixed(2) : parseFloat(price).toFixed(2)) : '-';
+    const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < (s.rating || 0) ? '#f1c40f' : '#ddd') + ';font-size:12px;cursor:pointer;" onclick="event.stopPropagation();setStockRating(\'' + s.full_code + '\',' + (i+1) + ')">★</span>').join('');
+    return '<tr onclick="showDetailByCode(\'' + s.code + '\')" style="cursor:pointer;"><td>' + s.full_code + '</td><td>' + s.name + '</td><td>' + (s.sw_industry || '-') + '</td><td>' + (s.industry || '-') + '</td><td style="font-weight:bold;">' + priceStr + '</td><td style="color:' + changeColor + ';">' + changeStr + '</td><td>' + (s.market_cap || '-') + '</td><td>' + (s.profit || '-') + '</td><td>' + (s.gross_margin || '-') + '</td><td>' + (s.net_margin || '-') + '</td><td>' + (s.deduct_net_margin || '-') + '</td><td>' + (s.pe || '-') + '</td><td>' + stars + '</td></tr>';
   }).join('');
+}
+
+function setStockRating(fullCode, rating) {
+  const s = basicsData.find(x => x.full_code === fullCode);
+  if (!s) return;
+  s.rating = s.rating === rating ? 0 : rating;
+  localStorage.setItem('stock_basics', JSON.stringify(basicsData));
+  renderBasics();
 }
 
 function showDetailByCode(code) {
@@ -1124,7 +1248,49 @@ function showDetailByCode(code) {
   document.getElementById('list-view').style.display = 'none';
   document.getElementById('basics-header').style.display = 'none';
   document.getElementById('detail-view').style.display = 'block';
-  document.getElementById('detail-view').innerHTML = '<button onclick="backToList()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;">← 返回列表</button><div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);max-width:800px;"><h2 style="margin-bottom:16px;color:#2c3e50;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px;font-size:14px;"><div><span style="color:#666;">行业：</span>' + (s.industry || '-') + '</div><div><span style="color:#666;">主营业务：</span>' + (s.business || '-') + '</div><div><span style="color:#666;">总市值：</span>' + (s.market_cap || '-') + '</div><div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div><div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div><div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div><div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div></div><div style="margin-top:16px;"><span style="color:#666;">核心竞争力：</span>' + (s.advantage || '-') + '</div><div style="margin-top:16px;"><span style="color:#666;">主要竞争对手：</span>' + (s.competitor || '-') + '</div></div>';
+  const tagsHtml = (s.tags || []).map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;margin:2px;display:inline-block;">' + t + '</span>').join('');
+  const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < (s.rating || 0) ? '#f1c40f' : '#ddd') + ';font-size:18px;">★</span>').join('');
+  const transferInfo = s.transfer_count > 0 ? '<div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:8px;"><span style="color:#666;">转让记录：</span>' + s.transfer_count + '条' + (s.transfer_stages ? ' (' + s.transfer_stages.join(', ') + ')' : '') + '，最近: ' + (s.last_transfer_date || '-') + '</div>' : '';
+  
+  let reportContent = '';
+  if (s.report_file) {
+    const reportItem = reportsData.find(r => r.file === s.report_file);
+    if (reportItem && reportItem.content) {
+      const htmlContent = marked.parse(reportItem.content);
+      reportContent = '<div style="height:100%;display:flex;flex-direction:column;"><div style="flex:1;overflow-y:auto;" class="markdown-body" style="background:#fafafa;padding:16px;border-radius:8px;font-size:14px;line-height:1.6;">' + htmlContent + '</div></div>';
+    } else {
+      reportContent = '<div style="color:#999;padding:20px;">暂无研究报告</div>';
+    }
+  } else {
+    reportContent = '<div style="color:#999;padding:20px;">暂无研究报告</div>';
+  }
+  
+  document.getElementById('detail-view').innerHTML = '<button onclick="backToList()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;">← 返回列表</button>' +
+    '<div style="background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px8px rgba(0,0,0,0.1);display:flex;gap:24px;">' +
+    '<div style="width:380px;flex-shrink:0;">' +
+    '<h2 style="margin-bottom:8px;color:#2c3e50;">' + s.name + ' (' + s.full_code + ')</h2>' +
+    '<div style="margin-bottom:12px;">' + stars + '</div>' +
+    '<div style="margin-bottom:16px;">' + (tagsHtml || '<span style="color:#999;">暂无标签</span>') + '</div>' +
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;font-size:14px;">' +
+    '<div><span style="color:#666;">现价：</span><b style="font-size:16px;">' + (s.price ? parseFloat(s.price).toFixed(2) : '-') + '</b></div>' +
+    '<div><span style="color:#666;">涨跌幅：</span><b style="color:' + (s.change_percent > 0 ? '#e74c3c' : s.change_percent < 0 ? '#27ae60' : '#666') + ';">' + (s.change_percent ? (s.change_percent > 0 ? '+' : '') + s.change_percent.toFixed(2) + '%' : '-') + '</b></div>' +
+    '<div><span style="color:#666;">市值：</span>' + (s.market_cap || '-') + '</div>' +
+    '<div><span style="color:#666;">净利润：</span>' + (s.profit || '-') + '</div>' +
+    '<div><span style="color:#666;">毛利率：</span>' + (s.gross_margin || '-') + '</div>' +
+    '<div><span style="color:#666;">净利率：</span>' + (s.net_margin || '-') + '</div>' +
+    '<div><span style="color:#666;">扣非净利率：</span>' + (s.deduct_net_margin || '-') + '</div>' +
+    '<div><span style="color:#666;">PE：</span>' + (s.pe || '-') + '</div>' +
+    '</div>' +
+    '<div style="margin-top:12px;"><span style="color:#666;">行业：</span>' + (s.sw_industry || '-') + '</div>' +
+    '<div style="margin-top:8px;"><span style="color:#666;">行业定位：</span>' + (s.industry || '-') + '</div>' +
+    '<div style="margin-top:8px;"><span style="color:#666;">主营业务：</span>' + (s.business || '-') + '</div>' +
+    transferInfo +
+    '</div>' +
+    '<div style="flex:1;border-left:1px solid #eee;padding-left:24px;overflow:hidden;">' +
+    '<h3 style="margin:0 0 12px;color:#2c3e50;">研究报告</h3>' +
+    '<div style="height:calc(100vh - 280px);overflow-y:auto;background:#fafafa;padding:16px;border-radius:8px;font-size:14px;line-height:1.6;">' + reportContent + '</div>' +
+    '</div>' +
+    '</div>';
 }
 
 function showDetailByCode2(code) {
