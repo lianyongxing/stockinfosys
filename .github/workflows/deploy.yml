@@ -23,23 +23,47 @@ jobs:
       - name: Install dependencies
         run: pip install -r ann_report_web/requirements.txt
 
-      - name: Generate data.json
+      - name: Generate display bundle
         run: |
-          python3 -c "
+          python3 - <<'PY'
           import json
+          import shutil
           from pathlib import Path
           import sys
-          sys.path.insert(0, '.')
+
+          repo = Path('.')
+          sys.path.insert(0, str(repo))
+
           from ann_report_web.merge_all import merge_all
-          records, update_time = merge_all(Path('ann_report/output'), Path('ann_report_web/data/all_records.jsonl'))
-          with open('data.json', 'w', encoding='utf-8') as f:
+
+          dist = repo / 'dist'
+          if dist.exists():
+              shutil.rmtree(dist)
+          (dist / 'user_data' / 'reports').mkdir(parents=True, exist_ok=True)
+
+          records, update_time = merge_all(repo / 'ann_report/output', repo / 'ann_report_web/data/all_records.jsonl')
+          with open(dist / 'data.json', 'w', encoding='utf-8') as f:
               json.dump({'records': records, 'update_time': update_time}, f, ensure_ascii=False)
-          "
+
+          copy_map = {
+              repo / 'ann_report_web/static/index.html': dist / 'index.html',
+              repo / 'ann_report_web/static/stockinfos.html': dist / 'stockinfos.html',
+              repo / 'ann_report_web/static/stockinfos.json': dist / 'stockinfos.json',
+              repo / 'ann_report_web/static/trade_quotes.json': dist / 'trade_quotes.json',
+              repo / 'ann_report_web/static/stocks_db.json': dist / 'stocks_db.json',
+              repo / 'ann_report_web/static/user_data/reports/data.json': dist / 'user_data/reports/data.json',
+          }
+
+          for src, dst in copy_map.items():
+              if src.exists():
+                  dst.parent.mkdir(parents=True, exist_ok=True)
+                  shutil.copy2(src, dst)
+          PY
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: dist
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
