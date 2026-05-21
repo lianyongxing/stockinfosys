@@ -1,4 +1,213 @@
 {
-  "quotes": {},
-  "update_time": ""
+  "quotes": {
+    "300142": {
+      "price": 13.89,
+      "change_percent": -0.64
+    },
+    "300171": {
+      "price": 12.59,
+      "change_percent": 0.16
+    },
+    "300236": {
+      "price": 99.9,
+      "change_percent": -0.76
+    },
+    "300286": {
+      "price": 24.93,
+      "change_percent": 0
+    },
+    "300358": {
+      "price": 9.12,
+      "change_percent": -1.72
+    },
+    "300381": {
+      "price": 7.36,
+      "change_percent": -1.47
+    },
+    "300458": {
+      "price": 36.6,
+      "change_percent": -0.33
+    },
+    "300661": {
+      "price": 108.26,
+      "change_percent": 2.76
+    },
+    "300676": {
+      "price": 39.9,
+      "change_percent": -0.25
+    },
+    "301078": {
+      "price": 8.98,
+      "change_percent": 5.52
+    },
+    "301095": {
+      "price": 107.08,
+      "change_percent": -2.52
+    },
+    "301269": {
+      "price": 93.3,
+      "change_percent": -1.31
+    },
+    "301301": {
+      "price": 9.63,
+      "change_percent": -0.52
+    },
+    "301498": {
+      "price": 45.79,
+      "change_percent": -0.07
+    },
+    "600079": {
+      "price": 17.94,
+      "change_percent": 0.11
+    },
+    "600276": {
+      "price": 51.81,
+      "change_percent": -1.18
+    },
+    "600415": {
+      "price": 14.28,
+      "change_percent": 6.17
+    },
+    "600460": {
+      "price": 30.96,
+      "change_percent": -0.29
+    },
+    "600648": {
+      "price": 9.91,
+      "change_percent": -0.1
+    },
+    "600703": {
+      "price": 16.44,
+      "change_percent": 1.61
+    },
+    "600873": {
+      "price": 9.39,
+      "change_percent": 0.86
+    },
+    "603290": {
+      "price": 121.09,
+      "change_percent": -2.03
+    },
+    "603444": {
+      "price": 377.11,
+      "change_percent": 0.97
+    },
+    "603566": {
+      "price": 11.35,
+      "change_percent": 0.18
+    },
+    "603893": {
+      "price": 186.65,
+      "change_percent": 3.01
+    },
+    "688018": {
+      "price": 181.96,
+      "change_percent": -1
+    },
+    "688050": {
+      "price": 47.35,
+      "change_percent": -0.63
+    },
+    "688065": {
+      "price": 43.91,
+      "change_percent": -2.18
+    },
+    "688099": {
+      "price": 118.84,
+      "change_percent": 8.93
+    },
+    "688110": {
+      "price": 154.79,
+      "change_percent": -1.9
+    },
+    "688111": {
+      "price": 253.7,
+      "change_percent": 0.2
+    },
+    "688114": {
+      "price": 52.2,
+      "change_percent": -0.55
+    },
+    "688136": {
+      "price": 24.61,
+      "change_percent": -1.36
+    },
+    "688153": {
+      "price": 32.71,
+      "change_percent": -0.76
+    },
+    "688187": {
+      "price": 54.13,
+      "change_percent": 0.61
+    },
+    "688206": {
+      "price": 35.2,
+      "change_percent": -1.7
+    },
+    "688213": {
+      "price": 107.7,
+      "change_percent": -1.98
+    },
+    "688220": {
+      "price": 109.78,
+      "change_percent": -1.65
+    },
+    "688234": {
+      "price": 146.51,
+      "change_percent": -2.22
+    },
+    "688259": {
+      "price": 39.41,
+      "change_percent": -0.73
+    },
+    "688286": {
+      "price": 75.31,
+      "change_percent": 1.58
+    },
+    "688293": {
+      "price": 45.89,
+      "change_percent": -1.31
+    },
+    "688380": {
+      "price": 50.68,
+      "change_percent": -1
+    },
+    "688506": {
+      "price": 247.7,
+      "change_percent": -1.89
+    },
+    "688620": {
+      "price": 13.57,
+      "change_percent": -1.31
+    },
+    "688639": {
+      "price": 26.4,
+      "change_percent": -0.26
+    },
+    "688690": {
+      "price": 35.25,
+      "change_percent": -1.7
+    },
+    "688711": {
+      "price": 33.23,
+      "change_percent": 5.66
+    },
+    "688728": {
+      "price": 14.53,
+      "change_percent": 0.14
+    },
+    "688798": {
+      "price": 72.64,
+      "change_percent": -0.29
+    },
+    "002001": {
+      "price": 31.24,
+      "change_percent": -1.58
+    },
+    "002422": {
+      "price": 32.86,
+      "change_percent": 7.28
+    }
+  },
+  "update_time": "2026-05-19T02:48"
 }

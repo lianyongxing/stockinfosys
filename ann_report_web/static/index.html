@@ -242,6 +242,7 @@
         <select id="sw3-filter" onchange="doBasicsFilter()"><option value="">申万三级</option></select>
         <button id="add-stock-btn" onclick="showAddForm()" style="background:#2563eb;">+新增</button>
         <button onclick="reloadBasics()" style="background:#f59e0b;">刷新</button>
+        <button onclick="syncSwFromDb()" style="background:#0ea5e9;" title="从 stocks_db.json 补全申万行业、行业定位等字段">同步行业数据</button>
         <button id="basics-quotes-btn" onclick="fetchQuotes()" style="background:#8b5cf6;">获取最新价</button>
         <button onclick="clearBasicsFilter()" style="background:#64748b;">清除筛选</button>
         </div>
@@ -269,61 +270,77 @@
 
   <div id="industry-analysis-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
     <div style="max-width:1400px;margin:0 auto;">
-      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px;">
-        <div>
-          <h2 style="margin:0 0 6px;color:#0f172a;">行业分析</h2>
-          <div class="muted">查看申万行业覆盖、分布和集中度</div>
+      <!-- 标题 + 操作行 -->
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+        <div style="flex:1;min-width:0;">
+          <h2 style="margin:0 0 2px;color:#0f172a;">行业分析</h2>
+          <div class="muted" style="font-size:12px;">申万行业覆盖与分布分析（基于已研究股票）</div>
         </div>
-        <button onclick="refreshIndustryAnalysis()" style="padding:8px 14px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;">刷新分析</button>
+        <select id="analysis-sw1-filter" onchange="onAnalysisSw1Change();renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万一级</option></select>
+        <select id="analysis-sw2-filter" onchange="onAnalysisSw2Change();renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万二级</option></select>
+        <select id="analysis-sw3-filter" onchange="renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万三级</option></select>
+        <button onclick="clearIndustryAnalysisFilters()" style="padding:7px 12px;background:#64748b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">清除筛选</button>
+        <button onclick="goToBasicsFromAnalysis()" style="padding:7px 12px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">查看基本面</button>
+        <button onclick="refreshIndustryAnalysis()" style="padding:7px 12px;background:#0ea5e9;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">刷新分析</button>
       </div>
-      <div id="sw-stats-panel" class="stats-panel"></div>
-      <div style="margin-top:18px;display:grid;grid-template-columns:1.2fr 0.8fr;gap:18px;align-items:start;">
+      <!-- 统计概览行 -->
+      <div id="sw-stats-panel"></div>
+      <!-- 排行榜 + 股票预览 -->
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
         <div class="report-detail-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
-            <h3 style="margin:0;color:#0f172a;">行业快速筛选</h3>
-            <span class="basic-chip">联动基本面与研究报告</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <h3 style="margin:0;color:#0f172a;">行业排行榜</h3>
+            <span class="muted" style="font-size:12px;">点击行业查看对应股票</span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
-            <select id="analysis-sw1-filter" onchange="onAnalysisSw1Change();renderIndustryAnalysis()"><option value="">申万一级</option></select>
-            <select id="analysis-sw2-filter" onchange="onAnalysisSw2Change();renderIndustryAnalysis()"><option value="">申万二级</option></select>
-            <select id="analysis-sw3-filter" onchange="renderIndustryAnalysis()"><option value="">申万三级</option></select>
-          </div>
-          <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
-            <button onclick="clearIndustryAnalysisFilters()" style="padding:8px 14px;background:#64748b;color:#fff;border:none;border-radius:999px;cursor:pointer;">清除筛选</button>
-            <button onclick="goToBasicsFromAnalysis()" style="padding:8px 14px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;">查看基本面</button>
-          </div>
-          <div id="industry-analysis-summary" style="margin-top:16px;"></div>
-        </div>
-        <div class="report-detail-card">
-          <h3 style="margin:0 0 12px;color:#0f172a;">说明</h3>
-          <div class="muted" style="line-height:1.8;font-size:14px;">这个页面集中展示申万行业统计和分布情况，适合先看行业结构，再回到“基本面”页做股票级别筛选。</div>
-        </div>
-      </div>
-      <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;">
-        <div class="report-detail-card">
-          <h3 style="margin:0 0 12px;color:#0f172a;">行业排行榜</h3>
-          <div class="muted" style="font-size:12px;margin-bottom:10px;">点击行业查看对应股票</div>
           <div id="industry-rank-list"></div>
         </div>
         <div class="report-detail-card">
-          <h3 style="margin:0 0 12px;color:#0f172a;">当前行业股票</h3>
-          <div class="muted" style="font-size:12px;margin-bottom:10px;">点击股票可直接打开基本面页</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <h3 style="margin:0;color:#0f172a;">当前行业股票</h3>
+            <div id="industry-analysis-summary" style="font-size:12px;color:#64748b;"></div>
+          </div>
           <div id="industry-stock-preview"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="detail-search-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
-    <div style="max-width:600px;margin:0 auto;">
-      <button onclick="goToDetailSearch()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;display:none;" id="detail-back-btn">< 返回搜索</button>
-      <div id="detail-search-list">
-        <h2 style="margin-bottom:16px;color:#2c3e50;">信息查询</h2>
-        <input type="text" id="detail-search-input" placeholder="搜索股票代码或名称..." oninput="searchDetailStocks()" style="width:100%;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:16px;box-sizing:border-box;">
-        <div id="detail-search-results" style="margin-top:16px;"></div>
+  <div id="detail-search-view" style="display:none;background:#f5f7fa;min-height:calc(100vh - 60px);">
+    <!-- top filter bar -->
+    <div style="background:#fff;border-bottom:1px solid #e9eef6;padding:11px 20px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;position:sticky;top:0;z-index:10;">
+      <div style="margin-right:6px;min-width:100px;">
+        <span style="font-size:16px;font-weight:700;color:#0f172a;">信息查询</span>
+        <div class="muted" id="detail-total-info" style="font-size:11px;margin-top:1px;"></div>
       </div>
-      <div id="detail-content" style="display:none;"></div>
+      <input type="text" id="detail-search-input" placeholder="代码 / 名称…" oninput="searchDetailStocks()" style="padding:7px 12px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;width:150px;flex-shrink:0;">
+      <select id="detail-sw2-filter" onchange="onDetailSw2Change();searchDetailStocks()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;max-width:140px;"><option value="">申万二级</option></select>
+      <select id="detail-sw3-filter" onchange="searchDetailStocks()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;max-width:140px;"><option value="">申万三级</option></select>
+      <label style="display:flex;align-items:center;gap:4px;font-size:13px;color:#475569;cursor:pointer;white-space:nowrap;flex-shrink:0;"><input type="checkbox" id="detail-has-report" onchange="searchDetailStocks()"> 有报告</label>
+      <button onclick="clearDetailSearch()" style="padding:7px 14px;background:#64748b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;flex-shrink:0;">清除筛选</button>
     </div>
+    <div id="detail-search-list" style="display:flex;">
+      <!-- lv1 sidebar -->
+      <div id="detail-lv1-sidebar" style="width:148px;min-width:148px;background:#fff;border-right:1px solid #e9eef6;overflow-y:auto;max-height:calc(100vh - 110px);position:sticky;top:55px;align-self:flex-start;"></div>
+      <!-- table area -->
+      <div style="flex:1;min-width:0;overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:580px;">
+          <thead>
+            <tr style="background:#f8fafc;border-bottom:2px solid #e9eef6;">
+              <th style="padding:10px 14px;text-align:left;font-weight:600;color:#64748b;white-space:nowrap;">代码</th>
+              <th style="padding:10px 14px;text-align:left;font-weight:600;color:#64748b;">名称</th>
+              <th style="padding:10px 14px;text-align:left;font-weight:600;color:#64748b;white-space:nowrap;">申万一级</th>
+              <th style="padding:10px 14px;text-align:left;font-weight:600;color:#64748b;white-space:nowrap;">申万二级</th>
+              <th style="padding:10px 14px;text-align:left;font-weight:600;color:#64748b;white-space:nowrap;">申万三级</th>
+              <th style="padding:10px 14px;text-align:center;font-weight:600;color:#64748b;">报告</th>
+              <th style="padding:10px 14px;text-align:center;font-weight:600;color:#64748b;">评分</th>
+            </tr>
+          </thead>
+          <tbody id="detail-table-body"></tbody>
+        </table>
+        <div id="detail-pagination" style="padding:10px 16px;background:#fff;border-top:1px solid #e9eef6;display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:13px;color:#475569;min-height:44px;"></div>
+      </div>
+    </div>
+    <div id="detail-content" style="display:none;padding:20px;"></div>
   </div>
 
   <div id="reports-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
@@ -410,6 +427,11 @@ let pageSize = 10;
 let sortColumn = null;
 let sortAsc = false;
 let dateRange = { from: "", to: "" };
+let detailIndustryFilter = '';
+let allStocksData = [];
+let detailFilteredStocks = [];
+let detailPage = 1;
+let detailPageSize = 20;
 const isLocalMode = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 function staticPath(path) {
@@ -1200,7 +1222,6 @@ async function persistStockDb() {
       transfer_count: s.transfer_count || 0,
       transfer_stages: s.transfer_stages || [],
       last_transfer_date: s.last_transfer_date || '',
-      report_preview: s.report_preview || '',
       sw_industry: s.sw_industry || '',
       sw_lv1: s.sw_lv1 || '',
       sw_lv2: s.sw_lv2 || '',
@@ -1257,7 +1278,7 @@ function switchTab(tab, el) {
     document.getElementById('basics-view').style.display = 'none';
     document.getElementById('industry-analysis-view').style.display = 'none';
     document.getElementById('detail-search-view').style.display = 'block';
-    document.getElementById('detail-search-list').style.display = 'block';
+    document.getElementById('detail-search-list').style.display = 'flex';
     document.getElementById('detail-view').style.display = 'none';
     document.getElementById('detail-content').style.display = 'none';
     document.getElementById('reports-view').style.display = 'none';
@@ -1266,10 +1287,8 @@ function switchTab(tab, el) {
     document.querySelector('.table-wrap').style.display = 'none';
     document.querySelector('.pagination').style.display = 'none';
     document.getElementById('page-title').textContent = '信息查询';
-    document.getElementById('detail-search-input').value = '';
-    document.getElementById('detail-search-results').innerHTML = '';
-    if (!basicsData || !basicsData.length) loadBasics();
-    else searchDetailStocks();
+    if (!allStocksData.length) loadAllStocks();
+    else { updateDetailSw2Options(); searchDetailStocks(); }
   } else if (tab === 'reports') {
     document.getElementById('basics-view').style.display = 'none';
     document.getElementById('industry-analysis-view').style.display = 'none';
@@ -1295,13 +1314,14 @@ function switchTab(tab, el) {
     if (!basicsData || !basicsData.length) {
       loadBasics();
     } else {
-      initSwIndustryFilters();
+      initAnalysisSwFilters();
       renderIndustryAnalysis();
     }
   } else {
     document.getElementById('basics-view').style.display = 'block';
     document.getElementById('industry-analysis-view').style.display = 'none';
     document.getElementById('detail-search-view').style.display = 'none';
+    document.getElementById('reports-view').style.display = 'none';
     document.querySelector('.toolbar').style.display = 'none';
     document.querySelector('.stats').style.display = 'none';
     document.querySelector('.table-wrap').style.display = 'none';
@@ -1321,20 +1341,221 @@ function switchTab(tab, el) {
 }
 
 function searchDetailStocks() {
-  var q = document.getElementById('detail-search-input').value.trim().toLowerCase();
-  var container = document.getElementById('detail-search-results');
-  if (!basicsData || !basicsData.length) {
-    container.innerHTML = '';
+  const q = (document.getElementById('detail-search-input').value || '').trim().toLowerCase();
+  const sw2 = (document.getElementById('detail-sw2-filter') || {}).value || '';
+  const sw3 = (document.getElementById('detail-sw3-filter') || {}).value || '';
+  const hasReport = !!(document.getElementById('detail-has-report') || {}).checked;
+  if (!allStocksData.length) return;
+  detailFilteredStocks = allStocksData.filter(s => {
+    if (detailIndustryFilter && s.sw_lv1 !== detailIndustryFilter) return false;
+    if (sw2 && s.sw_lv2 !== sw2) return false;
+    if (sw3 && s.sw_lv3 !== sw3) return false;
+    if (hasReport && !s.report_file) return false;
+    if (q) {
+      return (s.code || '').includes(q) || (s.name || '').toLowerCase().includes(q) ||
+             (s.sw_lv1 && s.sw_lv1.includes(q)) ||
+             (s.sw_lv2 && s.sw_lv2.includes(q)) ||
+             (s.sw_lv3 && s.sw_lv3.includes(q));
+    }
+    return true;
+  });
+  detailPage = 1;
+  renderDetailLv1Sidebar();
+  renderDetailTable();
+  updateDetailTotalInfo();
+}
+
+function renderDetailLv1Sidebar() {
+  const sidebar = document.getElementById('detail-lv1-sidebar');
+  if (!sidebar || !allStocksData.length) return;
+  const counts = {};
+  allStocksData.forEach(s => {
+    const lv1 = (s.sw_lv1 && s.sw_lv1 !== '-') ? s.sw_lv1 : '其他';
+    counts[lv1] = (counts[lv1] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const total = allStocksData.length;
+  const allActive = !detailIndustryFilter;
+  const btnStyle = (active) =>
+    'width:100%;text-align:left;padding:7px 12px 7px 14px;border:none;border-left:3px solid ' +
+    (active ? '#2563eb' : 'transparent') + ';background:' + (active ? '#eff6ff' : 'transparent') +
+    ';color:' + (active ? '#2563eb' : '#475569') + ';font-size:12px;cursor:pointer;' +
+    'display:flex;justify-content:space-between;align-items:center;gap:4px;font-weight:' + (active ? '600' : '400') + ';';
+  sidebar.innerHTML =
+    '<button onclick="setDetailIndustryFilter(\'\')" style="' + btnStyle(allActive) + '">' +
+    '<span>全部</span><span style="color:#94a3b8;font-size:11px;">' + total + '</span></button>' +
+    sorted.map(([name, cnt]) => {
+      const active = detailIndustryFilter === name;
+      return '<button onclick="setDetailIndustryFilter(\'' + name.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="' + btnStyle(active) + '">' +
+        '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:88px;">' + esc(name) + '</span>' +
+        '<span style="color:#94a3b8;font-size:11px;flex-shrink:0;">' + cnt + '</span></button>';
+    }).join('');
+}
+
+function renderDetailTable() {
+  const start = (detailPage - 1) * detailPageSize;
+  const pageItems = detailFilteredStocks.slice(start, start + detailPageSize);
+  const totalPages = Math.ceil(detailFilteredStocks.length / detailPageSize) || 1;
+  const tbody = document.getElementById('detail-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = pageItems.map((s, i) => {
+    const bg = i % 2 === 0 ? '#fff' : '#fafbfc';
+    const hasRep = !!s.report_file;
+    const rating = s.rating || 0;
+    const stars = rating > 0
+      ? '<span style="color:#f59e0b;">' + '★'.repeat(rating) + '</span><span style="color:#e2e8f0;">' + '☆'.repeat(5 - rating) + '</span>'
+      : '<span style="color:#e2e8f0;">☆☆☆☆☆</span>';
+    return '<tr onclick="showDetailByCode2(\'' + esc(s.code) + '\')" ' +
+      'style="background:' + bg + ';cursor:pointer;border-bottom:1px solid #f1f5f9;" ' +
+      'onmouseover="this.style.background=\'#eff6ff\'" onmouseout="this.style.background=\'' + bg + '\'">' +
+      '<td style="padding:9px 14px;font-family:monospace;font-size:12px;color:#64748b;white-space:nowrap;">' + esc(s.code) + '</td>' +
+      '<td style="padding:9px 14px;font-weight:500;color:#0f172a;white-space:nowrap;">' + esc(s.name) + '</td>' +
+      '<td style="padding:9px 14px;color:#475569;font-size:12px;">' + esc(s.sw_lv1 && s.sw_lv1 !== '-' ? s.sw_lv1 : '') + '</td>' +
+      '<td style="padding:9px 14px;color:#475569;font-size:12px;">' + esc(s.sw_lv2 && s.sw_lv2 !== '-' ? s.sw_lv2 : '') + '</td>' +
+      '<td style="padding:9px 14px;color:#475569;font-size:12px;">' + esc(s.sw_lv3 && s.sw_lv3 !== '-' ? s.sw_lv3 : '') + '</td>' +
+      '<td style="padding:9px 14px;text-align:center;">' +
+        (hasRep ? '<span style="color:#16a34a;font-size:15px;" title="有报告">●</span>' : '<span style="color:#e2e8f0;font-size:15px;">○</span>') +
+      '</td>' +
+      '<td style="padding:9px 14px;text-align:center;font-size:12px;white-space:nowrap;">' + stars + '</td>' +
+      '</tr>';
+  }).join('');
+  // Pagination
+  const pag = document.getElementById('detail-pagination');
+  if (!pag) return;
+  const pageSizeSel = '<span style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b;">每页' +
+    '<select onchange="onDetailPageSizeChange(this.value)" style="padding:2px 6px;border:1px solid #d9e2ec;border-radius:5px;font-size:12px;margin:0 2px;">' +
+    [20,50,100,200].map(n => '<option value="' + n + '"' + (n === detailPageSize ? ' selected' : '') + '>' + n + '</option>').join('') +
+    '</select>条</span>';
+  if (totalPages <= 1) {
+    pag.innerHTML = '<span>' + detailFilteredStocks.length + ' 只股票</span>' + pageSizeSel;
     return;
   }
-  var filtered = basicsData.filter(function(s) {
-    if (!q) return true;
-    return s.name.toLowerCase().includes(q) || s.code.includes(q);
-  });
-  container.innerHTML = '<div style="display:grid;gap:12px;">' + filtered.map(function(s) {
-    return '<div style="padding:12px;background:#fff;border-radius:8px;box-shadow:0 2px4px rgba(0,0,0,0.1);cursor:pointer;" onclick="showDetailByCode2(\'' + s.code + '\')"><strong>' + s.name + '</strong> (' + s.code + ')</div>';
-  }).join('') + '</div>';
+  const maxShow = 5, half = 2;
+  let startP = Math.max(1, detailPage - half);
+  let endP = Math.min(totalPages, startP + maxShow - 1);
+  if (endP - startP + 1 < maxShow) startP = Math.max(1, endP - maxShow + 1);
+  const btn = (n, label, disabled, active) =>
+    '<button onclick="detailGoPage(' + n + ')" ' + (disabled ? 'disabled' : '') +
+    ' style="padding:5px 9px;border:1px solid ' + (active ? '#2563eb' : '#d9e2ec') +
+    ';border-radius:6px;background:' + (active ? '#2563eb' : '#fff') +
+    ';color:' + (active ? '#fff' : (disabled ? '#cbd5e1' : '#475569')) +
+    ';cursor:' + (disabled ? 'default' : 'pointer') + ';font-weight:' + (active ? '600' : '400') + ';">' + label + '</button>';
+  let pagHtml = btn(1, '«', detailPage <= 1, false) + btn(detailPage - 1, '‹', detailPage <= 1, false);
+  if (startP > 1) pagHtml += '<span style="color:#94a3b8;padding:0 2px;">…</span>';
+  for (let p = startP; p <= endP; p++) pagHtml += btn(p, p, false, p === detailPage);
+  if (endP < totalPages) pagHtml += '<span style="color:#94a3b8;padding:0 2px;">…</span>';
+  pagHtml += btn(detailPage + 1, '›', detailPage >= totalPages, false) + btn(totalPages, '»', detailPage >= totalPages, false);
+  pagHtml += '<span style="margin-left:8px;">第 ' + detailPage + ' / ' + totalPages + ' 页 · 共 ' + detailFilteredStocks.length + ' 只</span>';
+  pagHtml += '<span style="margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;color:#64748b;">每页' +
+    '<select onchange="onDetailPageSizeChange(this.value)" style="padding:2px 6px;border:1px solid #d9e2ec;border-radius:5px;font-size:12px;margin:0 2px;">' +
+    [20,50,100,200].map(n => '<option value="' + n + '"' + (n === detailPageSize ? ' selected' : '') + '>' + n + '</option>').join('') +
+    '</select>条</span>';
+  pag.innerHTML = pagHtml;
 }
+
+function onDetailPageSizeChange(val) {
+  detailPageSize = parseInt(val, 10) || 20;
+  detailPage = 1;
+  renderDetailTable();
+}
+
+function detailGoPage(n) {
+  const totalPages = Math.ceil(detailFilteredStocks.length / detailPageSize) || 1;
+  detailPage = Math.max(1, Math.min(n, totalPages));
+  renderDetailTable();
+  window.scrollTo(0, 0);
+}
+
+function setDetailIndustryFilter(name) {
+  detailIndustryFilter = name;
+  updateDetailSw2Options();
+  const sw2 = document.getElementById('detail-sw2-filter');
+  const sw3 = document.getElementById('detail-sw3-filter');
+  if (sw2) sw2.value = '';
+  if (sw3) sw3.innerHTML = '<option value="">申万三级</option>';
+  searchDetailStocks();
+}
+
+function onDetailSw2Change() {
+  const sw2 = (document.getElementById('detail-sw2-filter') || {}).value || '';
+  const lv1 = detailIndustryFilter;
+  const opts = new Set();
+  allStocksData.forEach(s => {
+    if ((!lv1 || s.sw_lv1 === lv1) && (!sw2 || s.sw_lv2 === sw2) && s.sw_lv3 && s.sw_lv3 !== '-')
+      opts.add(s.sw_lv3);
+  });
+  document.getElementById('detail-sw3-filter').innerHTML = '<option value="">申万三级</option>' +
+    [...opts].sort().map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
+}
+
+function updateDetailSw2Options() {
+  const lv1 = detailIndustryFilter;
+  const opts = new Set();
+  allStocksData.forEach(s => {
+    if ((!lv1 || s.sw_lv1 === lv1) && s.sw_lv2 && s.sw_lv2 !== '-') opts.add(s.sw_lv2);
+  });
+  const sw2 = document.getElementById('detail-sw2-filter');
+  const sw3 = document.getElementById('detail-sw3-filter');
+  if (sw2) sw2.innerHTML = '<option value="">申万二级</option>' +
+    [...opts].sort().map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>').join('');
+  if (sw3) sw3.innerHTML = '<option value="">申万三级</option>';
+}
+
+function updateDetailTotalInfo() {
+  const el = document.getElementById('detail-total-info');
+  if (!el || !allStocksData.length) return;
+  const total = allStocksData.length;
+  const filtered = detailFilteredStocks.length;
+  const lv1Count = new Set(allStocksData.map(s => s.sw_lv1).filter(v => v && v !== '-')).size;
+  el.textContent = filtered < total
+    ? '筛选 ' + filtered + ' / ' + total + ' 只 · ' + lv1Count + ' 个申万一级'
+    : '共 ' + total + ' 只 · 覆盖 ' + lv1Count + ' 个申万一级';
+}
+
+function clearDetailSearch() {
+  document.getElementById('detail-search-input').value = '';
+  const cb = document.getElementById('detail-has-report');
+  if (cb) cb.checked = false;
+  detailIndustryFilter = '';
+  updateDetailSw2Options();
+  searchDetailStocks();
+}
+
+async function loadAllStocks() {
+  const infoEl = document.getElementById('detail-total-info');
+  if (infoEl) infoEl.textContent = '加载中…';
+  try {
+    const res = await fetch(staticPath('stocks_db.json'));
+    if (!res.ok) throw new Error('stocks_db.json 未找到');
+    const db = await res.json();
+    allStocksData = Object.values(db.stocks || {}).map(s => ({
+      code: s.code || '',
+      name: s.name || '',
+      full_code: s.full_code || '',
+      sw_lv1: s.sw_lv1 || '',
+      sw_lv2: s.sw_lv2 || '',
+      sw_lv3: s.sw_lv3 || '',
+      sw_industry: s.sw_industry || '',
+      report_file: s.report_file || '',
+      rating: s.rating || 0,
+      tags: s.tags || [],
+      industry: s.industry || '-',
+      business: s.business || '-',
+      price: s.price || '',
+      change_percent: s.change_percent || '',
+    }));
+    detailFilteredStocks = allStocksData;
+    updateDetailSw2Options();
+    renderDetailLv1Sidebar();
+    renderDetailTable();
+    updateDetailTotalInfo();
+  } catch(e) {
+    console.error('loadAllStocks error:', e);
+    if (infoEl) infoEl.textContent = '加载失败';
+  }
+}
+
+
 
 async function loadBasics() {
   try {
@@ -1480,6 +1701,30 @@ function reloadBasics() {
   loadBasics();
 }
 
+async function syncSwFromDb() {
+  if (!isLocalMode) {
+    alert('非本地模式下无法运行同步脚本。');
+    return;
+  }
+  const btn = document.querySelector('[onclick="syncSwFromDb()"]');
+  const origText = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = '同步中...'; btn.disabled = true; }
+  try {
+    const res = await fetch(apiPath('api/sync-sw-industry'), { method: 'POST' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || '同步失败');
+    allStocksData = [];   // 清除缓存，下次访问信息查询页自动重载
+    basicsData = [];
+    localStorage.removeItem('stock_basics');
+    await loadBasics();
+    alert('同步完成！\n' + (data.output || '').trim());
+  } catch (e) {
+    alert('同步失败: ' + e.message);
+  } finally {
+    if (btn) { btn.textContent = origText; btn.disabled = false; }
+  }
+}
+
 function initSwIndustryFilters() {
   const makeOptions = (placeholder, values) => {
     return ['<option value="">' + placeholder + '</option>'].concat(values.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>')).join('');
@@ -1493,6 +1738,32 @@ function initSwIndustryFilters() {
   if (sw1) sw1.innerHTML = makeOptions('申万一级', lv1);
   if (sw2) sw2.innerHTML = makeOptions('申万二级', lv2);
   if (sw3) sw3.innerHTML = makeOptions('申万三级', lv3);
+}
+
+function initAnalysisSwFilters() {
+  const src = allStocksData.length ? allStocksData : basicsData;
+  if (!src || !src.length) return;
+  const lv1 = Array.from(new Set(src.map(s => s.sw_lv1).filter(v => v && v !== '-'))).sort();
+  const a1 = document.getElementById('analysis-sw1-filter');
+  if (!a1) return;
+  const cur1 = a1.value;
+  a1.innerHTML = ['<option value="">申万一级</option>'].concat(lv1.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>')).join('');
+  if (cur1 && lv1.includes(cur1)) a1.value = cur1;
+  // cascade lv2 based on current lv1 selection
+  const a2 = document.getElementById('analysis-sw2-filter');
+  const a3 = document.getElementById('analysis-sw3-filter');
+  if (a2) {
+    const cur2 = a2.value;
+    const lv2 = Array.from(new Set(src.filter(s => !a1.value || s.sw_lv1 === a1.value).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort();
+    a2.innerHTML = buildSwOptions(lv2, '申万二级');
+    if (cur2 && lv2.includes(cur2)) a2.value = cur2;
+  }
+  if (a3) {
+    const cur3 = a3.value;
+    const lv3 = Array.from(new Set(src.filter(s => (!a1.value || s.sw_lv1 === a1.value) && (!a2 || !a2.value || s.sw_lv2 === a2.value)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
+    a3.innerHTML = buildSwOptions(lv3, '申万三级');
+    if (cur3 && lv3.includes(cur3)) a3.value = cur3;
+  }
 }
 
 function renderSwStats() {
@@ -1554,80 +1825,128 @@ function renderIndustryAnalysis() {
   const preview = document.getElementById('industry-stock-preview');
   if (!panel || !summary) return;
 
+  const src = basicsData;
+  if (!src || !src.length) {
+    panel.innerHTML = '<div class="muted">暂无数据，请先加载基本面数据。</div>';
+    return;
+  }
+
   const sw1 = document.getElementById('analysis-sw1-filter').value;
   const sw2 = document.getElementById('analysis-sw2-filter').value;
   const sw3 = document.getElementById('analysis-sw3-filter').value;
 
-  const filtered = basicsData.filter(s => (!sw1 || s.sw_lv1 === sw1) && (!sw2 || s.sw_lv2 === sw2) && (!sw3 || s.sw_lv3 === sw3));
-  const scoped = filtered.length ? filtered : basicsData;
+  // 全量统计（不受当前筛选影响，用于排行榜进度条）
+  const allLv1Map = new Map();
+  src.forEach(s => {
+    if (s.sw_lv1 && s.sw_lv1 !== '-') allLv1Map.set(s.sw_lv1, (allLv1Map.get(s.sw_lv1) || 0) + 1);
+  });
 
-  const lv1Map = new Map();
-  const lv2Map = new Map();
-  const lv3Map = new Map();
+  // 当前筛选结果
+  const filtered = src.filter(s =>
+    (!sw1 || s.sw_lv1 === sw1) &&
+    (!sw2 || s.sw_lv2 === sw2) &&
+    (!sw3 || s.sw_lv3 === sw3)
+  );
+  const scoped = sw1 || sw2 || sw3 ? filtered : src;
+
+  const lv1Map = new Map(), lv2Map = new Map(), lv3Map = new Map();
   scoped.forEach(s => {
     if (s.sw_lv1 && s.sw_lv1 !== '-') lv1Map.set(s.sw_lv1, (lv1Map.get(s.sw_lv1) || 0) + 1);
     if (s.sw_lv2 && s.sw_lv2 !== '-') lv2Map.set(s.sw_lv2, (lv2Map.get(s.sw_lv2) || 0) + 1);
     if (s.sw_lv3 && s.sw_lv3 !== '-') lv3Map.set(s.sw_lv3, (lv3Map.get(s.sw_lv3) || 0) + 1);
   });
-  const top = (map) => Array.from(map.entries()).sort((a, b) => b[1] - a[1]).slice(0, 8);
-  const topLv1 = top(lv1Map);
-  const topLv2 = top(lv2Map);
-  const topLv3 = top(lv3Map);
-  const renderBars = (items) => {
-    const max = items.length ? items[0][1] : 1;
-    return '<div class="bar-chart">' + items.map(([name, count]) => {
-      const width = Math.max(8, Math.round((count / max) * 100));
-      return '<div class="bar-row"><div class="bar-name" title="' + esc(name) + '">' + esc(name) + '</div><div class="bar-track"><div class="bar-fill" style="width:' + width + '%"></div></div><div class="bar-count">' + count + '</div></div>';
-    }).join('') + '</div>';
-  };
 
+  // 统计概览（紧凑 stat cards）
   panel.innerHTML =
     '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-label">当前样本</div><div class="stat-value">' + scoped.length + '</div><div class="stat-sub">当前筛选范围内股票数</div></div>' +
-      '<div class="stat-card"><div class="stat-label">申万一级</div><div class="stat-value">' + lv1Map.size + '</div><div class="stat-sub">行业大类数</div></div>' +
-      '<div class="stat-card"><div class="stat-label">申万二级</div><div class="stat-value">' + lv2Map.size + '</div><div class="stat-sub">行业中类数</div></div>' +
-      '<div class="stat-card"><div class="stat-label">申万三级</div><div class="stat-value">' + lv3Map.size + '</div><div class="stat-sub">行业小类数</div></div>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px;">' +
-      '<div class="stat-card"><div class="stat-label">一级行业分布</div>' + renderBars(topLv1) + '</div>' +
-      '<div class="stat-card"><div class="stat-label">二级行业分布</div>' + renderBars(topLv2) + '</div>' +
-      '<div class="stat-card"><div class="stat-label">三级行业分布</div>' + renderBars(topLv3) + '</div>' +
+      '<div class="stat-card"><div class="stat-label">研究覆盖</div><div class="stat-value">' + src.length + '</div><div class="stat-sub">已研究股票总数</div></div>' +
+      '<div class="stat-card"><div class="stat-label">当前筛选</div><div class="stat-value">' + scoped.length + '</div><div class="stat-sub">' + (sw1 || sw2 || sw3 ? [sw1,sw2,sw3].filter(Boolean).join(' › ') : '全部行业') + '</div></div>' +
+      '<div class="stat-card"><div class="stat-label">涉及一级</div><div class="stat-value">' + lv1Map.size + '</div><div class="stat-sub">/ ' + allLv1Map.size + ' 个大类</div></div>' +
+      '<div class="stat-card"><div class="stat-label">涉及二/三级</div><div class="stat-value">' + lv2Map.size + '</div><div class="stat-sub">二级 · ' + lv3Map.size + ' 个三级</div></div>' +
     '</div>';
 
-  summary.innerHTML =
-    '<div class="stat-card"><div class="stat-label">当前筛选</div><div class="stat-sub">' +
-      (sw1 || sw2 || sw3 ? [sw1, sw2, sw3].filter(Boolean).join(' / ') : '全部行业') +
-    '</div></div>';
+  // 摘要标签
+  summary.innerHTML = sw1 || sw2 || sw3
+    ? '<span class="basic-chip" style="background:#dbeafe;color:#1e40af;">' + esc([sw1,sw2,sw3].filter(Boolean).join(' › ')) + '</span>'
+    : '<span class="muted">全部行业</span>';
 
+  // 排行榜（全量一级行业，带进度条）
   if (rankList) {
-    const ranking = top(lv1Map).slice(0, 5);
-    rankList.innerHTML = ranking.length ? ranking.map(([name, count]) => {
-      const total = scoped.filter(s => s.sw_lv1 === name).length;
-      return '<div class="rank-item" onclick="applyIndustryAnalysisFilter(\'' + esc(name) + '\', \"\", \"\")"><div class="rank-left"><div class="rank-name">' + esc(name) + '</div><div class="rank-meta">申万一级 | ' + total + ' 只股票</div></div><div class="rank-count">' + count + '</div></div>';
-    }).join('') : '<div class="muted">暂无数据</div>';
+    const allRanking = Array.from(allLv1Map.entries()).sort((a,b) => b[1]-a[1]);
+    const maxCount = allRanking.length ? allRanking[0][1] : 1;
+    if (!allRanking.length) {
+      rankList.innerHTML = '<div class="muted">暂无数据</div>';
+    } else {
+      rankList.style.maxHeight = '480px';
+      rankList.style.overflowY = 'auto';
+      rankList.innerHTML = allRanking.map(([name, total]) => {
+        const reported = src.filter(s => s.sw_lv1 === name && s.report_file).length;
+        const barW = Math.max(4, Math.round((total / maxCount) * 100));
+        const isActive = sw1 === name;
+        return '<div class="rank-item" onclick="applyIndustryAnalysisFilter(\'' + esc(name) + '\',\'\',\'\')" ' +
+          'style="' + (isActive ? 'border-color:#2563eb;background:#eff6ff;' : '') + 'flex-direction:column;align-items:stretch;padding:8px 12px;gap:4px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
+            '<span class="rank-name" style="font-size:13px;">' + esc(name) + '</span>' +
+            '<span style="font-size:12px;color:#64748b;white-space:nowrap;flex-shrink:0;">' +
+              (reported ? '<span style="color:#16a34a;font-weight:600;">' + reported + '篇报告</span> · ' : '') +
+              total + '只' +
+            '</span>' +
+          '</div>' +
+          '<div style="background:#e2e8f0;border-radius:3px;height:5px;overflow:hidden;">' +
+            '<div style="background:' + (isActive ? '#2563eb' : '#93c5fd') + ';width:' + barW + '%;height:100%;border-radius:3px;transition:width .3s;"></div>' +
+          '</div>' +
+          '</div>';
+      }).join('');
+    }
   }
 
+  // 股票预览（当前筛选结果，列表形式）
   if (preview) {
-    const list = scoped.slice(0, 12);
-    preview.innerHTML = list.length ? '<div class="industry-preview">' + list.map(s => '<div class="industry-stock" onclick="goToBasicsStock(\'' + esc(s.code) + '\', \'' + esc(s.sw_lv1) + '\', \'' + esc(s.sw_lv2) + '\', \'' + esc(s.sw_lv3) + '\')"><div class="industry-stock-name">' + esc(s.name) + '</div><div class="industry-stock-code">' + esc(s.full_code || s.code) + '</div><div style="margin-top:6px;"><span class="sw-pill">' + esc([s.sw_lv1, s.sw_lv2, s.sw_lv3].filter(v => v && v !== '-').join(' / ') || '-') + '</span></div></div>').join('') + '</div>' : '<div class="muted">暂无股票</div>';
+    const list = scoped.slice(0, 20);
+    if (!list.length) {
+      preview.innerHTML = '<div class="muted">暂无股票</div>';
+    } else {
+      preview.style.maxHeight = '480px';
+      preview.style.overflowY = 'auto';
+      preview.innerHTML = list.map(s => {
+        const rating = s.rating || 0;
+        const stars = rating > 0 ? '<span style="color:#f59e0b;font-size:11px;">' + '★'.repeat(rating) + '</span>' : '';
+        const tag = s.sw_lv3 || s.sw_lv2 || s.sw_lv1 || '';
+        return '<div onclick="goToBasicsStock(\'' + esc(s.code) + '\',\'' + esc(s.sw_lv1) + '\',\'' + esc(s.sw_lv2) + '\',\'' + esc(s.sw_lv3) + '\')" ' +
+          'style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;border-bottom:1px solid #f1f5f9;" ' +
+          'onmouseover="this.style.background=\'#eff6ff\'" onmouseout="this.style.background=\'transparent\'">' +
+          '<div style="flex:1;min-width:0;">' +
+            '<div style="display:flex;align-items:center;gap:6px;">' +
+              '<span style="font-weight:500;color:#0f172a;font-size:13px;">' + esc(s.name) + '</span>' +
+              (s.report_file ? '<span style="color:#16a34a;font-size:11px;" title="有报告">●</span>' : '') +
+              stars +
+            '</div>' +
+            '<div style="font-size:11px;color:#94a3b8;margin-top:2px;">' + esc(s.full_code || s.code) + (tag ? ' · ' + esc(tag) : '') + '</div>' +
+          '</div>' +
+          '</div>';
+      }).join('') +
+      (scoped.length > 20 ? '<div class="muted" style="text-align:center;padding:8px;font-size:12px;">…仅显示前20只，使用筛选查看更多</div>' : '');
+    }
   }
 }
 
 function onAnalysisSw1Change() {
+  const src = allStocksData.length ? allStocksData : basicsData;
   const sw1 = document.getElementById('analysis-sw1-filter').value;
   const sw2 = document.getElementById('analysis-sw2-filter');
   const sw3 = document.getElementById('analysis-sw3-filter');
-  const lv2 = Array.from(new Set(basicsData.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort();
-  const lv3 = Array.from(new Set(basicsData.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
+  const lv2 = Array.from(new Set(src.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort();
+  const lv3 = Array.from(new Set(src.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
   if (sw2) { sw2.innerHTML = buildSwOptions(lv2, '申万二级'); sw2.value = ''; }
   if (sw3) { sw3.innerHTML = buildSwOptions(lv3, '申万三级'); sw3.value = ''; }
 }
 
 function onAnalysisSw2Change() {
+  const src = allStocksData.length ? allStocksData : basicsData;
   const sw1 = document.getElementById('analysis-sw1-filter').value;
   const sw2 = document.getElementById('analysis-sw2-filter').value;
   const sw3 = document.getElementById('analysis-sw3-filter');
-  const lv3 = Array.from(new Set(basicsData.filter(s => (!sw1 || s.sw_lv1 === sw1) && (!sw2 || s.sw_lv2 === sw2)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
+  const lv3 = Array.from(new Set(src.filter(s => (!sw1 || s.sw_lv1 === sw1) && (!sw2 || s.sw_lv2 === sw2)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
   if (sw3) { sw3.innerHTML = buildSwOptions(lv3, '申万三级'); sw3.value = ''; }
 }
 
@@ -1640,6 +1959,7 @@ function clearIndustryAnalysisFilters() {
 }
 
 function applyIndustryAnalysisFilter(sw1, sw2, sw3) {
+  initAnalysisSwFilters();
   document.getElementById('analysis-sw1-filter').value = sw1 || '';
   onAnalysisSw1Change();
   document.getElementById('analysis-sw2-filter').value = sw2 || '';
@@ -1668,7 +1988,7 @@ function goToBasicsStock(code, sw1, sw2, sw3) {
 }
 
 function refreshIndustryAnalysis() {
-  initSwIndustryFilters();
+  initAnalysisSwFilters();
   if (!document.getElementById('industry-analysis-view') || document.getElementById('industry-analysis-view').style.display === 'none') {
     return;
   }
@@ -1922,17 +2242,71 @@ function showDetailByCode(code) {
 }
 
 function showDetailByCode2(code) {
-  var s = basicsData.find(function(x) { return x.code === code; });
+  var s = allStocksData.find(x => x.code === code) || basicsData.find(x => x.code === code);
   if (!s) return;
   document.getElementById('detail-search-list').style.display = 'none';
   document.getElementById('detail-content').style.display = 'block';
-  document.getElementById('detail-content').innerHTML = '<button onclick="goToDetailSearch()" style="padding:8px 16px;background:#3498db;color:#fff;border:none;border-radius:4px;cursor:pointer;margin-bottom:16px;">← 返回搜索</button><div style="background:#fff;padding:24px;border-radius:14px;box-shadow:0 8px 24px rgba(15,23,42,0.08);max-width:800px;"><h2 style="margin-bottom:16px;color:#1e293b;">' + s.name + ' (' + s.code + ')</h2><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px 16px;font-size:14px;"><div><span class="muted">申万一级：</span>' + (s.sw_lv1 || '-') + '</div><div><span class="muted">申万二级：</span>' + (s.sw_lv2 || '-') + '</div><div><span class="muted">申万三级：</span>' + (s.sw_lv3 || '-') + '</div><div><span class="muted">申万行业：</span>' + (s.sw_industry || '-') + '</div><div><span class="muted">行业定位：</span>' + (s.industry || '-') + '</div><div><span class="muted">主营业务：</span>' + (s.business || '-') + '</div><div><span class="muted">总市值：</span>' + (s.market_cap || '-') + '</div><div><span class="muted">净利润：</span>' + (s.profit || '-') + '</div><div><span class="muted">毛利率：</span>' + (s.gross_margin || '-') + '</div><div><span class="muted">净利率：</span>' + (s.net_margin || '-') + '</div><div><span class="muted">PE：</span>' + (s.pe || '-') + '</div></div><div style="margin-top:16px;"><span class="muted">核心竞争力：</span><div style="margin-top:6px;line-height:1.7;">' + (s.advantage || '-') + '</div></div><div style="margin-top:16px;"><span class="muted">主要竞争对手：</span><div style="margin-top:6px;line-height:1.7;">' + (s.competitor || '-') + '</div></div></div>';
+  const tagsHtml = (s.tags || []).map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 8px;border-radius:10px;font-size:12px;margin:2px;display:inline-block;">' + esc(t) + '</span>').join('');
+  const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < (s.rating || 0) ? '#f1c40f' : '#ddd') + ';font-size:18px;">★</span>').join('');
+  const transferInfo = s.transfer_count > 0
+    ? '<div style="margin-top:16px;padding:12px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;font-size:13px;"><span style="color:#0369a1;font-weight:600;">转让记录：</span>' + s.transfer_count + '条' + (s.transfer_stages && s.transfer_stages.length ? '（' + s.transfer_stages.join('、') + '）' : '') + '，最近: ' + (s.last_transfer_date || '-') + '</div>' : '';
+  const reportItem = reportsData.find(r => r.file === s.report_file || r.name === s.name);
+  let reportContent;
+  if (reportItem && reportItem.content) {
+    reportContent = '<div class="markdown-body" style="padding:16px;border-radius:10px;font-size:14px;line-height:1.75;">' + marked.parse(reportItem.content) + '</div>';
+  } else {
+    reportContent = '<div style="color:#94a3b8;padding:40px;text-align:center;font-size:14px;">暂无研究报告</div>';
+  }
+  const swLabel = esc([s.sw_lv1, s.sw_lv2, s.sw_lv3].filter(v => v && v !== '-').join(' / ') || '-');
+  const priceHtml = s.price ? '<b style="font-size:22px;color:#0f172a;">' + parseFloat(s.price).toFixed(2) + '</b>' : '<span style="color:#94a3b8;">-</span>';
+  const chg = (s.change_percent !== '' && s.change_percent != null) ? parseFloat(s.change_percent) : null;
+  const chgHtml = (chg !== null && !isNaN(chg))
+    ? '<span style="font-size:13px;padding:3px 9px;border-radius:999px;background:' + (chg >= 0 ? '#dcfce7' : '#fef2f2') + ';color:' + (chg >= 0 ? '#16a34a' : '#dc2626') + ';margin-left:8px;">' + (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%</span>'
+    : '';
+  document.getElementById('detail-content').innerHTML =
+    '<button onclick="goToDetailSearch()" style="padding:8px 18px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;margin-bottom:18px;font-size:13px;">← 返回搜索</button>' +
+    '<div style="background:#fff;padding:24px;border-radius:16px;box-shadow:0 8px 28px rgba(15,23,42,0.08);display:flex;gap:24px;align-items:flex-start;">' +
+      '<div style="width:400px;flex-shrink:0;">' +
+        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px;">' +
+          '<div>' +
+            '<h2 style="margin:0 0 6px;color:#0f172a;font-size:20px;">' + esc(s.name) + ' <span style="color:#94a3b8;font-size:15px;font-weight:400;">(' + esc(s.full_code || s.code) + ')</span></h2>' +
+            '<div>' + stars + '</div>' +
+          '</div>' +
+          '<div style="text-align:right;">' + priceHtml + chgHtml + '</div>' +
+        '</div>' +
+        '<div style="margin-bottom:14px;">' + (tagsHtml || '<span class="muted" style="font-size:13px;">暂无标签</span>') + '</div>' +
+        '<div style="background:#f8fbff;border:1px solid #e6eef8;border-radius:12px;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;font-size:13px;margin-bottom:14px;">' +
+          '<div><span class="muted">申万行业</span><div style="margin-top:3px;"><span class="sw-pill" style="font-size:12px;">' + swLabel + '</span></div></div>' +
+          '<div><span class="muted">行业定位</span><div style="margin-top:3px;color:#334155;">' + esc(s.industry && s.industry !== '-' ? s.industry : (reportItem ? extractIndustry(reportItem.content) : '-')) + '</div></div>' +
+          '<div><span class="muted">总市值</span><div style="margin-top:3px;font-weight:500;">' + esc(s.market_cap || '-') + '</div></div>' +
+          '<div><span class="muted">PE</span><div style="margin-top:3px;font-weight:500;">' + esc(s.pe || '-') + '</div></div>' +
+          '<div><span class="muted">净利润</span><div style="margin-top:3px;font-weight:500;">' + esc(s.profit || '-') + '</div></div>' +
+          '<div><span class="muted">毛利率</span><div style="margin-top:3px;font-weight:500;">' + esc(s.gross_margin || '-') + '</div></div>' +
+          '<div><span class="muted">净利率</span><div style="margin-top:3px;font-weight:500;">' + esc(s.net_margin || '-') + '</div></div>' +
+          '<div><span class="muted">扣非净利率</span><div style="margin-top:3px;font-weight:500;">' + esc(s.deduct_net_margin || '-') + '</div></div>' +
+        '</div>' +
+        '<div style="font-size:13px;">' +
+          '<div class="muted" style="margin-bottom:6px;">主营业务</div>' +
+          '<div style="line-height:1.75;color:#334155;">' + esc(s.business || '-') + '</div>' +
+        '</div>' +
+        transferInfo +
+      '</div>' +
+      '<div style="flex:1;min-width:0;border-left:1px solid #eef2f7;padding-left:24px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
+          '<h3 style="margin:0;color:#0f172a;font-size:15px;">研究报告</h3>' +
+          '<span class="basic-chip">Markdown</span>' +
+        '</div>' +
+        '<div style="height:calc(100vh - 280px);overflow-y:auto;background:linear-gradient(180deg,#fafcff 0%,#f8fafc 100%);padding:16px;border-radius:12px;border:1px solid #eef2f7;">' +
+          reportContent +
+        '</div>' +
+      '</div>' +
+    '</div>';
 }
 
 function goToDetailSearch() {
   document.getElementById('detail-content').style.display = 'none';
-  document.getElementById('detail-search-list').style.display = 'block';
-  searchDetailStocks();
+  document.getElementById('detail-search-list').style.display = 'flex';
+  renderDetailTable();
 }
 
 function backToList() {

@@ -17,7 +17,7 @@ PLIST_CONTENT="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     <string>com.quant.ann-report-daily</string>
     <key>ProgramArguments</key>
     <array>
-        <string>$SCRIPT_DIR/../daily.sh</string>
+        <string>$REPO_DIR/scripts/daily.sh</string>
     </array>
     <key>WorkingDirectory</key>
     <string>$REPO_DIR</string>
@@ -32,7 +32,7 @@ PLIST_CONTENT="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
     </array>
     <key>StandardOutPath</key>
     <string>$LOG_DIR/daily.log</string>
-    <key>StandardErrorPath</key>
+<key>StandardErrorPath</key>
     <string>$LOG_DIR/daily.err</string>
     <key>RunAtLoad</key>
     <false/>

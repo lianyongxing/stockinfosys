@@ -3,6 +3,7 @@ set -e
 
 REPO_DIR="/Users/yxlian/Desktop/quant2"
 LOG_DIR="$REPO_DIR/logs"
+cd "$REPO_DIR"
 mkdir -p "$LOG_DIR"
 DATE_STR=$(date +%Y-%m-%d)
 

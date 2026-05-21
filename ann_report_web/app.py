@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import requests
@@ -92,6 +93,88 @@ def stock_basics():
 def trade_quotes():
     return send_file(SCRIPT_DIR / "static" / "trade_quotes.json")
 
+@app.route("/stocks_db.json")
+def stocks_db():
+    return send_file(SCRIPT_DIR / "static" / "stocks_db.json")
+
+
+@app.route("/api/stocks")
+def api_stocks():
+    db_path = SCRIPT_DIR / "static" / "stocks_db.json"
+    if not db_path.exists():
+        return jsonify({"stocks": [], "total": 0})
+
+    with open(db_path, encoding="utf-8") as f:
+        db = json.load(f)
+
+    stocks = list((db.get("stocks") or {}).values())
+
+    keyword = request.args.get("q", "").strip().lower()
+    sw1 = request.args.get("sw1", "").strip()
+    sw2 = request.args.get("sw2", "").strip()
+    sw3 = request.args.get("sw3", "").strip()
+
+    if sw1:
+        stocks = [s for s in stocks if s.get("sw_lv1", "") == sw1]
+    if sw2:
+        stocks = [s for s in stocks if s.get("sw_lv2", "") == sw2]
+    if sw3:
+        stocks = [s for s in stocks if s.get("sw_lv3", "") == sw3]
+
+    if keyword:
+        def _hit(s: dict) -> bool:
+            fields = [
+                s.get("code", ""),
+                s.get("full_code", ""),
+                s.get("name", ""),
+                s.get("industry", ""),
+                s.get("business", ""),
+                s.get("sw_lv1", ""),
+                s.get("sw_lv2", ""),
+                s.get("sw_lv3", ""),
+                s.get("sw_industry", ""),
+            ]
+            return any(keyword in str(v).lower() for v in fields)
+
+        stocks = [s for s in stocks if _hit(s)]
+
+    return jsonify({"stocks": stocks, "total": len(stocks)})
+
+
+@app.route("/api/save-stocks-db", methods=["POST"])
+def api_save_stocks_db():
+    data = request.get_json(silent=True) or {}
+    if not isinstance(data, dict):
+        return jsonify({"error": "invalid payload"}), 400
+
+    # Pre-validate: serialise once and verify it round-trips cleanly
+    try:
+        json_str = json.dumps(data, ensure_ascii=False, indent=2)
+        json.loads(json_str)          # crash early if we can't read it back
+    except Exception as e:
+        return jsonify({"error": f"payload failed validation: {e}"}), 400
+
+    targets = [SCRIPT_DIR / "static" / "stocks_db.json", SCRIPT_DIR.parent / "stocks_db.json"]
+    written = []
+    for path in targets:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        # Atomic write: write to a .tmp file then os.replace() so a crash or
+        # network interruption mid-write never leaves the target file corrupt.
+        tmp = path.with_suffix(".tmp")
+        try:
+            with open(tmp, "w", encoding="utf-8") as f:
+                f.write(json_str)
+                f.flush()
+                os.fsync(f.fileno())   # ensure bytes reach disk before rename
+            os.replace(tmp, path)      # POSIX-atomic rename
+            written.append(str(path))
+        except Exception:
+            if tmp.exists():
+                tmp.unlink(missing_ok=True)
+            raise
+
+    return jsonify({"success": True, "paths": written})
+
 @app.route("/user_data/<path:filepath>", methods=["GET", "POST"])
 def user_data(filepath):
     file_path = USER_DATA_DIR / filepath
@@ -113,6 +196,22 @@ def user_data(filepath):
 @app.route("/stockinfos.html")
 def stockinfos():
     return send_file(SCRIPT_DIR / "static" / "stockinfos.html")
+
+
+@app.route("/api/sync-sw-industry", methods=["POST"])
+def api_sync_sw_industry():
+    import subprocess, sys
+    script = SCRIPT_DIR.parent / "scripts" / "merge_sw_industry.py"
+    if not script.exists():
+        return jsonify({"error": f"脚本不存在: {script}"}), 404
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        capture_output=True, text=True,
+        cwd=str(SCRIPT_DIR.parent),
+    )
+    if result.returncode != 0:
+        return jsonify({"error": result.stderr or "脚本返回非零退出码", "stdout": result.stdout}), 500
+    return jsonify({"success": True, "output": result.stdout})
 
 
 @app.route("/api/sync-reports", methods=["POST"])

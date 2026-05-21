@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>股票研究报告</title>
+<style>body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;max-width:800px;margin:0 auto;padding:20px;background:#f5f7fa;}
+h1{color:#2c3e50;border-bottom:2px solid #3498db;padding-bottom:10px;}
+.card{padding:15px;margin:10px 0;background:#fff;border-radius:8px;box-shadow:0 2px4px rgba(0,0,0,0.1);cursor:pointer;}
+.card:hover{box-shadow:0 4px8px rgba(0,0,0,0.15);}
+.card h2{margin:0 0 10px;color:#2c3e50;}
+.card p{color:#666;font-size:14px;margin:0;}
+.preview{white-space:pre-wrap;overflow:hidden;text-overflow:ellipsis;max-height:60px;}
+.detail{display:none;padding:20px;background:#fff;border-radius:8px;margin-top:20px;}
+.detail.active{display:block;}
+.detail pre{white-space:pre-wrap;word-wrap:break-word;background:#f8f9fa;padding:15px;border-radius:4px;}
+.back{background:#3498db;color:#fff;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}</style>
+</head>
+<body>
+<h1>📊 股票研究报告</h1>
+<div id="list"><div class="card" onclick="showDetail('乐鑫科技.md')"><h2>乐鑫科技</h2><p class="preview">这份报告剥离了一切公关滤镜，基于最新的2025年完整财报及2026年当期市场数据，通过第一性原理对“乐鑫科技”这台商业机器进行拆解。
+
+### 🏢 1. 一分钟物理素描 (The Physical Reality)
+**一句话行业定位**：Fabless（无晶圆厂）物联网无线通信芯片设计与销售。
+
+...</p></div><div class="card" onclick="showDetail('华恒生物.md')"><h2>华恒生物</h2><p class="preview">这是一份完全剥离公关话术、基于第一性原理与财务现实拆解的华恒生物基本面分析报告：
+
+### 🏢 1. 一分钟物理素描 (The Physical Reality)
+*一句话行业定位*：披着科技外衣的精细化工厂（发酵代工大厂）。
+*主营业务描述*：物理世界里，这是一家盖满巨型不锈钢发酵罐的化工厂。它买...</p></div></div>
+<div id="detail" class="detail"></div>
+<script>
+const items = [{\'name\': \'乐鑫科技\', \'file\': \'乐鑫科技.md\', \'content\': \'这份报告剥离了一切公关滤镜，基于最新的2025年完整财报及2026年当期市场数据，通过第一性原理对“乐鑫科技”这台商业机器进行拆解。\n\n### 🏢 1. 一分钟物理素描 (The Physical Reality)\n**一句话行业定位**：Fabless（无晶圆厂）物联网无线通信芯片设计与销售。\n\n**主营业务描述**：在物理世界里，这家公司主要设计指甲盖大小的黑色硅片（芯片，如ESP32系列）以\'}, {\'name\': \'华恒生物\', \'file\': \'华恒生物.md\', \'content\': \'这是一份完全剥离公关话术、基于第一性原理与财务现实拆解的华恒生物基本面分析报告：\n\n### 🏢 1. 一分钟物理素描 (The Physical Reality)\n*一句话行业定位*：披着科技外衣的精细化工厂（发酵代工大厂）。\n*主营业务描述*：物理世界里，这是一家盖满巨型不锈钢发酵罐的化工厂。它买入成吨的玉米和葡萄糖，喂给经过基因改造的细菌，让细菌代谢排泄出氨基酸（丙氨酸、缬氨酸）和化工材料（P\'}];
+function showDetail(file) {
+  const item = items.find(i => i.file === file);
+  document.getElementById('list').style.display = 'none';
+  const d = document.getElementById('detail');
+  d.className = 'active';
+  d.innerHTML = '<button class="back" onclick="back()">← 返回</button><pre>' + item.content + '</pre>';
+}
+function back() {
+  document.getElementById('list').style.display = 'block';
+  document.getElementById('detail').className = 'detail';
+}
+</script>
+</body>
+</html>
