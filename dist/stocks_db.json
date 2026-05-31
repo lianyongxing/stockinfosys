@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-05-30",
+  "update_time": "2026-05-31",
   "stats": {
     "total_stocks": 5213,
     "stocks_with_quotes": 4,
@@ -5409,7 +5409,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "三友化工.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -5559,7 +5559,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "华塑股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -6909,7 +6909,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "金浦钛业.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],

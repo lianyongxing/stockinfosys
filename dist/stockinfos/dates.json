@@ -862,5 +862,23 @@
     "add_date": "2026-05-30",
     "order": 144,
     "rating": 0
+  },
+  {
+    "name": "三友化工",
+    "add_date": "2026-05-31",
+    "order": 145,
+    "rating": 0
+  },
+  {
+    "name": "华塑股份",
+    "add_date": "2026-05-31",
+    "order": 146,
+    "rating": 0
+  },
+  {
+    "name": "金浦钛业",
+    "add_date": "2026-05-31",
+    "order": 147,
+    "rating": 0
   }
 ]
