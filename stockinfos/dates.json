@@ -1174,5 +1174,89 @@
     "add_date": "2026-07-07",
     "order": 196,
     "rating": 0
+  },
+  {
+    "name": "ST辉丰",
+    "add_date": "2026-07-09",
+    "order": 197,
+    "rating": 0
+  },
+  {
+    "name": "中农联合",
+    "add_date": "2026-07-09",
+    "order": 198,
+    "rating": 0
+  },
+  {
+    "name": "农心科技",
+    "add_date": "2026-07-09",
+    "order": 199,
+    "rating": 0
+  },
+  {
+    "name": "利民股份",
+    "add_date": "2026-07-09",
+    "order": 200,
+    "rating": 0
+  },
+  {
+    "name": "国光股份",
+    "add_date": "2026-07-09",
+    "order": 201,
+    "rating": 0
+  },
+  {
+    "name": "安道麦A",
+    "add_date": "2026-07-09",
+    "order": 202,
+    "rating": 0
+  },
+  {
+    "name": "广信股份",
+    "add_date": "2026-07-09",
+    "order": 203,
+    "rating": 0
+  },
+  {
+    "name": "广康生化",
+    "add_date": "2026-07-09",
+    "order": 204,
+    "rating": 0
+  },
+  {
+    "name": "新安股份",
+    "add_date": "2026-07-09",
+    "order": 205,
+    "rating": 0
+  },
+  {
+    "name": "百傲化学",
+    "add_date": "2026-07-09",
+    "order": 206,
+    "rating": 0
+  },
+  {
+    "name": "苏利股份",
+    "add_date": "2026-07-09",
+    "order": 207,
+    "rating": 0
+  },
+  {
+    "name": "贝斯美",
+    "add_date": "2026-07-09",
+    "order": 208,
+    "rating": 0
+  },
+  {
+    "name": "海利尔",
+    "add_date": "2026-07-09",
+    "order": 209,
+    "rating": 0
+  },
+  {
+    "name": "*ST辉丰",
+    "add_date": "2026-07-09",
+    "order": 210,
+    "rating": 0
   }
 ]

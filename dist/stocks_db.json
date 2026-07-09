@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-07-07",
+  "update_time": "2026-07-09",
   "stats": {
     "total_stocks": 5213,
     "stocks_with_quotes": 4,
     "stocks_with_transfers": 4,
-    "stocks_with_ratings": 14
+    "stocks_with_ratings": 43
   },
   "sources": {
     "reports": "stockinfos.json",
@@ -31,7 +31,8 @@
       "rating": 5,
       "tags": [
         "半导体",
-        "通信芯片"
+        "通信芯片",
+        "成长票"
       ],
       "report_file": "乐鑫科技.md",
       "add_date": "2026-04-16",
@@ -162,7 +163,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "宠物",
+        "消费"
+      ],
       "report_file": "乖宝宠物.md",
       "add_date": "2026-04-16",
       "transfer_count": 0,
@@ -191,10 +195,11 @@
       "net_margin": "9.5%",
       "deduct_net_margin": "-",
       "pe": "3",
-      "rating": 0,
+      "rating": 3,
       "tags": [
         "游资票",
-        "创新药"
+        "创新药",
+        "医药"
       ],
       "report_file": "科兴制药.md",
       "add_date": "2026-04-16",
@@ -226,7 +231,7 @@
       "net_margin": "31.67%",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
+      "rating": 2,
       "tags": [
         "眼科医疗"
       ],
@@ -424,7 +429,8 @@
       "rating": 0,
       "tags": [
         "创新药",
-        "价投票"
+        "价投票",
+        "医药"
       ],
       "report_file": "恒瑞医药.md",
       "add_date": "2026-04-24",
@@ -516,7 +522,8 @@
       "pe": "-",
       "rating": 5,
       "tags": [
-        "价投票"
+        "价投票",
+        "医药"
       ],
       "report_file": "人福医药.md",
       "add_date": "2026-04-24",
@@ -581,7 +588,10 @@
       "deduct_net_margin": "-",
       "pe": "40",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体",
+        "数模混合芯片"
+      ],
       "report_file": "艾为电子.md",
       "add_date": "2026-04-27",
       "transfer_count": 0,
@@ -611,7 +621,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体",
+        "数模混合芯片"
+      ],
       "report_file": "圣邦股份.md",
       "add_date": "2026-04-27",
       "transfer_count": 0,
@@ -805,7 +818,10 @@
       "deduct_net_margin": "-",
       "pe": "25x",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "微电网"
+      ],
       "report_file": "安科瑞.md",
       "add_date": "2026-05-05",
       "transfer_count": 0,
@@ -1028,7 +1044,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体材料"
+      ],
       "report_file": "上海新阳.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1088,7 +1106,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体",
+        "射频芯片"
+      ],
       "report_file": "唯捷创芯.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1148,7 +1169,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "SiC"
+      ],
       "report_file": "天岳先进.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1178,7 +1201,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物"
+      ],
       "report_file": "奥浦迈.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1208,7 +1233,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "MEMS传感器"
+      ],
       "report_file": "敏芯股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1238,7 +1265,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "创新药"
+      ],
       "report_file": "百利天恒.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1268,7 +1297,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "医疗设备"
+      ],
       "report_file": "华大基因.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1298,7 +1329,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物"
+      ],
       "report_file": "华大智造.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1328,7 +1361,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物",
+        "价投票"
+      ],
       "report_file": "川宁生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1358,7 +1394,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物",
+        "宠物"
+      ],
       "report_file": "普莱柯.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1387,8 +1426,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "合成生物",
+        "价投票",
+        "消费"
+      ],
       "report_file": "梅花生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1418,7 +1461,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物"
+      ],
       "report_file": "纳微科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1448,7 +1493,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "软件"
+      ],
       "report_file": "金山办公.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1478,7 +1525,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物"
+      ],
       "report_file": "新和成.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1508,7 +1557,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "游戏"
+      ],
       "report_file": "吉比特.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1538,7 +1589,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "创新药"
+      ],
       "report_file": "沃森生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1568,7 +1621,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物"
+      ],
       "report_file": "溢多利.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1598,7 +1653,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体",
+        "通信芯片"
+      ],
       "report_file": "翱捷科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1628,7 +1686,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "半导体",
+        "存储芯片"
+      ],
       "report_file": "东芯股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1658,7 +1719,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "创新药"
+      ],
       "report_file": "科伦药业.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1688,7 +1751,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "功率半导体",
+        "半导体"
+      ],
       "report_file": "东微半导.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1808,7 +1874,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "水管",
+        "价投票"
+      ],
       "report_file": "伟星新材.md",
       "add_date": "",
       "transfer_count": 0,
@@ -1838,7 +1907,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票"
+      ],
       "report_file": "凌霄泵业.md",
       "add_date": "",
       "transfer_count": 0,
@@ -2138,7 +2209,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "传媒",
+        "游资票"
+      ],
       "report_file": "无线传媒.md",
       "add_date": "",
       "transfer_count": 0,
@@ -2228,7 +2302,11 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "微电网",
+        "价投票",
+        "电力设备"
+      ],
       "report_file": "海兴电力.md",
       "add_date": "",
       "transfer_count": 0,
@@ -5408,7 +5486,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "纯碱",
+        "化工"
+      ],
       "report_file": "三友化工.md",
       "add_date": "",
       "transfer_count": 0,
@@ -5558,7 +5639,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "化工"
+      ],
       "report_file": "华塑股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -6908,7 +6991,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "化工"
+      ],
       "report_file": "金浦钛业.md",
       "add_date": "",
       "transfer_count": 0,
@@ -6968,7 +7053,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "钛"
+      ],
       "report_file": "龙佰集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -10538,7 +10625,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氟化工"
+      ],
       "report_file": "巨化股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -10628,7 +10717,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氟化工"
+      ],
       "report_file": "多氟多.md",
       "add_date": "",
       "transfer_count": 0,
@@ -10718,7 +10809,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氟化工"
+      ],
       "report_file": "三美股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -10778,7 +10871,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氟化工"
+      ],
       "report_file": "昊华科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -11468,7 +11563,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "合成生物",
+        "游资票"
+      ],
       "report_file": "蔚蓝生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -14107,8 +14205,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 5,
+      "tags": [
+        "价投票",
+        "成长票",
+        "合成生物"
+      ],
       "report_file": "蓝晓科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15567,8 +15669,8 @@
       "code": "000731",
       "market": "SZ",
       "full_code": "000731.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "周期性气头农用及基础化工品制造商。",
+      "business": "这家公司在物理世界本质上是个“天然气加工厂”。它按协议从大股东（中石化）的管道里接出天然气，通过合成氨等化学工艺，将其转化为固体的化肥（尿素、复合肥）、液体的车用尾气处理液（车用尿素），以及三聚氰胺等化工中间体，并将富余的天然气液化成 LNG，直接卖给种地的农民、开柴油重卡的司机和下游化工厂。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -15578,7 +15680,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氮化工"
+      ],
       "report_file": "四川美丰.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15607,8 +15711,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 5,
+      "tags": [
+        "周期股",
+        "氮化工"
+      ],
       "report_file": "华鲁恒升.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15627,8 +15734,8 @@
       "code": "000912",
       "market": "SZ",
       "full_code": "000912.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "传统大宗氮肥及基础化工原料制造商。",
+      "business": "这家公司在物理世界里的动作极其单调——从上游（中石油等）买入天然气或煤炭，将这些化石燃料打入高压反应釜，合成氨，再将其转化为尿素（农用化肥）、甲醇、液氨等大宗粉末或液体。最后，把这些没有任何差异化的工业品装车、装船，按当天的市场公开报价，卖给农资批发商和下游工业加工厂。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -15638,7 +15745,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氮化工"
+      ],
       "report_file": "泸天化.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15657,8 +15766,8 @@
       "code": "600691",
       "market": "SH",
       "full_code": "600691.SH",
-      "industry": "-",
-      "business": "-",
+      "industry": "传统煤化工与氮肥生产商（兼顾化工装备制造）。",
+      "business": "这家公司在物理世界里就是个“吞煤吐尿素”的庞大化工厂。他们把买来的煤炭送进自家制造的气化炉（晋华炉），经过一系列化学反应，生产出尿素（卖给农民种地）、聚氯乙烯（PVC，卖给建材厂），同时顺带生产煤气化装备（卖给其他化工厂）和副产氢气（卖给园区企业）。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -15668,7 +15777,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氮化工"
+      ],
       "report_file": "潞化科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15687,8 +15798,8 @@
       "code": "000422",
       "market": "SZ",
       "full_code": "000422.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "重资产强周期的大宗基础化工与化肥制造商。",
+      "business": "把地下挖出来的便宜煤炭、磷矿石和盐，丢进庞大的高温高压反应釜和合成塔里，通过剧烈的化学反应，日夜不停地生产出成百上千万吨的尿素（卖给农民种地）、磷酸二铵（复合肥原料）和 PVC 粉末（卖给包工头做塑料管材）。这些高度同质化的粉末和颗粒，最终通过火车皮和长江驳船运往全国及海外。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -15698,7 +15809,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氮化工"
+      ],
       "report_file": "湖北宜化.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15717,8 +15830,8 @@
       "code": "600227",
       "market": "SH",
       "full_code": "600227.SH",
-      "industry": "-",
-      "business": "-",
+      "industry": "传统煤化工与区域医疗的低效缝合怪",
+      "business": "在物理世界里，这家公司主要做两件毫不相干的事：第一，在贵州地底下挖煤，将其送进庞大的高耗能化工厂，经高温高压合成尿素、甲醇和复合肥，装进编织袋卖给农民和工业分销商；第二，在贵阳盖了一栋大秦肿瘤医院，提供看病和手术服务。本质上是一台轰鸣且生锈的重资产化肥机器，外挂一个亏损的医院。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -15728,7 +15841,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "氮化工"
+      ],
       "report_file": "赤天化.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15758,7 +15873,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "六国化工.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15787,8 +15904,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "川恒股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15818,7 +15937,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "和邦生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15848,7 +15969,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "澄星股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15877,8 +16000,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "周期股",
+        "磷化工"
+      ],
       "report_file": "云天化.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15908,7 +16034,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "川发龙蟒.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15938,7 +16066,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "宏达股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15968,7 +16098,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "川金诺.md",
       "add_date": "",
       "transfer_count": 0,
@@ -15998,7 +16130,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "磷化工"
+      ],
       "report_file": "兴发集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -16237,8 +16371,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "化工",
+        "农药"
+      ],
       "report_file": "红太阳.md",
       "add_date": "",
       "transfer_count": 0,
@@ -16509,7 +16646,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "国光股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16539,7 +16676,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "中农联合.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16569,7 +16706,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "广康生化.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16599,7 +16736,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "农心科技.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16629,7 +16766,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "新安股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16659,7 +16796,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "贝斯美.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16687,9 +16824,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
-      "report_file": "",
+      "rating": 3,
+      "tags": [
+        "农药",
+        "周期股"
+      ],
+      "report_file": "利民股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16719,7 +16859,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "*ST辉丰.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16749,7 +16889,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "苏利股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16779,7 +16919,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "百傲化学.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16807,9 +16947,13 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
-      "report_file": "",
+      "rating": 4,
+      "tags": [
+        "农药",
+        "周期股",
+        "价投票"
+      ],
+      "report_file": "广信股份.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16839,7 +16983,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "海利尔.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16869,7 +17013,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "安道麦A.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -16897,8 +17041,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "周期股",
+        "农药"
+      ],
       "report_file": "扬农化工.md",
       "add_date": "",
       "transfer_count": 0,
@@ -16917,8 +17064,8 @@
       "code": "000893",
       "market": "SZ",
       "full_code": "000893.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "老挝钾盐矿开采与钾肥海外代工厂。",
+      "business": "这家公司在老挝甘蒙省挖深层钾盐矿，将其粉碎、选矿、结晶后制成氯化钾（钾肥），主要通过海运和陆运卖给中国国内及东南亚（印尼、马来西亚等）的农资、复合肥加工企业用于农业种植。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -16928,7 +17075,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "钾化工"
+      ],
       "report_file": "亚钾国际.md",
       "add_date": "",
       "transfer_count": 0,
@@ -16947,8 +17096,8 @@
       "code": "000792",
       "market": "SZ",
       "full_code": "000792.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "垄断型盐湖资源开采与初级化工提纯。",
+      "business": "用水泵将察尔汗盐湖的地下卤水抽入巨大的露天盐田，利用太阳暴晒蒸发水分。随后通过浮选和吸附工艺，将沉淀物分离为氯化钾（化肥）和碳酸锂（电池粉末），最后装袋通过铁路和重卡批发给农资经销商与正极材料厂。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -16957,8 +17106,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 5,
+      "tags": [
+        "钾化工",
+        "价投票",
+        "周期股"
+      ],
       "report_file": "盐湖股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -16977,8 +17130,8 @@
       "code": "002545",
       "market": "SZ",
       "full_code": "002545.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "披着传统铁塔制造外衣的海外钾盐矿核心开采商。",
+      "business": "在物理世界里，这家公司干两件事：一是在国内长三角和青岛的工厂里把钢材切割、打孔、焊接、镀锌，做成巨大的输电铁塔卖给国家电网；二是在老挝甘蒙省的地下开采钾盐矿石，在井下和地表通过浮选和结晶工艺提纯成粉状和颗粒状氯化钾（化肥原料），装船或通过中老铁路卖给东南亚及中国的农业化肥终端。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -16988,7 +17141,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "钾化工"
+      ],
       "report_file": "东方铁塔.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17007,8 +17162,8 @@
       "code": "000902",
       "market": "SZ",
       "full_code": "000902.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "磷复肥及磷酸铁材料制造商",
+      "business": "这家公司在物理世界里做三件事：开采地下的磷矿石；将矿石、煤炭和硫磺放入高炉与反应釜，合成磷酸、合成氨等基础化工原料；最后将其加工成颗粒状的化肥（复合肥/磷肥）或粉末状的新能源正极前驱体（磷酸铁）。最终通过物流车队发往全国 6000 个经销商和 7 万个村镇零售点，卖给种地的农民或电池厂。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17017,8 +17172,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 5,
+      "tags": [
+        "复合肥",
+        "价投票"
+      ],
       "report_file": "新洋丰.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17037,8 +17195,8 @@
       "code": "002170",
       "market": "SZ",
       "full_code": "002170.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "披着复合肥外衣的磷矿资源开采商。",
+      "business": "在物理世界里，这家公司雇佣了约3000名工人，核心工作是开采贵州地下的磷矿石（小高寨矿）。挖出来的石头，一部分直接按吨卖给下游化工厂，另一部分运进自己的工厂，经过化学反应掺入氮、钾，做成复合肥卖给经销商和农民，极少部分加工成新能源材料（磷酸铁）卖给电池厂。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17047,8 +17205,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "复合肥",
+        "周期股"
+      ],
       "report_file": "芭田股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17067,8 +17228,8 @@
       "code": "002539",
       "market": "SZ",
       "full_code": "002539.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "重资产的农化资源及盐磷化工一体化制造商。",
+      "business": "这家公司在物理世界中主要是“挖矿与化学合成”。它从自己拥有的盐矿和磷矿中挖出原料，通过重资产的化工厂将其加工成复合肥、纯碱、黄磷，然后通过几千个县乡的经销商网络，一袋袋卖给种地的农民。同时，它也把部分副产物拿去做新能源电池正极的前驱体（磷酸铁）。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17077,8 +17238,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "复合肥"
+      ],
       "report_file": "云图控股.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17097,8 +17260,8 @@
       "code": "002538",
       "market": "SZ",
       "full_code": "002538.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "磷复肥及上游磷矿开采制造商",
+      "business": "这家公司在物理世界里的核心动作是：在贵州和安徽的自有矿山里挖出磷矿石和硫铁矿，拉到化工厂里通过化学反应将其合成磷酸一铵和氮磷钾复合肥，装袋打包，最后通过各地的农资经销商网络，按吨卖给种地的农民。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17108,7 +17271,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "复合肥"
+      ],
       "report_file": "ST司特.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17127,8 +17292,8 @@
       "code": "002470",
       "market": "SZ",
       "full_code": "002470.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "复合肥制造与磷化工“困境反转”玩家。",
+      "business": "在物理世界里，这家公司就是把买来的氮、磷、钾等基础化工原料拉进车间，掺混、造粒成常规复合肥或缓释肥，装进编织袋，通过各级农资经销商卖给种地的农民。目前，公司正试图在贵州向地下打洞开采磷矿（马路槽磷矿项目），以期减少外购成本。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17138,7 +17303,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "复合肥",
+        "游资票"
+      ],
       "report_file": "金正大.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17157,8 +17325,8 @@
       "code": "603395",
       "market": "SH",
       "full_code": "603395.SH",
-      "industry": "-",
-      "business": "-",
+      "industry": "传统基础化工与复合肥制造商。",
+      "business": "向控股股东（中盐集团）采购液氨，向外部采购煤炭、钾肥和磷肥，在化工厂内通过物理掺混或化学合成制造出复合肥和尿素。装袋后，通过农资经销商网络卖给终端种地的农民。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17168,7 +17336,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "复合肥",
+        "游资票"
+      ],
       "report_file": "红四方.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17187,8 +17358,8 @@
       "code": "002588",
       "market": "SZ",
       "full_code": "002588.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "农用大宗复合肥制造商",
+      "business": "采购尿素（氮）、磷酸一铵（磷）、氯化钾（钾）等基础化工原料，送入车间进行物理粉碎与化学反应造粒，产出特定养分配比的复合肥颗粒并装入50公斤编织袋。产品通过全国数千家县、乡两级农资经销店，搬运并卖给种植粮食和经济作物的农民。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17197,8 +17368,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "复合肥",
+        "价投票",
+        "周期股"
+      ],
       "report_file": "史丹利.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17217,8 +17392,8 @@
       "code": "002999",
       "market": "SZ",
       "full_code": "002999.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "区域性农资（化肥、农药）流通二道贩子。",
+      "business": "这家公司在物理世界里只干一件事：从上游化工大厂大规模买入一袋袋化肥（尿素、钾肥）和一瓶瓶农药，堆进自己的仓库，然后再依靠在广东省及周边铺设的网点，加价倒卖给乡镇批发商和种地农户。近年来为了增加黏性，开始派人或无人机下地帮农民喷药施肥（农技服务）。其本质是赚取大宗商品的搬运差价，自产比例极低。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17228,7 +17403,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "复合肥"
+      ],
       "report_file": "天禾股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17247,8 +17424,8 @@
       "code": "002758",
       "market": "SZ",
       "full_code": "002758.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "区域性农业生资与大宗商品流通商（兼营传统汽车4S店）。",
+      "business": "在物理世界中，这家公司主要在干三件事：一是向化工企业买入化肥/农药，再通过省内网点批发或零售给各级经销商和农民；二是开着几十家宝马、MINI等品牌汽车4S店卖车及修车；三是倒卖塑料等大宗原材料及少量医药产品。本质上，这是一个背靠浙江省供销社体系、“左手进货、右手出货”的巨型批发部。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17257,8 +17434,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 1,
+      "tags": [
+        "复合肥"
+      ],
       "report_file": "浙农股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -17277,8 +17456,8 @@
       "code": "300387",
       "market": "SZ",
       "full_code": "300387.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "化肥助剂（工业味精）配方厂",
+      "business": "在物理世界里，这家公司实际上就是把各种基础化工原料（表面活性剂等）进行搅拌复配，生产出防结块剂、包裹剂等化学助剂。然后派出大量销售人员，把这些助剂卖给化肥厂。化肥厂把它喷涂在化肥表面，以防止化肥在储存和运输中吸潮结块。本质上是一家面向 B 端化肥企业的专用化学品定制及推销商。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -17288,7 +17467,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "复合肥"
+      ],
       "report_file": "富邦科技.md",
       "add_date": "",
       "transfer_count": 0,
@@ -20198,7 +20379,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "铝"
+      ],
       "report_file": "神火股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -38528,7 +38711,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "机械"
+      ],
       "report_file": "新坐标.md",
       "add_date": "",
       "transfer_count": 0,
@@ -46508,7 +46693,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票"
+      ],
       "report_file": "老板电器.md",
       "add_date": "",
       "transfer_count": 0,
@@ -47498,7 +47685,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "汽车零配件"
+      ],
       "report_file": "热威股份.md",
       "add_date": "",
       "transfer_count": 0,
@@ -48518,7 +48707,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "消费",
+        "游资票"
+      ],
       "report_file": "技源集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -51158,7 +51350,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "消费"
+      ],
       "report_file": "广州酒家.md",
       "add_date": "",
       "transfer_count": 0,
@@ -52627,8 +52822,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 1,
+      "tags": [
+        "消费"
+      ],
       "report_file": "华利集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -55057,8 +55254,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "周期股"
+      ],
       "report_file": "太阳纸业.md",
       "add_date": "",
       "transfer_count": 0,
@@ -57638,7 +57837,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 3,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "家具"
+      ],
       "report_file": "顾家家居.md",
       "add_date": "",
       "transfer_count": 0,
@@ -59737,8 +59939,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "医药",
+        "价投票",
+        "成长票"
+      ],
       "report_file": "奥锐特.md",
       "add_date": "",
       "transfer_count": 0,
@@ -61358,7 +61564,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "眼科医疗"
+      ],
       "report_file": "兴齐眼药.md",
       "add_date": "",
       "transfer_count": 0,
@@ -62827,8 +63035,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 5,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "价投票",
+        "医药"
+      ],
       "report_file": "丽珠集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -63578,7 +63789,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "医药"
+      ],
       "report_file": "健康元.md",
       "add_date": "",
       "transfer_count": 0,
@@ -65047,8 +65260,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "医药",
+        "价投票"
+      ],
       "report_file": "华润江中.md",
       "add_date": "",
       "transfer_count": 0,
@@ -66578,7 +66794,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "创新药",
+        "医药"
+      ],
       "report_file": "特宝生物.md",
       "add_date": "",
       "transfer_count": 0,
@@ -68827,8 +69046,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "医疗设备",
+        "消费"
+      ],
       "report_file": "鱼跃医疗.md",
       "add_date": "",
       "transfer_count": 0,
@@ -69727,8 +69949,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "医疗设备",
+        "成长票"
+      ],
       "report_file": "南微医学.md",
       "add_date": "",
       "transfer_count": 0,
@@ -77138,7 +77363,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票"
+      ],
       "report_file": "成都燃气.md",
       "add_date": "",
       "transfer_count": 0,
@@ -78968,7 +79195,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 3,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "高速收费站"
+      ],
       "report_file": "皖通高速.md",
       "add_date": "",
       "transfer_count": 0,
@@ -79388,7 +79618,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 3,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "高速收费站"
+      ],
       "report_file": "宁沪高速.md",
       "add_date": "",
       "transfer_count": 0,
@@ -80168,7 +80401,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "周期股"
+      ],
       "report_file": "招商轮船.md",
       "add_date": "",
       "transfer_count": 0,
@@ -80707,8 +80942,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 3,
+      "tags": [
+        "价投票"
+      ],
       "report_file": "青岛港.md",
       "add_date": "",
       "transfer_count": 0,
@@ -83378,7 +83615,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "房地产"
+      ],
       "report_file": "中国国贸.md",
       "add_date": "",
       "transfer_count": 0,
@@ -84608,7 +84848,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "消费"
+      ],
       "report_file": "供销大集.md",
       "add_date": "",
       "transfer_count": 0,
@@ -89318,7 +89560,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "传媒"
+      ],
       "report_file": "行动教育.md",
       "add_date": "",
       "transfer_count": 0,
@@ -93728,7 +93973,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "水泥",
+        "价投票"
+      ],
       "report_file": "塔牌集团.md",
       "add_date": "",
       "transfer_count": 0,
@@ -95468,7 +95716,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 1,
-      "tags": [],
+      "tags": [
+        "建材"
+      ],
       "report_file": "北新建材.md",
       "add_date": "",
       "transfer_count": 0,
@@ -121388,7 +121638,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "价投票",
+        "机械"
+      ],
       "report_file": "弘亚数控.md",
       "add_date": "",
       "transfer_count": 0,
@@ -122467,8 +122720,12 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "价投票",
+        "软件",
+        "医疗设备"
+      ],
       "report_file": "美亚光电.md",
       "add_date": "",
       "transfer_count": 0,
@@ -131888,7 +132145,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "光学仪器"
+      ],
       "report_file": "力鼎光电.md",
       "add_date": "",
       "transfer_count": 0,
@@ -133347,8 +133606,8 @@
       "code": "301589",
       "market": "SZ",
       "full_code": "301589.SZ",
-      "industry": "-",
-      "business": "-",
+      "industry": "LED 大屏的“显卡与大脑”（视频图像显控龙头）。",
+      "business": "诺瓦在物理世界不造屏幕，只造控制屏幕的“器官”。它生产视频处理器、发送卡和接收卡。一端，视频处理器接收外部的图像信号并进行切割调色；另一端，接收卡（焊在 LED 屏幕背面）接收信号并告诉千万个 LED 灯珠该发什么光、亮什么色。这些软硬件通过直销或经销卖给利亚德、洲明等屏厂，最终被安装在春晚舞台、奥运会大屏、演唱会以及监控指挥中心。",
       "price": "",
       "change_percent": "",
       "market_cap": "-",
@@ -133357,8 +133616,10 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "价投票"
+      ],
       "report_file": "诺瓦星云.md",
       "add_date": "",
       "transfer_count": 0,
@@ -133597,7 +133858,7 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
+      "rating": 4,
       "tags": [],
       "report_file": "柏楚电子.md",
       "add_date": "",
@@ -139988,7 +140249,9 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "软件"
+      ],
       "report_file": "合合信息.md",
       "add_date": "",
       "transfer_count": 0,
@@ -141367,8 +141630,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 1,
+      "tags": [
+        "价投票",
+        "游戏"
+      ],
       "report_file": "恺英网络.md",
       "add_date": "",
       "transfer_count": 0,
@@ -148087,8 +148353,11 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
-      "tags": [],
+      "rating": 4,
+      "tags": [
+        "卫星导航",
+        "半导体"
+      ],
       "report_file": "华测导航.md",
       "add_date": "",
       "transfer_count": 0,
@@ -152438,7 +152707,10 @@
       "deduct_net_margin": "-",
       "pe": "-",
       "rating": 0,
-      "tags": [],
+      "tags": [
+        "环保",
+        "游资票"
+      ],
       "report_file": "联合水务.md",
       "add_date": "",
       "transfer_count": 0,

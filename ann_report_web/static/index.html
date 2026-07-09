@@ -843,32 +843,24 @@ function syncReportRatingsToBasics(name, rating) {
   const targetCode = reportItem ? reportItem.full_code : '';
   const targetFile = reportItem ? reportItem.file : '';
   const target = basicsData.find(s => s.name === name || s.report_file === targetFile || s.full_code === targetCode);
-  if (!target) return;
+  if (!target) return false;
   target.rating = rating;
+  target.report_file = target.report_file || targetFile;
   localStorage.setItem('stock_basics', JSON.stringify(basicsData));
+  return true;
 }
 
-async function refreshReportRatingsToBasics() {
-  if (!reportsData || !reportsData.length) {
-    await loadReports();
-  }
-  const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
-  let changed = false;
-  for (const report of reportsData) {
-    const rating = savedRatings[report.name] || report.rating || 0;
-    const target = basicsData.find(s => s.name === report.name || s.report_file === report.file || s.full_code === report.full_code);
-    if (target && target.rating !== rating) {
-      target.rating = rating;
-      changed = true;
-    }
-  }
-  if (changed) {
-    localStorage.setItem('stock_basics', JSON.stringify(basicsData));
-    await persistStockDb();
-  }
+async function persistOneStockRating(name) {
+  if (!isLocalMode || !basicsData || !basicsData.length) return;
+  const reportItem = reportsData.find(r => r.name === name);
+  const targetCode = reportItem ? reportItem.full_code : '';
+  const targetFile = reportItem ? reportItem.file : '';
+  const target = basicsData.find(s => s.name === name || s.report_file === targetFile || s.full_code === targetCode);
+  if (!target) return;
+  await persistStockDb();
 }
 
-function setRating(name, rating) {
+async function setRating(name, rating) {
   if (!requireLocalMode('修改报告评分')) return;
   const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
   const current = savedRatings[name] || 0;
@@ -879,6 +871,7 @@ function setRating(name, rating) {
   const item = reportsData.find(r => r.name === name);
   if (item) item.rating = newRating;
   syncReportRatingsToBasics(name, newRating);
+  await persistOneStockRating(name);
   refreshSharedData();
   renderReportsList();
 }
@@ -1237,6 +1230,15 @@ function buildReportMetaIndex() {
   return byName;
 }
 
+function buildReportDataIndex() {
+  const ratings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
+  const tags = JSON.parse(localStorage.getItem('report_tags') || '{}');
+  const fileData = getLocalData('reports/data.json', {});
+  const fileRatings = fileData.ratings || {};
+  const fileTags = fileData.tags || {};
+  return { ratings: { ...fileRatings, ...ratings }, tags: { ...fileTags, ...tags } };
+}
+
 function syncReportMetaToBasics() {
   const reportIndex = buildReportMetaIndex();
   let changed = false;
@@ -1252,6 +1254,36 @@ function syncReportMetaToBasics() {
     if (!next.business || next.business === '-') next.business = extractedBusiness;
     if (next.report_file || next.industry !== s.industry || next.business !== s.business || next.report_preview !== s.report_preview) changed = true;
     return next;
+  });
+  return changed;
+}
+
+function syncReportRatingsToBasics() {
+  const { ratings } = buildReportDataIndex();
+  const reportIndex = buildReportMetaIndex();
+  let changed = false;
+  basicsData = basicsData.map(s => {
+    const report = reportIndex[s.name] || (s.report_file ? (reportsData || []).find(r => r.file === s.report_file) : null);
+    const rating = report ? (ratings[report.name] ?? report.rating ?? 0) : (ratings[s.name] ?? s.rating ?? 0);
+    if ((s.rating || 0) === rating) return s;
+    changed = true;
+    return { ...s, rating };
+  });
+  return changed;
+}
+
+function syncReportTagsToBasics() {
+  const { tags } = buildReportDataIndex();
+  const reportIndex = buildReportMetaIndex();
+  let changed = false;
+  basicsData = basicsData.map(s => {
+    const report = reportIndex[s.name] || (s.report_file ? (reportsData || []).find(r => r.file === s.report_file) : null);
+    const nextTags = report ? (tags[report.name] || tags[s.name] || s.tags || []) : (tags[s.name] || s.tags || []);
+    const normalized = Array.isArray(nextTags) ? nextTags : [];
+    const current = Array.isArray(s.tags) ? s.tags : [];
+    if (current.length === normalized.length && current.every((v, i) => v === normalized[i])) return s;
+    changed = true;
+    return { ...s, tags: normalized };
   });
   return changed;
 }
@@ -1746,6 +1778,8 @@ async function loadBasics() {
     localStorage.setItem('stock_basics', JSON.stringify(basicsData));
     initSwIndustryFilters();
     syncReportMetaToBasics();
+    syncReportRatingsToBasics();
+    syncReportTagsToBasics();
     localStorage.setItem('stock_basics', JSON.stringify(basicsData));
     renderBasics();
     if (isLocalMode) {
