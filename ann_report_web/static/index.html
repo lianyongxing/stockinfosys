@@ -91,22 +91,38 @@
     .industry-stock:hover { border-color: #bfdbfe; box-shadow: 0 6px 18px rgba(59,130,246,0.08); }
     .industry-stock-name { font-size: 13px; font-weight: 600; color: #0f172a; }
     .industry-stock-code { font-size: 11px; color: #64748b; margin-top: 2px; }
-    .reports-shell { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
+    .reports-shell { display: grid; grid-template-columns: 260px 1fr; gap: 18px; align-items: start; }
     .reports-sidebar, .reports-main-panel { background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); overflow: hidden; }
-    .reports-sidebar { position: sticky; top: 18px; }
+    .reports-sidebar { position: sticky; top: 18px; max-height: calc(100vh - 36px); display: flex; flex-direction: column; }
     .reports-head { padding: 16px 18px; border-bottom: 1px solid #eef2f7; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); }
     .reports-head h3 { margin: 0 0 8px; color: #0f172a; font-size: 16px; }
-    .reports-controls { padding: 14px 18px; display: grid; gap: 10px; }
+    .reports-controls { padding: 14px 18px; display: grid; gap: 10px; border-bottom: 1px solid #eef2f7; }
     .reports-controls input, .reports-controls select { width: 100%; padding: 9px 10px; border: 1px solid #d9e2ec; border-radius: 10px; font-size: 13px; }
     .reports-controls input:focus, .reports-controls select:focus { outline: none; border-color: #8ab4f8; box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12); }
-    .reports-toc { padding: 10px 12px 14px; max-height: calc(100vh - 440px); overflow-y: auto; }
-    .report-card { position: relative; padding: 18px 18px 16px; background: #fff; border: 1px solid #edf2f7; border-radius: 16px; box-shadow: 0 2px 8px rgba(15,23,42,0.04); cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
-    .report-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15,23,42,0.08); border-color: #d7e3f3; }
-    .report-title { margin: 0 0 8px; color: #0f172a; font-size: 18px; }
-    .report-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-    .report-preview { color: #475569; font-size: 14px; line-height: 1.7; }
+    .report-rating-filter { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 4px 0 2px; }
+    .report-rating-filter .star-btn { border: none; background: transparent; padding: 0; cursor: pointer; font-size: 18px; line-height: 1; color: #ddd; transition: transform .15s ease, color .15s ease; }
+    .report-rating-filter .star-btn:hover { transform: scale(1.08); }
+    .report-rating-filter .star-btn.active { color: #f1c40f; }
+    .report-rating-filter .rating-clear { font-size: 12px; color: #64748b; cursor: pointer; margin-left: 2px; }
+    .report-rating-filter .rating-clear:hover { color: #2563eb; }
+    .report-date-filter { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding: 4px 0 2px; }
+    .report-date-filter .date-btn { border: 1px solid #d9e2ec; background: #fff; border-radius: 999px; padding: 4px 10px; font-size: 12px; cursor: pointer; color: #475569; transition: transform .15s ease, border-color .15s ease, color .15s ease, background .15s ease; }
+    .report-date-filter .date-btn:hover { transform: translateY(-1px); border-color: #8ab4f8; }
+    .report-date-filter .date-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
+    .report-date-filter .date-clear { font-size: 12px; color: #64748b; cursor: pointer; margin-left: 2px; }
+    .report-date-filter .date-clear:hover { color: #2563eb; }
+    .reports-toc { padding: 10px 12px 14px; overflow-y: scroll; flex: 1; scrollbar-gutter: stable; }
+    .report-row { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; background: #fff; border: 1px solid #edf2f7; border-radius: 12px; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; box-sizing: border-box; width: 100%; }
+    .report-row:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); border-color: #d7e3f3; }
+    .report-row.active { border-color: #2563eb; box-shadow: 0 8px 20px rgba(37,99,235,0.12); }
+    .report-list-item { box-sizing: border-box; width: 100%; }
+    .report-title { margin: 0; color: #0f172a; font-size: 13px; font-weight: 700; line-height: 1.35; }
+    .report-meta { display: flex; gap: 6px; flex-wrap: wrap; }
     .report-detail-card { background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); padding: 18px; }
-    .report-list-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap: 18px; margin-top: 0; }
+    .report-list-grid { display: grid; gap: 8px; margin-top: 0; }
+    .report-list-item { position: relative; padding: 10px 12px 9px; background: #fff; border: 1px solid #edf2f7; border-radius: 12px; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+    .report-list-item:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); border-color: #d7e3f3; }
+    .report-list-item.active { border-color: #2563eb; box-shadow: 0 8px 20px rgba(37,99,235,0.12); }
     .loading { text-align: center; padding: 40px; color: #666; }
     .error-row td { background: #ffebee; }
     .skipped-row td { background: #f5f5f5; color: #999; }
@@ -398,33 +414,28 @@
           <select id="report-sw3-filter" onchange="filterReports()">
             <option value="">申万三级</option>
           </select>
-          <select id="report-rating-filter" onchange="filterReports()">
-            <option value="">全部星级</option>
-            <option value="0">未评分</option>
-            <option value="1">1星</option>
-            <option value="2">2星</option>
-            <option value="3">3星</option>
-            <option value="4">4星</option>
-            <option value="5">5星</option>
-          </select>
+          <div id="report-rating-filter" class="report-rating-filter" aria-label="星级筛选"></div>
           <select id="report-tag-filter" onchange="filterReports()">
             <option value="">全部标签</option>
           </select>
-          <select id="report-date-filter" onchange="filterReports()"></select>
+          <div id="report-date-filter" class="report-date-filter" aria-label="日期筛选"></div>
         </div>
         <div id="reports-toc" class="reports-toc"></div>
       </div>
       <div class="reports-main-panel">
         <div style="padding:16px 18px;border-bottom:1px solid #eef2f7;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
           <div>
-            <h3 style="margin:0;color:#0f172a;">报告卡片</h3>
-            <div class="muted" style="font-size:12px;">支持评分、标签和 Markdown 预览</div>
+            <h3 style="margin:0;color:#0f172a;">报告列表</h3>
+            <div class="muted" style="font-size:12px;">点击左侧条目后，右侧显示完整内容</div>
           </div>
           <div class="basic-chip">共 <span id="report-count">0</span> 篇</div>
         </div>
         <div style="padding:18px;">
-          <div id="reports-list"></div>
-          <div id="reports-detail" style="display:none;"></div>
+          <div style="display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:18px;align-items:start;">
+            <div id="reports-list" style="min-width:0;"></div>
+            <div id="reports-detail" style="display:block;min-width:0;"><div class="report-detail-card"><div class="muted">选择左侧报告查看详情</div></div></div>
+          </div>
+          <div id="reports-pagination" style="display:flex;justify-content:flex-start;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;"></div>
         </div>
       </div>
     </div>
@@ -446,6 +457,8 @@ let allStocksData = [];
 let detailFilteredStocks = [];
 let detailPage = 1;
 let detailPageSize = 20;
+let reportPage = 1;
+let reportPageSize = 20;
 const isLocalMode = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 function staticPath(path) {
@@ -650,9 +663,9 @@ function renderReportsList() {
   const sw1 = document.getElementById('report-sw1-filter').value;
   const sw2 = document.getElementById('report-sw2-filter').value;
   const sw3 = document.getElementById('report-sw3-filter').value;
-  const ratingFilter = document.getElementById('report-rating-filter').value;
+  const ratingFilter = document.getElementById('report-rating-filter-value')?.value || '';
   const tagFilter = document.getElementById('report-tag-filter').value;
-  const dateFilter = document.getElementById('report-date-filter').value;
+  const dateFilter = document.getElementById('report-date-filter-value')?.value || '';
   
   const filtered = reportsData.filter(r => {
     const s = basicsData.find(x => x.name === r.name || x.report_file === r.file);
@@ -677,20 +690,38 @@ function renderReportsList() {
     document.getElementById('reports-list').innerHTML = '<div style="padding:20px;color:#999;">暂无报告</div>';
     return;
   }
-  document.getElementById('reports-list').innerHTML = '<div class="report-list-grid">' + 
-    filtered.map(r => {
+  const totalPages = Math.max(1, Math.ceil(filtered.length / reportPageSize));
+  if (reportPage > totalPages) reportPage = totalPages;
+  const start = (reportPage - 1) * reportPageSize;
+  const pageItems = filtered.slice(start, start + reportPageSize);
+  const paginationEl = document.getElementById('reports-pagination');
+  if (paginationEl) {
+    const prevDisabled = reportPage <= 1 ? 'disabled' : '';
+    const nextDisabled = reportPage >= totalPages ? 'disabled' : '';
+    paginationEl.innerHTML = '<button ' + prevDisabled + ' onclick="changeReportPage(-1)" style="padding:8px 12px;border:1px solid #d9e2ec;border-radius:8px;background:#fff;cursor:pointer;">上一页</button>' +
+      '<span class="muted" style="font-size:12px;">第 ' + reportPage + ' / ' + totalPages + ' 页，共 ' + filtered.length + ' 篇</span>' +
+      '<button ' + nextDisabled + ' onclick="changeReportPage(1)" style="padding:8px 12px;border:1px solid #d9e2ec;border-radius:8px;background:#fff;cursor:pointer;">下一页</button>';
+  }
+  document.getElementById('reports-list').innerHTML = '<div class="report-list-grid">' +
+    pageItems.map(r => {
       const rating = savedRatings[r.name] ?? r.rating ?? 0;
       const tags = savedTags[r.name] || [];
       const stars = Array(5).fill(0).map((_, i) => {
         const starNum = i + 1;
         const clickAttr = isLocalMode ? 'onclick="event.stopPropagation();setRating(\'' + r.name + '\',' + starNum + ')" onmouseover="event.target.style.transform=\'scale(1.3)\'" onmouseout="event.target.style.transform=\'scale(1)\'"' : '';
         const cursor = isLocalMode ? 'pointer' : 'default';
-        return '<span ' + clickAttr + ' style="cursor:' + cursor + ';color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:18px;margin:0 2px;transition:transform 0.2s;display:inline-block;">★</span>';
+        return '<span ' + clickAttr + ' style="cursor:' + cursor + ';color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:15px;margin:0 1px;transition:transform 0.2s;display:inline-block;">★</span>';
       }).join('');
       const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;margin-right:4px;">' + t + '</span>').join('');
-      return '<div class="report-card" onclick="showReport(\'' + r.file + '\')"><div style="position:absolute;top:12px;right:12px;">' + stars + '</div><h3 class="report-title">' + r.name + '</h3><div class="report-meta">' + tagHtml + '</div><p style="color:#94a3b8;font-size:12px;margin:0 0 10px;">添加日期: ' + (r.add_date || '-') + '</p><p class="report-preview">' + r.content.substring(0, 110) + '...</p></div>';
-    }).join('') + 
+      return '<div class="report-list-item" onclick="showReport(\'' + r.file + '\')" data-report-file="' + esc(r.file) + '"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="min-width:0;flex:1;display:flex;align-items:center;gap:10px;"><h3 class="report-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.name + '</h3><span class="muted" style="font-size:11px;white-space:nowrap;">' + (r.add_date || '-') + '</span></div><div style="white-space:nowrap;">' + stars + '</div></div><div class="report-meta" style="margin-top:6px;">' + tagHtml + '</div></div>';
+    }).join('') +
     '</div>';
+  highlightActiveReport(null);
+}
+
+function changeReportPage(delta) {
+  reportPage = Math.max(1, reportPage + delta);
+  renderReportsList();
 }
 
 function renderReportsTOC(filtered, savedRatings, savedTags) {
@@ -704,11 +735,12 @@ function renderReportsTOC(filtered, savedRatings, savedTags) {
     const tags = savedTags[r.name] || [];
     const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:12px;">★</span>').join('');
     const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:1px 4px;border-radius:8px;font-size:10px;margin-right:2px;">' + t + '</span>').join('');
-    return '<div onclick="showReport(\'' + r.file + '\')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #eef2f7;font-size:12px;color:#334155;" onmouseover="this.style.background=\'#f8fbff\'" onmouseout="this.style.background=\'#fff\'"><div style="font-weight:600;color:#0f172a;">' + r.name + '</div><div style="margin:4px 0;">' + tagHtml + '</div><div style="color:#94a3b8;font-size:11px;">' + stars + ' | ' + (r.add_date || '') + '</div></div>';
+    return '<div data-report-file="' + esc(r.file) + '" onclick="showReport(\'' + r.file + '\')" style="padding:10px 12px;cursor:pointer;border-bottom:1px solid #eef2f7;font-size:12px;color:#334155;" onmouseover="this.style.background=\'#f8fbff\'" onmouseout="this.style.background=\'#fff\'"><div style="font-weight:600;color:#0f172a;">' + r.name + '</div><div style="margin:4px 0;">' + tagHtml + '</div><div style="color:#94a3b8;font-size:11px;">' + stars + ' | ' + (r.add_date || '') + '</div></div>';
   }).join('');
 }
 
 function filterReports() {
+  reportPage = 1;
   renderReportsList();
 }
 
@@ -789,6 +821,44 @@ function updateTagFilter() {
   select.innerHTML = '<option value="">全部</option>' + allTags.map(t => '<option value="' + t + '">' + t + '</option>').join('');
 }
 
+function renderReportRatingFilter() {
+  const wrap = document.getElementById('report-rating-filter');
+  if (!wrap) return;
+  const current = document.getElementById('report-rating-filter-value')?.value || '';
+  const stars = [0, 1, 2, 3, 4, 5].map(v => {
+    const label = v === 0 ? '未评分' : String(v);
+    const active = String(v) === current ? 'active' : '';
+    return '<button type="button" class="star-btn ' + active + '" onclick="setReportRatingFilter(\'' + v + '\')" title="' + label + '">★</button>';
+  }).join('');
+  wrap.innerHTML = stars + '<span class="rating-clear" onclick="setReportRatingFilter(\'\')">清除</span><input type="hidden" id="report-rating-filter-value" value="' + current + '">';
+}
+
+function setReportRatingFilter(value) {
+  const hidden = document.getElementById('report-rating-filter-value');
+  if (hidden) hidden.value = value;
+  renderReportRatingFilter();
+  filterReports();
+}
+
+function renderReportDateFilter() {
+  const wrap = document.getElementById('report-date-filter');
+  if (!wrap) return;
+  const current = document.getElementById('report-date-filter-value')?.value || '';
+  const dates = [...new Set(reportsData.map(r => r.add_date).filter(Boolean))].sort().reverse();
+  const buttons = dates.slice(0, 12).map(d => {
+    const active = d === current ? 'active' : '';
+    return '<button type="button" class="date-btn ' + active + '" onclick="setReportDateFilter(\'' + d + '\')">' + d + '</button>';
+  }).join('');
+  wrap.innerHTML = buttons + '<span class="date-clear" onclick="setReportDateFilter(\'\')">清除</span><input type="hidden" id="report-date-filter-value" value="' + current + '">';
+}
+
+function setReportDateFilter(value) {
+  const hidden = document.getElementById('report-date-filter-value');
+  if (hidden) hidden.value = value;
+  renderReportDateFilter();
+  filterReports();
+}
+
 function showTagEditor(name) {
   const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
   const currentTags = savedTags[name] || [];
@@ -835,10 +905,10 @@ function quickAddTag(name) {
 }
 
 function initReportFilters() {
-  const dates = [...new Set(reportsData.map(r => r.add_date).filter(Boolean))].sort().reverse();
-  const dateSel = document.getElementById('report-date-filter');
-  dateSel.innerHTML = '<option value="">全部</option>' + dates.map(d => '<option value="' + d + '">' + d + '</option>').join('');
+  renderReportRatingFilter();
+  renderReportDateFilter();
   updateTagFilter();
+  renderReportRatingFilter();
 }
 
 function syncReportRatingsToBasics(name, rating) {
@@ -882,9 +952,8 @@ async function setRating(name, rating) {
 function showReport(file) {
   const item = reportsData.find(r => r.file === file);
   if (!item) return;
-  document.getElementById('reports-list').style.display = 'none';
+  highlightActiveReport(file);
   const d = document.getElementById('reports-detail');
-  d.style.display = 'block';
   const htmlContent = marked.parse(item.content);
   const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
   const tags = savedTags[item.name] || [];
@@ -892,15 +961,25 @@ function showReport(file) {
   const tagEditorSection = isLocalMode
     ? '<div style="margin-bottom:16px;padding:14px;background:#f8fbff;border:1px solid #e5eef9;border-radius:12px;"><button onclick="document.getElementById(\'tag-editor-content\').style.display=document.getElementById(\'tag-editor-content\').style.display===\'none\'?\'block\':\'none\'" style="padding:6px 12px;background:#7c3aed;color:#fff;border:none;border-radius:999px;cursor:pointer;font-size:12px;">编辑标签</button><div id="tag-editor-content" style="display:none;margin-top:12px;"></div></div>'
     : '';
-  d.innerHTML = '<div class="report-detail-card"><button onclick="backToReports()" style="padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;margin-bottom:18px;">← 返回</button><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;"><div><div style="font-size:22px;font-weight:700;color:#0f172a;">' + item.name + '</div><div class="muted" style="margin-top:4px;">添加日期: ' + (item.add_date || '-') + '</div></div><div style="display:flex;gap:8px;flex-wrap:wrap;">' + (tagHtml || '<span class="muted">暂无标签</span>') + '</div></div>' + tagEditorSection + '<div class="markdown-body" style="background:linear-gradient(180deg,#fafcff 0%,#ffffff 100%);padding:22px;border-radius:14px;font-size:14px;line-height:1.75;border:1px solid #eef2f7;">' + htmlContent + '</div></div>';
+  d.style.display = 'block';
+  d.innerHTML = '<div class="report-detail-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px;"><div><div style="font-size:22px;font-weight:700;color:#0f172a;">' + item.name + '</div><div class="muted" style="margin-top:4px;">添加日期: ' + (item.add_date || '-') + '</div></div><button onclick="backToReports()" style="padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;">返回列表</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' + (tagHtml || '<span class="muted">暂无标签</span>') + '</div>' + tagEditorSection + '<div class="markdown-body" style="background:linear-gradient(180deg,#fafcff 0%,#ffffff 100%);padding:22px;border-radius:14px;font-size:14px;line-height:1.75;border:1px solid #eef2f7;">' + htmlContent + '</div></div>';
   if (isLocalMode) {
     document.getElementById('tag-editor-content').innerHTML = showTagEditor(item.name);
   }
 }
 
 function backToReports() {
-  document.getElementById('reports-list').style.display = 'block';
   document.getElementById('reports-detail').style.display = 'none';
+  highlightActiveReport(null);
+}
+
+function highlightActiveReport(file) {
+  document.querySelectorAll('.report-list-item').forEach(el => {
+    el.classList.toggle('active', !!file && el.getAttribute('data-report-file') === file);
+  });
+  document.querySelectorAll('.reports-toc > div').forEach(el => {
+    el.classList.toggle('active', !!file && el.getAttribute && el.getAttribute('data-report-file') === file);
+  });
 }
 
 function showReportByName(name) {
@@ -946,6 +1025,7 @@ async function saveReport() {
       return;
     }
     reportsData = data.items;
+    reportPage = 1;
     renderReportsList();
     hideAddReport();
     alert('保存成功');
