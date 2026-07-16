@@ -387,7 +387,8 @@
           <div class="muted" style="font-size:12px;">按星级、标签、日期快速缩小范围</div>
         </div>
         <div class="reports-controls">
-          <input type="text" id="report-search" placeholder="搜索股票..." oninput="filterReports()">
+          <input type="text" id="report-title-search" placeholder="搜索标题..." oninput="filterReports()">
+          <input type="text" id="report-content-search" placeholder="搜索内容..." oninput="filterReports()">
           <select id="report-sw1-filter" onchange="onReportSw1Change();filterReports()">
             <option value="">申万一级</option>
           </select>
@@ -644,7 +645,8 @@ function renderReportsList() {
   const savedRatings = JSON.parse(localStorage.getItem('report_ratings') || '{}');
   const savedTags = JSON.parse(localStorage.getItem('report_tags') || '{}');
   const allTags = getAllTags();
-  const q = document.getElementById('report-search').value.trim().toLowerCase();
+  const titleQ = normalizeSearchText(document.getElementById('report-title-search').value);
+  const contentQ = normalizeSearchText(document.getElementById('report-content-search').value);
   const sw1 = document.getElementById('report-sw1-filter').value;
   const sw2 = document.getElementById('report-sw2-filter').value;
   const sw3 = document.getElementById('report-sw3-filter').value;
@@ -656,7 +658,8 @@ function renderReportsList() {
     const s = basicsData.find(x => x.name === r.name || x.report_file === r.file);
     const rating = savedRatings[r.name] ?? r.rating ?? 0;
     const tags = savedTags[r.name] || [];
-    if (q && !r.name.toLowerCase().includes(q)) return false;
+    if (titleQ && normalizeSearchText(r.name) !== titleQ) return false;
+    if (contentQ && !normalizeSearchText(r.content || '').includes(contentQ)) return false;
     if (sw1 && (!s || s.sw_lv1 !== sw1)) return false;
     if (sw2 && (!s || s.sw_lv2 !== sw2)) return false;
     if (sw3 && (!s || s.sw_lv3 !== sw3)) return false;
