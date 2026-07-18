@@ -1,10 +1,10 @@
 {
-  "update_time": "2026-07-16",
+  "update_time": "2026-07-17",
   "stats": {
     "total_stocks": 5213,
     "stocks_with_quotes": 4,
     "stocks_with_transfers": 4,
-    "stocks_with_ratings": 60
+    "stocks_with_ratings": 61
   },
   "sources": {
     "reports": "stockinfos.json",
@@ -10624,7 +10624,7 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 0,
+      "rating": 3,
       "tags": [
         "氟化工"
       ],
