@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-07-17",
+  "update_time": "2026-07-18",
   "stats": {
     "total_stocks": 5213,
     "stocks_with_quotes": 4,
@@ -64,7 +64,7 @@
       "net_margin": "-",
       "deduct_net_margin": "-",
       "pe": "-",
-      "rating": 4,
+      "rating": 3,
       "tags": [
         "合成生物"
       ],

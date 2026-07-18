@@ -91,7 +91,7 @@
     .industry-stock:hover { border-color: #bfdbfe; box-shadow: 0 6px 18px rgba(59,130,246,0.08); }
     .industry-stock-name { font-size: 13px; font-weight: 600; color: #0f172a; }
     .industry-stock-code { font-size: 11px; color: #64748b; margin-top: 2px; }
-    .reports-shell { display: grid; grid-template-columns: 260px 1fr; gap: 18px; align-items: start; }
+    .reports-shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 18px; align-items: start; }
     .reports-sidebar, .reports-main-panel { background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(15,23,42,0.06); overflow: hidden; }
     .reports-sidebar { position: sticky; top: 18px; max-height: calc(100vh - 36px); display: flex; flex-direction: column; }
     .reports-head { padding: 16px 18px; border-bottom: 1px solid #eef2f7; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); }
@@ -111,18 +111,37 @@
     .report-date-filter .date-btn.active { background: #2563eb; color: #fff; border-color: #2563eb; }
     .report-date-filter .date-clear { font-size: 12px; color: #64748b; cursor: pointer; margin-left: 2px; }
     .report-date-filter .date-clear:hover { color: #2563eb; }
-    .reports-toc { padding: 10px 12px 14px; overflow-y: scroll; flex: 1; scrollbar-gutter: stable; }
+    .reports-toc { display: none; }
     .report-row { display: grid; grid-template-columns: 1fr; gap: 8px; padding: 12px 14px; background: #fff; border: 1px solid #edf2f7; border-radius: 12px; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; box-sizing: border-box; width: 100%; }
     .report-row:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); border-color: #d7e3f3; }
     .report-row.active { border-color: #2563eb; box-shadow: 0 8px 20px rgba(37,99,235,0.12); }
     .report-list-item { box-sizing: border-box; width: 100%; }
     .report-title { margin: 0; color: #0f172a; font-size: 13px; font-weight: 700; line-height: 1.35; }
-    .report-meta { display: flex; gap: 6px; flex-wrap: wrap; }
-    .report-detail-card { background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); padding: 18px; }
+    .report-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .report-tags { display: flex; gap: 4px; flex-wrap: wrap; min-width: 0; }
+    .report-tags .report-tag { max-width: 100%; }
+    .report-headline { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .report-headline-left { min-width: 0; flex: 1 1 auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .report-headline-right { flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-end; }
+    .report-headline-line { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0; }
+    .report-headline-tags { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
+    .report-detail-card { background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(15,23,42,0.08); padding: 18px; margin-top: -16px; }
+    .report-detail-empty { display: grid; place-items: center; min-height: 360px; color: #64748b; text-align: center; padding: 24px; border: 1px dashed #d9e2ec; border-radius: 16px; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); }
     .report-list-grid { display: grid; gap: 8px; margin-top: 0; }
     .report-list-item { position: relative; padding: 10px 12px 9px; background: #fff; border: 1px solid #edf2f7; border-radius: 12px; cursor: pointer; transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
     .report-list-item:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(15,23,42,0.08); border-color: #d7e3f3; }
     .report-list-item.active { border-color: #2563eb; box-shadow: 0 8px 20px rgba(37,99,235,0.12); }
+    .reports-body { display: grid; grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr); gap: 12px; align-items: start; }
+    .reports-list-pane, .reports-detail-pane { min-width: 0; }
+    .reports-list-pane { display: flex; flex-direction: column; gap: 12px; min-height: calc(100vh - 230px); }
+    .reports-detail-pane { position: sticky; top: -16px; }
+    .reports-detail-shell { min-height: 360px; max-height: calc(100vh - 320px); overflow: hidden; }
+    .reports-detail-scroll { max-height: calc(100vh - 420px); overflow-y: auto; scrollbar-gutter: stable; }
+    .reports-detail-placeholder { display: grid; place-items: center; min-height: 420px; padding: 24px; border: 1px dashed #d9e2ec; border-radius: 16px; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); color: #64748b; text-align: center; }
+    @media (max-width: 1200px) {
+      .reports-body { grid-template-columns: 1fr; }
+      .reports-detail-pane { position: static; }
+    }
     .loading { text-align: center; padding: 40px; color: #666; }
     .error-row td { background: #ffebee; }
     .skipped-row td { background: #f5f5f5; color: #999; }
@@ -423,19 +442,35 @@
         <div id="reports-toc" class="reports-toc"></div>
       </div>
       <div class="reports-main-panel">
-        <div style="padding:16px 18px;border-bottom:1px solid #eef2f7;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-          <div>
+        <div style="padding:6px 18px 4px;border-bottom:1px solid #eef2f7;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
             <h3 style="margin:0;color:#0f172a;">报告列表</h3>
             <div class="muted" style="font-size:12px;">点击左侧条目后，右侧显示完整内容</div>
           </div>
           <div class="basic-chip">共 <span id="report-count">0</span> 篇</div>
         </div>
-        <div style="padding:18px;">
-          <div style="display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:18px;align-items:start;">
-            <div id="reports-list" style="min-width:0;"></div>
-            <div id="reports-detail" style="display:block;min-width:0;"><div class="report-detail-card"><div class="muted">选择左侧报告查看详情</div></div></div>
+        <div style="padding:0 18px 12px 18px;">
+          <div id="reports-filter-summary" style="font-size:12px;visibility:hidden;min-width:180px;"></div>
+          <div class="reports-body">
+            <div class="reports-list-pane">
+              <div id="reports-list"></div>
+              <div id="reports-pagination" style="display:flex;justify-content:flex-start;align-items:center;gap:8px;flex-wrap:wrap;padding-bottom:8px;"></div>
+            </div>
+            <div class="reports-detail-pane">
+              <div id="reports-detail" class="reports-detail-shell">
+                <div class="report-detail-placeholder">
+                  <div style="max-width:340px;">
+                    <div style="font-size:18px;font-weight:700;color:#0f172a;margin-bottom:10px;">研究报告概览</div>
+                    <div style="display:grid;gap:10px;text-align:left;">
+                      <div style="padding:10px 12px;background:#fff;border:1px solid #e5edf7;border-radius:12px;"><div style="font-size:12px;color:#64748b;">当前筛选</div><div id="reports-summary-text" style="font-size:14px;font-weight:600;color:#0f172a;">全部报告</div></div>
+                      <div style="padding:10px 12px;background:#fff;border:1px solid #e5edf7;border-radius:12px;"><div style="font-size:12px;color:#64748b;">浏览方式</div><div style="font-size:14px;font-weight:600;color:#0f172a;">先筛选，再展开详情</div></div>
+                      <div style="padding:10px 12px;background:#fff;border:1px solid #e5edf7;border-radius:12px;"><div style="font-size:12px;color:#64748b;">操作提示</div><div style="font-size:14px;font-weight:600;color:#0f172a;">点击左侧任一条即可查看全文</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div id="reports-pagination" style="display:flex;justify-content:flex-start;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;"></div>
         </div>
       </div>
     </div>
@@ -458,7 +493,7 @@ let detailFilteredStocks = [];
 let detailPage = 1;
 let detailPageSize = 20;
 let reportPage = 1;
-let reportPageSize = 20;
+let reportPageSize = 12;
 const isLocalMode = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 function staticPath(path) {
@@ -684,10 +719,24 @@ function renderReportsList() {
 
   const countEl = document.getElementById('report-count');
   if (countEl) countEl.textContent = filtered.length;
+  const summaryEl = document.getElementById('reports-filter-summary');
+  if (summaryEl) {
+    const parts = [];
+    if (titleQ) parts.push('标题「' + titleQ + '」');
+    if (contentQ) parts.push('内容「' + contentQ + '」');
+    if (sw1) parts.push(sw1);
+    if (sw2) parts.push(sw2);
+    if (sw3) parts.push(sw3);
+    if (ratingFilter) parts.push(ratingFilter + '星');
+    if (tagFilter) parts.push(tagFilter);
+    if (dateFilter) parts.push(dateFilter);
+    summaryEl.textContent = parts.length ? '当前筛选：' + parts.join(' · ') : '当前显示全部报告';
+  }
   
   renderReportsTOC(filtered, savedRatings, savedTags);
   if (filtered.length === 0) {
     document.getElementById('reports-list').innerHTML = '<div style="padding:20px;color:#999;">暂无报告</div>';
+    document.getElementById('reports-detail').innerHTML = '<div class="report-detail-placeholder"><div><div style="font-size:16px;font-weight:600;color:#0f172a;margin-bottom:8px;">没有可显示的报告</div><div style="font-size:13px;line-height:1.7;">请调整筛选条件后再查看。</div></div></div>';
     return;
   }
   const totalPages = Math.max(1, Math.ceil(filtered.length / reportPageSize));
@@ -712,8 +761,19 @@ function renderReportsList() {
         const cursor = isLocalMode ? 'pointer' : 'default';
         return '<span ' + clickAttr + ' style="cursor:' + cursor + ';color:' + (i < rating ? '#f1c40f' : '#ddd') + ';font-size:15px;margin:0 1px;transition:transform 0.2s;display:inline-block;">★</span>';
       }).join('');
-      const tagHtml = tags.map(t => '<span style="background:' + getTagColor(t) + ';color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;margin-right:4px;">' + t + '</span>').join('');
-      return '<div class="report-list-item" onclick="showReport(\'' + r.file + '\')" data-report-file="' + esc(r.file) + '"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><div style="min-width:0;flex:1;display:flex;align-items:center;gap:10px;"><h3 class="report-title" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + r.name + '</h3><span class="muted" style="font-size:11px;white-space:nowrap;">' + (r.add_date || '-') + '</span></div><div style="white-space:nowrap;">' + stars + '</div></div><div class="report-meta" style="margin-top:6px;">' + tagHtml + '</div></div>';
+      const tagHtml = tags.map(t => '<span class="report-tag" style="background:' + getTagColor(t) + ';color:#fff;padding:2px 6px;border-radius:10px;font-size:11px;line-height:1.4;">' + t + '</span>').join('');
+      return '<div class="report-list-item" onclick="showReport(\'' + r.file + '\')" data-report-file="' + esc(r.file) + '">' +
+        '<div class="report-headline">' +
+          '<div class="report-headline-left">' +
+            '<span class="report-title" style="display:inline;">' + esc(r.name) + '</span>' +
+            '<span class="report-headline-line" style="font-size:11px;color:#64748b;line-height:1.4;">' +
+              '<span>' + esc(r.add_date || '-') + '</span>' +
+              '<span class="report-headline-tags">' + tagHtml + '</span>' +
+            '</span>' +
+          '</div>' +
+          '<div class="report-headline-right">' + stars + '</div>' +
+        '</div>' +
+      '</div>';
     }).join('') +
     '</div>';
   highlightActiveReport(null);
@@ -962,14 +1022,15 @@ function showReport(file) {
     ? '<div style="margin-bottom:16px;padding:14px;background:#f8fbff;border:1px solid #e5eef9;border-radius:12px;"><button onclick="document.getElementById(\'tag-editor-content\').style.display=document.getElementById(\'tag-editor-content\').style.display===\'none\'?\'block\':\'none\'" style="padding:6px 12px;background:#7c3aed;color:#fff;border:none;border-radius:999px;cursor:pointer;font-size:12px;">编辑标签</button><div id="tag-editor-content" style="display:none;margin-top:12px;"></div></div>'
     : '';
   d.style.display = 'block';
-  d.innerHTML = '<div class="report-detail-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:18px;"><div><div style="font-size:22px;font-weight:700;color:#0f172a;">' + item.name + '</div><div class="muted" style="margin-top:4px;">添加日期: ' + (item.add_date || '-') + '</div></div><button onclick="backToReports()" style="padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;">返回列表</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">' + (tagHtml || '<span class="muted">暂无标签</span>') + '</div>' + tagEditorSection + '<div class="markdown-body" style="background:linear-gradient(180deg,#fafcff 0%,#ffffff 100%);padding:22px;border-radius:14px;font-size:14px;line-height:1.75;border:1px solid #eef2f7;">' + htmlContent + '</div></div>';
+  d.innerHTML = '<div class="report-detail-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px;"><div style="min-width:0;flex:1 1 auto;"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><div style="font-size:22px;font-weight:700;color:#0f172a;">' + item.name + '</div><div style="display:flex;gap:4px;flex-wrap:wrap;min-width:0;">' + (tagHtml || '<span class="muted">暂无标签</span>') + '</div></div></div><button onclick="backToReports()" style="padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:999px;cursor:pointer;">返回列表</button></div>' + tagEditorSection + '<div class="reports-detail-scroll"><div class="markdown-body" style="background:linear-gradient(180deg,#fafcff 0%,#ffffff 100%);padding:18px;border-radius:14px;font-size:14px;line-height:1.7;border:1px solid #eef2f7;">' + htmlContent + '</div></div></div>';
   if (isLocalMode) {
     document.getElementById('tag-editor-content').innerHTML = showTagEditor(item.name);
   }
 }
 
 function backToReports() {
-  document.getElementById('reports-detail').style.display = 'none';
+  const d = document.getElementById('reports-detail');
+  d.innerHTML = '<div class="report-detail-placeholder"><div><div style="font-size:16px;font-weight:600;color:#0f172a;margin-bottom:8px;">请选择一篇研究报告</div><div style="font-size:13px;line-height:1.7;">左侧列表用于快速筛选与浏览，点击后这里会显示完整内容。</div></div></div>';
   highlightActiveReport(null);
 }
 
