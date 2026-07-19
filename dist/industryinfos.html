@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>行业研究报告</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --brand: #2563eb;
+      --brand-soft: #dbeafe;
+      --hover: #f8fafc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .page {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      min-height: 100vh;
+    }
+    .sidebar {
+      background: var(--panel);
+      border-right: 1px solid var(--line);
+      padding: 20px;
+      overflow: auto;
+    }
+    .title {
+      margin: 0 0 8px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .subtitle {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .group {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      background: #fff;
+    }
+    .group-head {
+      padding: 12px 14px;
+      font-weight: 600;
+      background: #fafafa;
+      border-bottom: 1px solid var(--line);
+    }
+    .group-list {
+      padding: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all .15s ease;
+      white-space: nowrap;
+    }
+    .chip:hover { background: var(--hover); }
+    .chip.active {
+      background: var(--brand-soft);
+      border-color: var(--brand);
+      color: var(--brand);
+      font-weight: 600;
+    }
+    .main {
+      padding: 24px;
+      overflow: auto;
+    }
+    .breadcrumb {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, .04);
+      overflow: hidden;
+    }
+    .card-head {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .card-head h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+    .card-head .meta {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .report {
+      padding: 20px;
+      line-height: 1.85;
+      font-size: 15px;
+      white-space: normal;
+    }
+    .report pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: inherit;
+      color: var(--text);
+    }
+    .empty {
+      padding: 56px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .loading {
+      padding: 56px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+    @media (max-width: 960px) {
+      .page { grid-template-columns: 1fr; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--line); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <aside class="sidebar">
+      <h2 class="title">行业研究报告</h2>
+      <p class="subtitle">按申万三级类目联动筛选，点击后在右侧展示对应行业报告。报告文件统一读取 `industryinfos/` 下的 Markdown 文件。</p>
+      <div id="filters"></div>
+    </aside>
+
+    <main class="main">
+      <div class="breadcrumb" id="breadcrumb">请选择行业类目</div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h1 id="report-title">未选择行业</h1>
+            <div class="meta" id="report-meta">左侧选择三级类目后查看行业报告</div>
+          </div>
+        </div>
+        <div class="report" id="report-body">
+          <div class="empty">请选择左侧类目查看行业报告</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const stockDb = [];
+    const state = {
+      lv1: '',
+      lv2: '',
+      lv3: '',
+      industry: ''
+    };
+
+    function uniqueSorted(values) {
+      return [...new Set(values.filter(Boolean))].sort((a, b) => a.localeCompare(b, 'zh-Hans-CN'));
+    }
+
+    function buildFilters() {
+      const filters = document.getElementById('filters');
+      const lv1List = uniqueSorted(stockDb.map(x => x.sw_lv1));
+      filters.innerHTML = renderGroup('一级类目', 'lv1', lv1List);
+      refreshLevel2();
+    }
+
+    function renderGroup(label, key, items) {
+      const chips = items.map(item => `<button class="chip ${state[key] === item ? 'active' : ''}" data-key="${key}" data-value="${item}">${item}</button>`).join('');
+      return `<div class="group"><div class="group-head">${label}</div><div class="group-list">${chips || '<span style="color:#6b7280;font-size:13px;">暂无数据</span>'}</div></div>`;
+    }
+
+    function refreshLevel2() {
+      const filters = document.getElementById('filters');
+      const lv2List = uniqueSorted(stockDb.filter(x => !state.lv1 || x.sw_lv1 === state.lv1).map(x => x.sw_lv2));
+      const lv3List = uniqueSorted(stockDb.filter(x => (!state.lv1 || x.sw_lv1 === state.lv1) && (!state.lv2 || x.sw_lv2 === state.lv2)).map(x => x.sw_lv3));
+      const industryList = uniqueSorted(stockDb.filter(x => (!state.lv1 || x.sw_lv1 === state.lv1) && (!state.lv2 || x.sw_lv2 === state.lv2) && (!state.lv3 || x.sw_lv3 === state.lv3)).map(x => x.sw_industry));
+      filters.innerHTML = [
+        renderGroup('一级类目', 'lv1', uniqueSorted(stockDb.map(x => x.sw_lv1))),
+        renderGroup('二级类目', 'lv2', lv2List),
+        renderGroup('三级类目', 'lv3', lv3List),
+        renderGroup('行业标签', 'industry', industryList)
+      ].join('');
+      attachEvents();
+    }
+
+    function attachEvents() {
+      document.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.key;
+          const value = btn.dataset.value;
+          if (state[key] === value) {
+            state[key] = '';
+            if (key === 'lv1') { state.lv2 = ''; state.lv3 = ''; state.industry = ''; }
+            if (key === 'lv2') { state.lv3 = ''; state.industry = ''; }
+            if (key === 'lv3') { state.industry = ''; }
+          } else {
+            state[key] = value;
+            if (key === 'lv1') { state.lv2 = ''; state.lv3 = ''; state.industry = ''; }
+            if (key === 'lv2') { state.lv3 = ''; state.industry = ''; }
+            if (key === 'lv3') { state.industry = ''; }
+          }
+          refreshLevel2();
+          loadReport();
+        });
+      });
+    }
+
+    function currentIndustryName() {
+      return state.industry || state.lv3 || state.lv2 || state.lv1 || '';
+    }
+
+    function updateBreadcrumb(name) {
+      const parts = [];
+      if (state.lv1) parts.push(state.lv1);
+      if (state.lv2) parts.push(state.lv2);
+      if (state.lv3) parts.push(state.lv3);
+      if (state.industry) parts.push(state.industry);
+      document.getElementById('breadcrumb').textContent = parts.length ? parts.join(' / ') : '请选择行业类目';
+      document.getElementById('report-title').textContent = name || '未选择行业';
+    }
+
+    async function loadReport() {
+      const name = currentIndustryName();
+      updateBreadcrumb(name);
+      const body = document.getElementById('report-body');
+      const meta = document.getElementById('report-meta');
+
+      if (!name) {
+        meta.textContent = '左侧选择三级类目后查看行业报告';
+        body.innerHTML = '<div class="empty">请选择左侧类目查看行业报告</div>';
+        return;
+      }
+
+      meta.textContent = '正在加载报告...';
+      body.innerHTML = '<div class="loading">正在加载行业报告...</div>';
+
+      try {
+        const resp = await fetch(`/api/industry-report?name=${encodeURIComponent(name)}`);
+        const data = await resp.json();
+        if (!data.exists) {
+          meta.textContent = '当前类目暂无对应报告';
+          body.innerHTML = '<div class="empty">不存在当前行业报告</div>';
+          return;
+        }
+        meta.textContent = `对应文件：${name}.md`;
+        body.innerHTML = `<pre>${escapeHtml(data.content)}</pre>`;
+      } catch (e) {
+        meta.textContent = '加载失败';
+        body.innerHTML = '<div class="empty">报告加载失败，请稍后重试</div>';
+      }
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;');
+    }
+
+    async function init() {
+      try {
+        const resp = await fetch('/stocks_db.json');
+        const data = await resp.json();
+        Object.assign(stockDb, Object.values(data.stocks || {}));
+      } catch (e) {
+        try {
+          const resp = await fetch('/static/stocks_db.json');
+          const data = await resp.json();
+          Object.assign(stockDb, Object.values(data.stocks || {}));
+        } catch (err) {
+          document.getElementById('filters').innerHTML = '<div class="group"><div class="group-head">类目</div><div class="group-list"><span style="color:#6b7280;font-size:13px;">无法加载类目数据</span></div></div>';
+          return;
+        }
+      }
+      buildFilters();
+      attachEvents();
+    }
+
+    init();
+  </script>
+</body>
+</html>

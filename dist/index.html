@@ -138,9 +138,259 @@
     .reports-detail-shell { min-height: 360px; max-height: calc(100vh - 320px); overflow: hidden; }
     .reports-detail-scroll { max-height: calc(100vh - 420px); overflow-y: auto; scrollbar-gutter: stable; }
     .reports-detail-placeholder { display: grid; place-items: center; min-height: 420px; padding: 24px; border: 1px dashed #d9e2ec; border-radius: 16px; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); color: #64748b; text-align: center; }
+    .industry-analysis-layout { display: grid; grid-template-columns: minmax(220px, 300px) minmax(0, 1fr); gap: 16px; align-items: start; }
+    .industry-analysis-sidebar { display: grid; gap: 12px; position: sticky; top: 16px; align-self: start; }
+    .industry-analysis-sidebar--stock { position: sticky; top: 76px; display: block; align-self: start; }
+    .industry-analysis-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 8px 24px rgba(15,23,42,.04); padding: 16px; display: grid; gap: 12px; }
+    .industry-analysis-card--tree { max-height: calc(100vh - 140px); overflow: hidden; }
+    .industry-analysis-card--tree .analysis-industry-lists { overflow-y: auto; padding-right: 4px; max-height: calc(100vh - 180px); }
+    .industry-analysis-card--stock { max-height: calc(100vh - 140px); overflow: hidden; }
+    .industry-analysis-card--stock .industry-preview { overflow-y: auto; padding-right: 4px; max-height: calc(100vh - 180px); }
+    .analysis-industry-lists {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      justify-content: stretch;
+      column-gap: 0;
+    }
+    .analysis-industry-lists > div {
+      min-width: 0;
+      padding: 0 14px;
+      position: relative;
+    }
+    .analysis-industry-lists > div:not(:first-child)::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 2px;
+      bottom: 2px;
+      width: 1px;
+      background: #cbd5e1;
+    }
+    .analysis-industry-lists > div {
+      min-width: 0;
+      padding: 0 14px;
+      position: relative;
+    }
+    .analysis-industry-lists > div:not(:first-child)::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 2px;
+      bottom: 2px;
+      width: 1px;
+      background: #cbd5e1;
+    }
+    .industry-analysis-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(15,23,42,.04);
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+    }
+    .industry-analysis-card--report {
+      padding: 16px;
+    }
+    .industry-analysis-main {
+      min-width: 0;
+      display: grid;
+      gap: 16px;
+    }
+    .industry-analysis-sidebar--stock {
+      position: sticky;
+      top: 76px;
+      display: block;
+      align-self: start;
+    }
+    .industry-analysis-sidebar {
+      display: grid;
+      gap: 12px;
+      position: sticky;
+      top: 16px;
+      align-self: start;
+    }
+    .industry-analysis-sidebar-card { display: grid; gap: 10px; }
+    .industry-analysis-tree { display: grid; gap: 8px; max-height: calc(100vh - 140px); overflow-y: auto; scrollbar-gutter: stable; }
+    .industry-analysis-tree.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .industry-analysis-tree.grid-3 .industry-analysis-tree-item { min-width: 0; }
+    .industry-analysis-tree-item { padding: 9px 10px; border: 1px solid #e6eef8; border-radius: 10px; background: #fff; cursor: pointer; transition: all .15s ease; }
+    .industry-analysis-tree-item:hover { border-color: #bfdbfe; box-shadow: 0 6px 18px rgba(59,130,246,0.08); }
+    .industry-analysis-tree-item.active { border-color: #2563eb; background: #eff6ff; }
+    .industry-analysis-tree-item-main { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-width: 0; }
+    .industry-analysis-tree-item-name { font-size: 13px; color: #0f172a; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .industry-analysis-tree-item-meta { font-size: 11px; color: #64748b; margin-top: 2px; white-space: nowrap; }
+    .industry-analysis-tree-empty { display: grid; place-items: center; min-height: 120px; border: 1px dashed #d9e2ec; border-radius: 12px; color: #64748b; background: #fbfdff; text-align: center; padding: 16px; }
+    .industry-analysis-subtree { display: grid; gap: 8px; }
+    .industry-analysis-subtree-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12px; color: #64748b; }
+    .industry-analysis-content { display: grid; gap: 16px; min-width: 0; }
+    .industry-analysis-report { min-width: 0; }
+    .industry-analysis-report .report-detail-card { margin-top: 0; }
+    .industry-analysis-report-shell { display: grid; gap: 12px; }
+    .industry-analysis-report-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+    .industry-analysis-report-body { border: 1px solid #eef2f7; border-radius: 14px; background: linear-gradient(180deg, #fafcff 0%, #ffffff 100%); padding: 16px; }
+    .industry-analysis-report-empty { display: grid; place-items: center; min-height: 300px; padding: 20px; border: 1px dashed #d9e2ec; border-radius: 14px; background: linear-gradient(180deg, #fff 0%, #f8fbff 100%); color: #64748b; text-align: center; }
+    .industry-analysis-report-scroll { max-height: calc(100vh - 430px); overflow-y: auto; scrollbar-gutter: stable; }
+    .analysis-industry-lists {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: start;
+      justify-content: stretch;
+      column-gap: 0;
+    }
+    .analysis-industry-lists > div {
+      min-width: 0;
+      padding: 0 14px;
+      position: relative;
+    }
+    .analysis-industry-lists > div:not(:first-child)::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 2px;
+      bottom: 2px;
+      width: 1px;
+      background: #cbd5e1;
+    }
+    .industry-analysis-card-title {
+      margin: 0 0 6px;
+      color: #0f172a;
+      font-size: 22px;
+    }
+    .industry-analysis-card-subtitle {
+      margin: 0;
+      color: #0f172a;
+      font-size: 16px;
+    }
+    .industry-analysis-card-desc {
+      font-size: 12px;
+      line-height: 1.6;
+      color: #64748b;
+    }
+    .industry-analysis-card-label {
+      font-size: 12px;
+      margin-bottom: 8px;
+      color: #64748b;
+    }
+    .industry-analysis-summary {
+      font-size: 13px;
+      color: #0f172a;
+      line-height: 1.6;
+      min-height: 24px;
+    }
+    .industry-analysis-search {
+      padding: 9px 11px;
+      border: 1px solid #d9e2ec;
+      border-radius: 10px;
+      font-size: 13px;
+      width: 100%;
+      min-width: 0;
+    }
+    .industry-analysis-clear-btn {
+      padding: 9px 11px;
+      background: #64748b;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .industry-analysis-clear-btn--top {
+      margin-bottom: 0;
+    }
+    .industry-analysis-tree-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .industry-analysis-tree-toolbar .industry-analysis-search {
+      flex: 1;
+      width: auto;
+      min-width: 0;
+    }
+    .industry-analysis-tree-toolbar .industry-analysis-clear-btn {
+      width: auto;
+    }
+    .analysis-industry-empty-note {
+      padding: 4px 0;
+      color: #94a3b8;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+    .analysis-industry-panel {
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+      padding: 0;
+      box-shadow: none;
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .analysis-industry-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      padding-bottom: 8px;
+    }
+    .analysis-industry-panel-title {
+      margin: 0;
+      font-size: 13px;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: .01em;
+      display: inline-flex;
+      align-items: center;
+    }
+    .analysis-industry-panel-subtitle {
+      margin: 0 0 0 2px;
+      font-size: 11px;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .analysis-industry-chip-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      align-content: flex-start;
+    }
+    .analysis-industry-chip {
+      border: 0;
+      background: transparent;
+      color: #475569;
+      border-radius: 0;
+      padding: 4px 0;
+      font-size: 12px;
+      line-height: 1.45;
+      cursor: pointer;
+      transition: background-color .15s ease, color .15s ease;
+      white-space: nowrap;
+      text-align: left;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .analysis-industry-chip:hover {
+      background: #f8fafc;
+      color: #1d4ed8;
+    }
+    .analysis-industry-chip.active {
+      background: #eff6ff;
+      color: #2563eb;
+      font-weight: 600;
+    }
     @media (max-width: 1200px) {
       .reports-body { grid-template-columns: 1fr; }
       .reports-detail-pane { position: static; }
+      .industry-analysis-layout { grid-template-columns: 1fr; }
+      .industry-analysis-sidebar { position: static; }
+      .analysis-industry-lists { grid-template-columns: 1fr; }
     }
     .loading { text-align: center; padding: 40px; color: #666; }
     .error-row td { background: #ffebee; }
@@ -195,7 +445,7 @@
     </div>
     <div id="sw-stats" style="display:none;"></div>
 
-  <div class="toolbar">
+  <div class="toolbar"><a href="/industryinfos.html" style="text-decoration:none;"><button type="button">行业分析</button></a>
     <input type="text" id="search-input" placeholder="搜索..." oninput="doFilter()" style="width:120px;">
     <span style="font-size:13px;margin-right:4px;">阶段:</span>
     <select id="stage-filter" onchange="doFilter()" style="width:100px;">
@@ -313,41 +563,34 @@
       </div>
   </div>
 
-  <div id="industry-analysis-view" style="display:none;padding:20px;background:#f5f7fa;min-height:calc(100vh - 60px);">
-    <div style="max-width:1400px;margin:0 auto;">
-      <!-- 标题 + 操作行 -->
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-        <div style="flex:1;min-width:0;">
-          <h2 style="margin:0 0 2px;color:#0f172a;">行业分析</h2>
-          <div class="muted" style="font-size:12px;">申万行业覆盖与分布分析（基于已研究股票）</div>
-        </div>
-        <input id="analysis-search-input" type="text" placeholder="搜索行业名称" oninput="renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:140px;">
-        <select id="analysis-sw1-filter" onchange="onAnalysisSw1Change();renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万一级</option></select>
-        <select id="analysis-sw2-filter" onchange="onAnalysisSw2Change();renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万二级</option></select>
-        <select id="analysis-sw3-filter" onchange="renderIndustryAnalysis()" style="padding:7px 10px;border:1px solid #d9e2ec;border-radius:8px;font-size:13px;min-width:110px;"><option value="">申万三级</option></select>
-        <button onclick="clearIndustryAnalysisFilters()" style="padding:7px 12px;background:#64748b;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">清除筛选</button>
-        <button onclick="goToBasicsFromAnalysis()" style="padding:7px 12px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">查看基本面</button>
-        <button onclick="refreshIndustryAnalysis()" style="padding:7px 12px;background:#0ea5e9;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap;">刷新分析</button>
-      </div>
-      <!-- 统计概览行 -->
-      <div id="sw-stats-panel"></div>
-      <!-- 排行榜 + 股票预览 -->
-      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;">
-        <div class="report-detail-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <h3 style="margin:0;color:#0f172a;">行业排行榜</h3>
-            <span class="muted" style="font-size:12px;">点击行业查看对应股票</span>
+  <div id="industry-analysis-view" style="display:none;background:#f5f7fb;min-height:calc(100vh - 60px);padding:28px 24px;">
+    <div class="industry-analysis-layout" style="max-width:1660px;margin:0 auto;grid-template-columns:minmax(320px, 380px) minmax(220px, 280px) minmax(0,1fr);gap:20px;align-items:start;">
+      <aside class="industry-analysis-sidebar" style="top:76px;">
+        <section class="industry-analysis-card industry-analysis-card--tree">
+          <div class="industry-analysis-tree-toolbar">
+            <input id="analysis-search-input" type="text" placeholder="搜索行业名称" oninput="applyIndustryAnalysisSearchPath(this.value);renderIndustryAnalysis()" class="industry-analysis-search">
+            <button onclick="clearIndustryAnalysisFilters()" class="industry-analysis-clear-btn industry-analysis-clear-btn--top">清除筛选</button>
           </div>
-          <div id="industry-rank-list"></div>
-        </div>
-        <div class="report-detail-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <h3 style="margin:0;color:#0f172a;">当前行业股票</h3>
-            <div id="industry-analysis-summary" style="font-size:12px;color:#64748b;"></div>
+          <div>
+            <h3 class="industry-analysis-card-subtitle">三级联动</h3>
+            <div class="industry-analysis-card-desc">点击一级、二级、三级和行业标签快速定位报告。</div>
           </div>
-          <div id="industry-stock-preview"></div>
-        </div>
-      </div>
+          <div id="analysis-industry-lists" class="analysis-industry-lists"></div>
+        </section>
+      </aside>
+      <aside class="industry-analysis-sidebar industry-analysis-sidebar--stock" style="top:76px;position:sticky;align-self:start;">
+        <section class="industry-analysis-card industry-analysis-card--stock">
+          <div>
+            <h3 class="industry-analysis-card-subtitle">当前行业股票</h3>
+            <div class="industry-analysis-card-desc" id="industry-stock-preview-hint">正在加载股票列表...</div>
+          </div>
+          <div id="industry-stock-preview" class="industry-preview"></div>
+        </section>
+      </aside>
+      <main class="industry-analysis-main">
+        <section id="sw-stats-panel" class="industry-analysis-card industry-analysis-card--stats"></section>
+        <section id="industry-report-panel" class="industry-analysis-report industry-analysis-card industry-analysis-card--report" style="min-height:calc(100vh - 180px);"></section>
+      </main>
     </div>
   </div>
 
@@ -519,6 +762,22 @@ function normalizeSearchText(value) {
   return String(value == null ? '' : value).trim().toLowerCase();
 }
 
+function getIndustryReportsData() {
+  return window.industryReportsData || [];
+}
+
+function findIndustryReportItem(industryKey, sw1, sw2, sw3) {
+  const items = getIndustryReportsData();
+  if (!items.length) return null;
+  const keys = [industryKey, sw3, sw2, sw1].filter(Boolean).map(v => normalizeSearchText(v));
+  return items.find(item => {
+    const candidates = [item.key, item.industry, item.name, item.sw_lv3, item.sw_lv2, item.sw_lv1, item.file]
+      .filter(Boolean)
+      .map(v => normalizeSearchText(v));
+    return candidates.some(v => keys.includes(v));
+  }) || null;
+}
+
 const pinyinCharMap = {
   乐: 'le', 鑫: 'xin', 科: 'ke', 技: 'ji', 安: 'an', 生: 'sheng', 物: 'wu', 医: 'yi', 药: 'yao', 结: 'jie', 果: 'guo', 美: 'mei', 亚: 'ya', 光: 'guang', 电: 'dian', 华: 'hua', 润: 'run', 江: 'jiang', 中: 'zhong', 微: 'wei', 传: 'chuan', 媒: 'mei', 网: 'wang', 易: 'yi', 富: 'fu', 龙: 'long', 海: 'hai', 尔: 'er', 讯: 'xun', 立: 'li', 思: 'si', 瑞: 'rui', 新: 'xin', 冠: 'guan', 芯: 'xin', 片: 'pian', 半: 'ban', 导: 'dao', 研: 'yan', 报: 'bao', 告: 'gao', 证: 'zheng', 券: 'quan', 银: 'yin', 行: 'hang'
 };
@@ -596,6 +855,15 @@ function setLocalData(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
 
+async function initIndustryReportsData() {
+  try {
+    const res = await fetch(apiPath('api/industry-report?name=' + encodeURIComponent('__probe__')));
+    if (res.ok) {
+      window.industryReportsData = window.industryReportsData || [];
+    }
+  } catch (e) {}
+}
+
 async function init() {
   console.log("init starting...");
   try {
@@ -608,17 +876,17 @@ async function init() {
     originalRecords = [...allRecords];
     const updateTime = data.update_time || new Date().toLocaleString();
     document.getElementById("update-time").textContent = "数据更新: " + updateTime;
-    
+
     let fileQuotes = {};
     try {
       const quotesRes = await fetch(staticPath('trade_quotes.json'));
       if (quotesRes.ok) fileQuotes = await quotesRes.json();
     } catch(e) { console.log('trade_quotes.json fetch failed:', e); }
     const fileCount = Object.keys(fileQuotes).length;
-    
+
     const savedQuotes = localStorage.getItem('trade_quotes_cache');
     const savedQuotesCount = savedQuotes ? Object.keys(JSON.parse(savedQuotes)).length : 0;
-    
+
     if (fileCount > savedQuotesCount) {
       tradeQuotesCache = fileQuotes;
       localStorage.setItem('trade_quotes_cache', JSON.stringify(fileQuotes));
@@ -634,6 +902,7 @@ async function init() {
       tradeQuotesCache = fileQuotes;
       console.log('Using empty file quotes:', fileCount);
     }
+    await initIndustryReportsData();
     doFilter();
     loadReports();
   } catch (e) {
@@ -1565,16 +1834,11 @@ async function switchTab(tab, el) {
     document.querySelector('.table-wrap').style.display = 'none';
     document.querySelector('.pagination').style.display = 'none';
     document.getElementById('page-title').textContent = '行业分析';
-    if (!basicsData || !basicsData.length) {
-      await loadBasics();
-      if (currentTab === 'industry') {
-        initAnalysisSwFilters();
-        renderIndustryAnalysis();
-      }
-    } else {
-      initAnalysisSwFilters();
-      renderIndustryAnalysis();
-    }
+    if (!allStocksData.length) await loadAllStocks();
+    if (!basicsData.length) await loadBasics();
+    initAnalysisSwFilters();
+    renderAnalysisIndustryLists('', '', '');
+    renderIndustryAnalysis();
   } else {
     document.getElementById('basics-view').style.display = 'block';
     document.getElementById('industry-analysis-view').style.display = 'none';
@@ -2082,30 +2346,214 @@ function initSwIndustryFilters() {
   if (sw3) sw3.innerHTML = makeOptions('申万三级', lv3);
 }
 
+function getIndustryAnalysisSource() {
+  return basicsData.length ? basicsData : allStocksData;
+}
+
+function getIndustryAnalysisPathLabel(sw1, sw2, sw3) {
+  return [sw1, sw2, sw3].filter(v => v && v !== '-').join(' / ');
+}
+
+function getIndustryAnalysisReportCandidates(sw1, sw2, sw3) {
+  return [sw3, sw2, sw1]
+    .filter(Boolean)
+    .map(v => String(v).trim())
+    .filter(v => v && v !== '-');
+}
+
+function getIndustryAnalysisReportName(sw1, sw2, sw3) {
+  const candidates = getIndustryAnalysisReportCandidates(sw1, sw2, sw3);
+  return candidates.find(name => {
+    const clean = name.replace(/\s+/g, '');
+    return clean === '农药' || clean.length > 0;
+  }) || '';
+}
+
+function getIndustryAnalysisReport(sw1, sw2, sw3) {
+  return getIndustryAnalysisReportName(sw1, sw2, sw3);
+}
+
+function renderAnalysisIndustryLists(sw1, sw2, sw3) {
+  const src = getIndustryAnalysisSource();
+  const root = document.getElementById('analysis-industry-lists');
+  if (!root) return;
+  if (!src || !src.length) {
+    root.innerHTML = '<div class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">申万一级</h4><p class="analysis-industry-panel-subtitle">暂无数据</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">暂无申万行业数据</div></div><div class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">申万二级</h4><p class="analysis-industry-panel-subtitle">暂无数据</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">请先加载行业数据</div></div><div class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">申万三级</h4><p class="analysis-industry-panel-subtitle">暂无数据</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">请先加载行业数据</div></div>';
+    return;
+  }
+
+  const lv1List = Array.from(new Set(src.map(s => s.sw_lv1).filter(v => v && v !== '-'))).sort();
+  const lv2List = sw1 ? Array.from(new Set(src.filter(s => normalizeIndustryValue(s.sw_lv1) === normalizeIndustryValue(sw1)).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort() : [];
+  const lv3List = sw1 && sw2 ? Array.from(new Set(src.filter(s => normalizeIndustryValue(s.sw_lv1) === normalizeIndustryValue(sw1) && normalizeIndustryValue(s.sw_lv2) === normalizeIndustryValue(sw2)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort() : [];
+
+  const renderColumn = (title, subtitle, items, level) => {
+    if (level === 1) {
+      return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">' + items.length + '</span></div><div class="analysis-industry-chip-wrap">' + items.map(item => '<button type="button" class="analysis-industry-chip ' + (sw1 === item ? 'active' : '') + '" data-level="1" data-sw1="' + esc(item) + '">' + esc(item) + '</button>').join('') + '</div></section></div>';
+    }
+    if (level === 2) {
+      if (!sw1) {
+        return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">请先选择申万一级</div></section></div>';
+      }
+      return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">' + items.length + '</span></div><div class="analysis-industry-chip-wrap">' + items.map(item => '<button type="button" class="analysis-industry-chip ' + (sw2 === item ? 'active' : '') + '" data-level="2" data-sw1="' + esc(sw1) + '" data-sw2="' + esc(item) + '">' + esc(item) + '</button>').join('') + '</div></section></div>';
+    }
+    if (!sw1) {
+      return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">请先选择申万一级</div></section></div>';
+    }
+    if (!sw2) {
+      return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">0</span></div><div class="analysis-industry-empty-note">请先选择申万二级</div></section></div>';
+    }
+    return '<div><section class="analysis-industry-panel"><div class="analysis-industry-panel-head"><div><h4 class="analysis-industry-panel-title">' + title + '</h4><p class="analysis-industry-panel-subtitle">' + subtitle + '</p></div><span class="muted" style="font-size:12px;">' + items.length + '</span></div><div class="analysis-industry-chip-wrap">' + items.map(item => '<button type="button" class="analysis-industry-chip ' + (sw3 === item ? 'active' : '') + '" data-level="3" data-sw1="' + esc(sw1) + '" data-sw2="' + esc(sw2) + '" data-sw3="' + esc(item) + '">' + esc(item) + '</button>').join('') + '</div></section></div>';
+  };
+
+  root.innerHTML = [
+    renderColumn('申万一级', '一级类目', lv1List, 1),
+    renderColumn('申万二级', '二级类目', lv2List, 2),
+    renderColumn('申万三级', '三级类目', lv3List, 3)
+  ].join('');
+
+  root.querySelectorAll('.analysis-industry-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const level = btn.dataset.level;
+      if (level === '1') {
+        currentAnalysisSw1 = btn.dataset.sw1 || '';
+        currentAnalysisSw2 = '';
+        currentAnalysisSw3 = '';
+      } else if (level === '2') {
+        currentAnalysisSw1 = btn.dataset.sw1 || '';
+        currentAnalysisSw2 = btn.dataset.sw2 || '';
+        currentAnalysisSw3 = '';
+      } else {
+        currentAnalysisSw1 = btn.dataset.sw1 || '';
+        currentAnalysisSw2 = btn.dataset.sw2 || '';
+        currentAnalysisSw3 = btn.dataset.sw3 || '';
+      }
+      renderAnalysisIndustryLists(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3);
+      renderIndustryAnalysis();
+    });
+  });
+}
+
+function setIndustryAnalysisPath(sw1, sw2, sw3) {
+  currentAnalysisSw1 = sw1 || '';
+  currentAnalysisSw2 = sw2 || '';
+  currentAnalysisSw3 = sw3 || '';
+  renderAnalysisIndustryLists(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3);
+  renderIndustryAnalysis();
+}
+
+function normalizeIndustryValue(value) {
+  return normalizeSearchText(value || '').replace(/\s+/g, '');
+}
+
+function findIndustryAnalysisMatch(keyword) {
+  const source = getIndustryAnalysisSource();
+  const q = normalizeSearchText(keyword);
+  if (!q) return null;
+  return source.find(s => [s.sw_lv1, s.sw_lv2, s.sw_lv3, s.sw_industry, s.name].some(v => matchesSearchText(v, q))) || null;
+}
+
+function applyIndustryAnalysisSearchPath(keyword) {
+  const match = findIndustryAnalysisMatch(keyword);
+  if (!match) return;
+  currentAnalysisSw1 = match.sw_lv1 || '';
+  currentAnalysisSw2 = match.sw_lv2 || '';
+  currentAnalysisSw3 = match.sw_lv3 || '';
+  currentAnalysisIndustry = match.sw_industry || match.sw_lv3 || match.sw_lv2 || match.sw_lv1 || '';
+  renderAnalysisIndustryLists(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3);
+  renderIndustryAnalysis();
+}
+
+function clearIndustryAnalysisFilters() {
+  currentAnalysisSw1 = '';
+  currentAnalysisSw2 = '';
+  currentAnalysisSw3 = '';
+  currentAnalysisIndustry = '';
+  const input = document.getElementById('analysis-search-input');
+  if (input) input.value = '';
+  renderIndustryAnalysis();
+}
+
+function refreshIndustryAnalysis() {
+  renderIndustryAnalysis();
+}
+
+function goToBasicsFromAnalysis() {
+  showTab('trade');
+}
+
+async function renderIndustryAnalysis() {
+  const preview = document.getElementById('industry-stock-preview');
+  const previewHint = document.getElementById('industry-stock-preview-hint');
+  const reportPanel = document.getElementById('industry-report-panel');
+  if (!preview || !reportPanel) return;
+
+  const src = getIndustryAnalysisSource();
+  if (!src || !src.length) {
+    if (previewHint) previewHint.textContent = '暂无申万行业数据';
+    preview.innerHTML = '<div class="industry-analysis-report-empty">暂无行业股票</div>';
+    reportPanel.innerHTML = '<div class="industry-analysis-report-empty">暂无行业报告</div>';
+    renderAnalysisIndustryLists('', '', '');
+    return;
+  }
+
+  renderAnalysisIndustryLists(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3);
+
+  const searchInput = document.getElementById('analysis-search-input');
+  const search = normalizeSearchText(searchInput ? searchInput.value : '');
+  const sw1 = currentAnalysisSw1 || '';
+  const sw2 = currentAnalysisSw2 || '';
+  const sw3 = currentAnalysisSw3 || '';
+  const sw1Key = normalizeIndustryValue(sw1);
+  const sw2Key = normalizeIndustryValue(sw2);
+  const sw3Key = normalizeIndustryValue(sw3);
+
+  let filtered = src.filter(s => !search || matchesSearchText(s.name, search) || matchesSearchText(s.sw_lv1, search) || matchesSearchText(s.sw_lv2, search) || matchesSearchText(s.sw_lv3, search) || matchesSearchText(s.sw_industry, search));
+  if (sw1Key) filtered = filtered.filter(s => normalizeSearchText(s.sw_lv1) === sw1Key);
+  if (sw2Key) filtered = filtered.filter(s => normalizeSearchText(s.sw_lv2) === sw2Key);
+  if (sw3Key) filtered = filtered.filter(s => normalizeSearchText(s.sw_lv3) === sw3Key);
+
+  renderAnalysisIndustryLists(sw1, sw2, sw3);
+
+  const selectedLabel = getIndustryAnalysisPathLabel(sw1, sw2, sw3) || [sw1, sw2, sw3].filter(Boolean).join(' / ') || '';
+  const stockRows = filtered.slice(0, 20).map(s => '<div class="industry-preview-item"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;"><div><div style="font-weight:600;color:#0f172a;">' + esc(s.name) + '</div><div class="muted" style="font-size:12px;margin-top:2px;">' + esc(selectedLabel || getIndustryAnalysisPathLabel(s.sw_lv1, s.sw_lv2, s.sw_lv3) || '-') + '</div></div><span class="sw-pill" style="font-size:11px;">' + esc(s.sw_industry || s.sw_lv3 || '-') + '</span></div></div>').join('');
+  if (previewHint) previewHint.textContent = '当前匹配 ' + filtered.length + ' 只股票';
+  if (!filtered.length && (sw1Key || sw2Key || sw3Key)) {
+    const sample = src.find(s => normalizeSearchText(s.sw_lv1) === sw1Key || normalizeSearchText(s.sw_lv2) === sw2Key || normalizeSearchText(s.sw_lv3) === sw3Key);
+    if (sample) {
+      console.debug('industry analysis mismatch', {
+        selected: { sw1, sw2, sw3 },
+        sample: {
+          name: sample.name,
+          sw_lv1: sample.sw_lv1,
+          sw_lv2: sample.sw_lv2,
+          sw_lv3: sample.sw_lv3,
+          sw_industry: sample.sw_industry
+        }
+      });
+    }
+  }
+  preview.innerHTML = '<div class="muted" style="font-size:12px;margin-bottom:10px;">共 ' + filtered.length + ' 只</div>' + (stockRows || '<div class="industry-analysis-report-empty">暂无当前行业股票</div>');
+
+  reportPanel.innerHTML = '<div class="industry-analysis-report-empty">正在加载行业报告...</div>';
+  const reportName = currentAnalysisIndustry || getIndustryAnalysisReport(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3);
+  if (reportName) {
+    try {
+      const data = await fetchIndustryReportContent(reportName);
+      if (data && data.exists && String(data.content || '').trim()) {
+        reportPanel.innerHTML = '<div class="report-detail-card" style="padding:18px;display:grid;gap:12px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;"><div><h3 style="margin:0;color:#0f172a;">' + esc(reportName) + '</h3><div class="muted" style="font-size:12px;margin-top:2px;">' + esc(getIndustryAnalysisPathLabel(currentAnalysisSw1, currentAnalysisSw2, currentAnalysisSw3)) + '</div></div><span class="basic-chip">Markdown</span></div><div class="industry-analysis-report-scroll markdown-body">' + marked.parse(data.content) + '</div></div>';
+        return;
+      }
+    } catch (e) {}
+  }
+  reportPanel.innerHTML = '<div class="industry-analysis-report-empty">当前行业报告不存在</div>';
+
+}
+
 function initAnalysisSwFilters() {
-  const src = allStocksData.length ? allStocksData : basicsData;
-  if (!src || !src.length) return;
-  const lv1 = Array.from(new Set(src.map(s => s.sw_lv1).filter(v => v && v !== '-'))).sort();
-  const a1 = document.getElementById('analysis-sw1-filter');
-  if (!a1) return;
-  const cur1 = a1.value;
-  a1.innerHTML = ['<option value="">申万一级</option>'].concat(lv1.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>')).join('');
-  if (cur1 && lv1.includes(cur1)) a1.value = cur1;
-  // cascade lv2 based on current lv1 selection
-  const a2 = document.getElementById('analysis-sw2-filter');
-  const a3 = document.getElementById('analysis-sw3-filter');
-  if (a2) {
-    const cur2 = a2.value;
-    const lv2 = Array.from(new Set(src.filter(s => !a1.value || s.sw_lv1 === a1.value).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort();
-    a2.innerHTML = buildSwOptions(lv2, '申万二级');
-    if (cur2 && lv2.includes(cur2)) a2.value = cur2;
-  }
-  if (a3) {
-    const cur3 = a3.value;
-    const lv3 = Array.from(new Set(src.filter(s => (!a1.value || s.sw_lv1 === a1.value) && (!a2 || !a2.value || s.sw_lv2 === a2.value)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
-    a3.innerHTML = buildSwOptions(lv3, '申万三级');
-    if (cur3 && lv3.includes(cur3)) a3.value = cur3;
-  }
+  if (typeof currentAnalysisSw1 === 'undefined') currentAnalysisSw1 = '';
+  if (typeof currentAnalysisSw2 === 'undefined') currentAnalysisSw2 = '';
+  if (typeof currentAnalysisSw3 === 'undefined') currentAnalysisSw3 = '';
+  if (typeof currentAnalysisIndustry === 'undefined') currentAnalysisIndustry = '';
 }
 
 function renderSwStats() {
@@ -2160,213 +2608,6 @@ function renderSwStats() {
     '</div>';
 }
 
-function renderIndustryAnalysis() {
-  const panel = document.getElementById('sw-stats-panel');
-  const summary = document.getElementById('industry-analysis-summary');
-  const rankList = document.getElementById('industry-rank-list');
-  const preview = document.getElementById('industry-stock-preview');
-  if (!panel || !summary) return;
-
-  const src = basicsData;
-  if (!src || !src.length) {
-    panel.innerHTML = '<div class="muted">暂无数据，请先加载基本面数据。</div>';
-    return;
-  }
-
-  const searchQuery = normalizeSearchText(document.getElementById('analysis-search-input').value);
-  const sw1 = document.getElementById('analysis-sw1-filter').value;
-  const sw2 = document.getElementById('analysis-sw2-filter').value;
-  const sw3 = document.getElementById('analysis-sw3-filter').value;
-  const selectedIndustry = sw3 || sw2 || sw1 || '';
-  const clickedIndustry = window.__analysisSelectedIndustry || '';
-
-  // 全量统计（不受当前筛选影响，用于排行榜进度条）
-  const allLv1Map = new Map();
-  src.forEach(s => {
-    if (s.sw_lv1 && s.sw_lv1 !== '-') allLv1Map.set(s.sw_lv1, (allLv1Map.get(s.sw_lv1) || 0) + 1);
-  });
-
-  // 当前筛选结果
-  const filtered = src.filter(s =>
-    (!sw1 || s.sw_lv1 === sw1) &&
-    (!sw2 || s.sw_lv2 === sw2) &&
-    (!sw3 || s.sw_lv3 === sw3)
-  );
-  const scoped = (sw1 || sw2 || sw3) ? filtered : src;
-  const industryEntries = [];
-  const seenIndustryEntries = new Set();
-  src.forEach(s => {
-    const path = [s.sw_lv1, s.sw_lv2, s.sw_lv3].filter(v => v && v !== '-');
-    const industry = path[path.length - 1] || '';
-    if (!industry || !matchesSearchText(industry, searchQuery)) return;
-    const key = path.join(' > ');
-    if (seenIndustryEntries.has(key)) return;
-    seenIndustryEntries.add(key);
-    industryEntries.push({ sw1: s.sw_lv1 || '', sw2: s.sw_lv2 || '', sw3: s.sw_lv3 || '', name: industry });
-  });
-  const matchedIndustries = searchQuery ? industryEntries : [];
-
-  const lv1Map = new Map(), lv2Map = new Map(), lv3Map = new Map();
-  scoped.forEach(s => {
-    if (s.sw_lv1 && s.sw_lv1 !== '-') lv1Map.set(s.sw_lv1, (lv1Map.get(s.sw_lv1) || 0) + 1);
-    if (s.sw_lv2 && s.sw_lv2 !== '-') lv2Map.set(s.sw_lv2, (lv2Map.get(s.sw_lv2) || 0) + 1);
-    if (s.sw_lv3 && s.sw_lv3 !== '-') lv3Map.set(s.sw_lv3, (lv3Map.get(s.sw_lv3) || 0) + 1);
-  });
-
-  // 统计概览（紧凑 stat cards）
-  panel.innerHTML =
-    '<div class="stats-grid">' +
-      '<div class="stat-card"><div class="stat-label">研究覆盖</div><div class="stat-value">' + src.length + '</div><div class="stat-sub">已研究股票总数</div></div>' +
-      '<div class="stat-card"><div class="stat-label">当前筛选</div><div class="stat-value">' + scoped.length + '</div><div class="stat-sub">' + (sw1 || sw2 || sw3 ? [sw1,sw2,sw3].filter(Boolean).join(' › ') : '全部行业') + '</div></div>' +
-      '<div class="stat-card"><div class="stat-label">涉及一级</div><div class="stat-value">' + lv1Map.size + '</div><div class="stat-sub">/ ' + allLv1Map.size + ' 个大类</div></div>' +
-      '<div class="stat-card"><div class="stat-label">涉及二/三级</div><div class="stat-value">' + lv2Map.size + '</div><div class="stat-sub">二级 · ' + lv3Map.size + ' 个三级</div></div>' +
-    '</div>';
-
-  // 摘要标签
-  summary.innerHTML = selectedIndustry
-    ? '<span class="basic-chip" style="background:#dbeafe;color:#1e40af;">' + esc(selectedIndustry) + '</span>'
-    : (searchQuery
-      ? '<span class="basic-chip" style="background:#f8fafc;color:#64748b;">' + esc(searchQuery) + '</span>'
-      : '<span class="muted">全部行业</span>');
-
-  // 排行榜（全量一级行业，带进度条）
-  if (rankList) {
-    const allRanking = Array.from(allLv1Map.entries()).sort((a,b) => b[1]-a[1]);
-    const maxCount = allRanking.length ? allRanking[0][1] : 1;
-    if (!allRanking.length) {
-      rankList.innerHTML = '<div class="muted">暂无数据</div>';
-    } else {
-      rankList.style.maxHeight = '480px';
-      rankList.style.overflowY = 'auto';
-      rankList.innerHTML = allRanking.map(([name, total]) => {
-        const reported = src.filter(s => s.sw_lv1 === name && s.report_file).length;
-        const barW = Math.max(4, Math.round((total / maxCount) * 100));
-        const isActive = sw1 === name;
-        return '<div class="rank-item" onclick="applyIndustryAnalysisFilter(\'' + esc(name) + '\',\'\',\'\')" ' +
-          'style="' + (isActive ? 'border-color:#2563eb;background:#eff6ff;' : '') + 'flex-direction:column;align-items:stretch;padding:8px 12px;gap:4px;">' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">' +
-            '<span class="rank-name" style="font-size:13px;">' + esc(name) + '</span>' +
-            '<span style="font-size:12px;color:#64748b;white-space:nowrap;flex-shrink:0;">' +
-              (reported ? '<span style="color:#16a34a;font-weight:600;">' + reported + '篇报告</span> · ' : '') +
-              total + '只' +
-            '</span>' +
-          '</div>' +
-          '<div style="background:#e2e8f0;border-radius:3px;height:5px;overflow:hidden;">' +
-            '<div style="background:' + (isActive ? '#2563eb' : '#93c5fd') + ';width:' + barW + '%;height:100%;border-radius:3px;transition:width .3s;"></div>' +
-          '</div>' +
-          '</div>';
-      }).join('');
-    }
-  }
-
-  // 搜索结果行业 + 选中行业股票预览
-  if (preview) {
-    const industryHtml = searchQuery
-      ? '<div style="margin-bottom:10px;"><div style="font-size:12px;color:#64748b;margin-bottom:6px;">匹配行业</div><div style="display:flex;flex-wrap:wrap;gap:8px;">' + (matchedIndustries.length ? matchedIndustries.map(item => '<button onclick="applyIndustryAnalysisFilter(\'' + item.sw1.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\',\'' + item.sw2.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\',\'' + item.sw3.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')" style="border:none;border-radius:999px;padding:4px 10px;background:#ecfeff;color:#155e75;cursor:pointer;font-size:12px;">' + esc(item.name) + '</button>').join('') : '<span class="muted">未找到匹配行业</span>') + '</div></div>'
-      : '';
-    const activeIndustry = clickedIndustry || selectedIndustry;
-    const selectedStocks = activeIndustry ? src.filter(s => s.sw_lv3 === activeIndustry || s.sw_lv2 === activeIndustry || s.sw_lv1 === activeIndustry || s.sw_industry === activeIndustry) : [];
-    const list = selectedStocks.slice(0, 20);
-    if (!activeIndustry) {
-      preview.innerHTML = industryHtml + '<div class="muted">点击匹配行业后显示对应股票</div>';
-    } else if (!list.length) {
-      preview.innerHTML = industryHtml + '<div class="muted">暂无股票</div>';
-    } else {
-      preview.style.maxHeight = '480px';
-      preview.style.overflowY = 'auto';
-      preview.innerHTML = industryHtml + list.map(s => {
-        const rating = s.rating || 0;
-        const stars = rating > 0 ? '<span style="color:#f59e0b;font-size:11px;">' + '★'.repeat(rating) + '</span>' : '';
-        const tag = s.sw_lv3 || s.sw_lv2 || s.sw_lv1 || '';
-        return '<div onclick="goToBasicsStock(\'' + esc(s.code) + '\',\'' + esc(s.sw_lv1) + '\',\'' + esc(s.sw_lv2) + '\',\'' + esc(s.sw_lv3) + '\')" ' +
-          'style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;border-bottom:1px solid #f1f5f9;" ' +
-          'onmouseover="this.style.background=\'#eff6ff\'" onmouseout="this.style.background=\'transparent\'">' +
-          '<div style="flex:1;min-width:0;">' +
-            '<div style="display:flex;align-items:center;gap:6px;">' +
-              '<span style="font-weight:500;color:#0f172a;font-size:13px;">' + esc(s.name) + '</span>' +
-              (s.report_file ? '<span style="color:#16a34a;font-size:11px;" title="有报告">●</span>' : '') +
-              stars +
-            '</div>' +
-            '<div style="font-size:11px;color:#94a3b8;margin-top:2px;">' + esc(s.full_code || s.code) + (tag ? ' · ' + esc(tag) : '') + '</div>' +
-          '</div>' +
-          '</div>';
-      }).join('') +
-      (selectedStocks.length > 20 ? '<div class="muted" style="text-align:center;padding:8px;font-size:12px;">…仅显示前20只，使用筛选查看更多</div>' : '');
-    }
-  }
-}
-
-function onAnalysisSw1Change(keepValues) {
-  const src = allStocksData.length ? allStocksData : basicsData;
-  const sw1 = document.getElementById('analysis-sw1-filter').value;
-  const sw2 = document.getElementById('analysis-sw2-filter');
-  const sw3 = document.getElementById('analysis-sw3-filter');
-  const cur2 = sw2 ? sw2.value : '';
-  const cur3 = sw3 ? sw3.value : '';
-  const lv2 = Array.from(new Set(src.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv2).filter(v => v && v !== '-'))).sort();
-  const lv3 = Array.from(new Set(src.filter(s => !sw1 || s.sw_lv1 === sw1).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
-  if (sw2) { sw2.innerHTML = buildSwOptions(lv2, '申万二级'); sw2.value = keepValues && cur2 && lv2.includes(cur2) ? cur2 : ''; }
-  if (sw3) { sw3.innerHTML = buildSwOptions(lv3, '申万三级'); sw3.value = keepValues && cur3 && lv3.includes(cur3) ? cur3 : ''; }
-}
-
-function onAnalysisSw2Change(keepValue) {
-  const src = allStocksData.length ? allStocksData : basicsData;
-  const sw1 = document.getElementById('analysis-sw1-filter').value;
-  const sw2 = document.getElementById('analysis-sw2-filter').value;
-  const sw3 = document.getElementById('analysis-sw3-filter');
-  const cur3 = sw3 ? sw3.value : '';
-  const lv3 = Array.from(new Set(src.filter(s => (!sw1 || s.sw_lv1 === sw1) && (!sw2 || s.sw_lv2 === sw2)).map(s => s.sw_lv3).filter(v => v && v !== '-'))).sort();
-  if (sw3) { sw3.innerHTML = buildSwOptions(lv3, '申万三级'); sw3.value = keepValue && cur3 && lv3.includes(cur3) ? cur3 : ''; }
-}
-
-function clearIndustryAnalysisFilters() {
-  document.getElementById('analysis-sw1-filter').value = '';
-  document.getElementById('analysis-sw2-filter').value = '';
-  document.getElementById('analysis-sw3-filter').value = '';
-  onAnalysisSw1Change();
-  renderIndustryAnalysis();
-}
-
-function applyIndustryAnalysisFilter(sw1, sw2, sw3) {
-  window.__analysisSelectedIndustry = sw3 || sw2 || sw1 || '';
-  initAnalysisSwFilters();
-  const sw1El = document.getElementById('analysis-sw1-filter');
-  const sw2El = document.getElementById('analysis-sw2-filter');
-  const sw3El = document.getElementById('analysis-sw3-filter');
-  if (sw1El) sw1El.value = sw1 || '';
-  if (sw2El) sw2El.value = sw2 || '';
-  if (sw3El) sw3El.value = sw3 || '';
-  if (sw1El && sw1El.value) onAnalysisSw1Change(true);
-  if (sw2El && sw2El.value) onAnalysisSw2Change(true);
-  renderIndustryAnalysis();
-}
-
-function goToBasicsFromAnalysis() {
-  switchTab('basics', document.querySelector('.nav-item:nth-child(2)'));
-}
-
-function goToBasicsStock(code, sw1, sw2, sw3) {
-  switchTab('basics', document.querySelector('.nav-item:nth-child(2)'));
-  setTimeout(() => {
-    document.getElementById('basics-search').value = '';
-    document.getElementById('sw1-filter').value = sw1 || '';
-    onSw1Change();
-    document.getElementById('sw2-filter').value = sw2 || '';
-    onSw2Change();
-    document.getElementById('sw3-filter').value = sw3 || '';
-    renderBasics();
-    const row = basicsData.find(s => s.code === code);
-    if (row) showDetailByCode(code);
-  }, 50);
-}
-
-function refreshIndustryAnalysis() {
-  initAnalysisSwFilters();
-  if (!document.getElementById('industry-analysis-view') || document.getElementById('industry-analysis-view').style.display === 'none') {
-    return;
-  }
-  renderIndustryAnalysis();
-}
 
 function buildSwOptions(values, placeholder) {
   return ['<option value="">' + placeholder + '</option>'].concat(values.map(v => '<option value="' + esc(v) + '">' + esc(v) + '</option>')).join('');
@@ -2604,6 +2845,8 @@ function showDetailByCode(code) {
   const stars = Array(5).fill(0).map((_, i) => '<span style="color:' + (i < (s.rating || 0) ? '#f1c40f' : '#ddd') + ';font-size:18px;">★</span>').join('');
   const transferInfo = s.transfer_count > 0 ? '<div style="margin-top:16px;padding:12px;background:#f8f9fa;border-radius:8px;"><span style="color:#666;">转让记录：</span>' + s.transfer_count + '条' + (s.transfer_stages ? ' (' + s.transfer_stages.join(', ') + ')' : '') + '，最近: ' + (s.last_transfer_date || '-') + '</div>' : '';
   
+  window.industryReportsData = window.industryReportsData || [];
+
   let reportContent = '';
   const reportItem = reportsData.find(r => r.file === s.report_file || r.name === s.name);
   if (reportItem && reportItem.content) {
