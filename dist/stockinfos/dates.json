@@ -4936,5 +4936,41 @@
     "add_date": "2026-08-12",
     "order": 823,
     "rating": 0
+  },
+  {
+    "name": "*ST生物",
+    "add_date": "2026-08-12",
+    "order": 824,
+    "rating": 0
+  },
+  {
+    "name": "兰卫医学",
+    "add_date": "2026-08-12",
+    "order": 825,
+    "rating": 0
+  },
+  {
+    "name": "诺禾致源",
+    "add_date": "2026-08-12",
+    "order": 826,
+    "rating": 0
+  },
+  {
+    "name": "贝瑞基因",
+    "add_date": "2026-08-12",
+    "order": 827,
+    "rating": 0
+  },
+  {
+    "name": "迪安诊断",
+    "add_date": "2026-08-12",
+    "order": 828,
+    "rating": 0
+  },
+  {
+    "name": "金域医学",
+    "add_date": "2026-08-12",
+    "order": 829,
+    "rating": 0
   }
 ]
