@@ -5944,5 +5944,125 @@
     "add_date": "2026-08-20",
     "order": 991,
     "rating": 0
+  },
+  {
+    "name": "中关村",
+    "add_date": "2026-08-20",
+    "order": 992,
+    "rating": 0
+  },
+  {
+    "name": "九典制药",
+    "add_date": "2026-08-20",
+    "order": 993,
+    "rating": 0
+  },
+  {
+    "name": "亚太药业",
+    "add_date": "2026-08-20",
+    "order": 994,
+    "rating": 0
+  },
+  {
+    "name": "亿帆医药",
+    "add_date": "2026-08-20",
+    "order": 995,
+    "rating": 0
+  },
+  {
+    "name": "南新制药",
+    "add_date": "2026-08-20",
+    "order": 996,
+    "rating": 0
+  },
+  {
+    "name": "国药现代",
+    "add_date": "2026-08-20",
+    "order": 997,
+    "rating": 0
+  },
+  {
+    "name": "常山药业",
+    "add_date": "2026-08-20",
+    "order": 998,
+    "rating": 0
+  },
+  {
+    "name": "必贝特-U",
+    "add_date": "2026-08-20",
+    "order": 999,
+    "rating": 0
+  },
+  {
+    "name": "海思科",
+    "add_date": "2026-08-20",
+    "order": 1000,
+    "rating": 0
+  },
+  {
+    "name": "海正药业",
+    "add_date": "2026-08-20",
+    "order": 1001,
+    "rating": 0
+  },
+  {
+    "name": "百济神州",
+    "add_date": "2026-08-20",
+    "order": 1002,
+    "rating": 0
+  },
+  {
+    "name": "联环药业",
+    "add_date": "2026-08-20",
+    "order": 1003,
+    "rating": 0
+  },
+  {
+    "name": "诺诚健华",
+    "add_date": "2026-08-20",
+    "order": 1004,
+    "rating": 0
+  },
+  {
+    "name": "辰欣药业",
+    "add_date": "2026-08-20",
+    "order": 1005,
+    "rating": 0
+  },
+  {
+    "name": "金陵药业",
+    "add_date": "2026-08-20",
+    "order": 1006,
+    "rating": 0
+  },
+  {
+    "name": "吉贝尔",
+    "add_date": "2026-08-21",
+    "order": 1007,
+    "rating": 0
+  },
+  {
+    "name": "广生堂",
+    "add_date": "2026-08-21",
+    "order": 1008,
+    "rating": 0
+  },
+  {
+    "name": "泰恩康",
+    "add_date": "2026-08-21",
+    "order": 1009,
+    "rating": 0
+  },
+  {
+    "name": "泽璟制药-U",
+    "add_date": "2026-08-21",
+    "order": 1010,
+    "rating": 0
+  },
+  {
+    "name": "益方生物-U",
+    "add_date": "2026-08-21",
+    "order": 1011,
+    "rating": 0
   }
 ]
