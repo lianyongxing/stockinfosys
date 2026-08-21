@@ -1,5 +1,5 @@
 {
-  "update_time": "2026-08-20",
+  "update_time": "2026-08-21",
   "stats": {
     "total_stocks": 5213,
     "stocks_with_quotes": 4,
@@ -64076,7 +64076,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "东诚药业.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -64106,7 +64106,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "莱美药业.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
@@ -64136,7 +64136,7 @@
       "pe": "-",
       "rating": 0,
       "tags": [],
-      "report_file": "",
+      "report_file": "向日葵.md",
       "add_date": "",
       "transfer_count": 0,
       "transfer_stages": [],
